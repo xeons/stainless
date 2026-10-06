@@ -185,6 +185,24 @@ public class SampleTests
     /// <summary>And the GTK sample against those.</summary>
     private static string[] GtkBindings() => BindingsUnder("gtk");
 
+    /// <summary>
+    /// The files of a binding directory that <paramref name="program"/>
+    /// reaches by its imports, as a build reaches the standard library's.
+    /// <c>bindings/macos</c> is 438,000 lines, and binding all of it for each
+    /// Forms sample costs more than the rest of the suite.
+    /// </summary>
+    private static string[] ReachedBindings(IEnumerable<string> program, string directory)
+    {
+        var quiet = new DiagnosticBag();
+        var bindings = BindingsUnder(directory)
+            .Select(p => Syntax.LexedSource.Of(SourceText.FromFile(p), quiet, Driver.Compilation.PlatformSymbols([])))
+            .ToList();
+        var own = program
+            .Select(p => Syntax.LexedSource.Of(SourceText.FromFile(p), quiet, Driver.Compilation.PlatformSymbols([])))
+            .ToList();
+        return Driver.LibraryClosure.ReachedFiles(bindings, own).Select(f => f.Source.Path).ToArray();
+    }
+
     private static string[] BindingsUnder(string directory) =>
         Directory.EnumerateFiles(Path.Combine(Repository.Root, "bindings", directory),
                                  "*.sl", SearchOption.AllDirectories)
@@ -223,7 +241,12 @@ public class SampleTests
         if (sample.NeedsForms)
         {
             paths.AddRange(FormsSources());
-            paths.AddRange(OperatingSystem.IsWindows() ? Win32Bindings() : GtkBindings());
+            paths.AddRange(TargetPlatform.HostOS switch
+            {
+                TargetOS.Windows => Win32Bindings(),
+                TargetOS.MacOS => ReachedBindings(paths, "macos"),
+                _ => GtkBindings(),
+            });
         }
 
         var program = Front.BindFiles(paths, out var diagnostics, sample.Shared);
