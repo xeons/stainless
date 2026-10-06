@@ -246,7 +246,19 @@ class CaptionBar : CustomControl
         if (now == _hotGlyph)
             return;
         _hotGlyph = now;
+        ToolTip = DescribeGlyph(now);
         Invalidate();
+    }
+
+    /// What a glyph does, as its tip says it: Visual Studio's words.
+    String DescribeGlyph(int glyph)
+    {
+        switch (glyph)
+        {
+            case 1: return _pinned ? "Auto Hide" : "Dock";
+            case 2: return "Close";
+            default: return "";
+        }
     }
 
     protected override void OnMouseLeave()
@@ -255,6 +267,7 @@ class CaptionBar : CustomControl
         if (_hotGlyph == 0)
             return;
         _hotGlyph = 0;
+        ToolTip = "";
         Invalidate();
     }
 
@@ -578,6 +591,8 @@ public class DockWell : Panel
         var page = new TabPage(_tabs, title);
         var pane = new ToolWindow(page, name, title);
         _panes.Add(pane);
+        // One pane needs no tab: the caption already names it.
+        _tabs.ShowTabs = _panes.Count > 1u;
         UpdateCaption();
         Visible = true;
         return pane;

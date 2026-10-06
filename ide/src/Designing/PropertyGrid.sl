@@ -61,7 +61,14 @@ class GridRow
 public class PropertyGrid : Panel
 {
     private late Label _heading;
-    private late TabControl _tabs;
+    /// Two buttons choosing which list shows, as Visual Studio's grid has:
+    /// the pane is already a tab of its own, and a second row of tabs inside
+    /// it says "Properties" three times over.
+    private late ToolBar _views;
+    private late ToolButton _showProperties;
+    private late ToolButton _showEvents;
+    private late Panel _propertiesPage;
+    private late Panel _eventsPage;
     private late ListView _properties;
     private late ListView _events;
     private late Panel _editor;
@@ -101,10 +108,19 @@ public class PropertyGrid : Panel
         _heading.Dock = DockStyle.Top;
         _heading.Height = 22;
 
-        _tabs = new TabControl(this);
-        _tabs.Dock = DockStyle.Fill;
-        var propertiesPage = new TabPage(_tabs, "Properties");
-        var eventsPage = new TabPage(_tabs, "Events");
+        _views = new ToolBar(this);
+        _views.Dock = DockStyle.Top;
+        _showProperties = _views.AddToggle("Properties", -1);
+        _showProperties.Click += (sender) => this.ShowEvents(false);
+        _showEvents = _views.AddToggle("Events", -1);
+        _showEvents.Click += (sender) => this.ShowEvents(true);
+
+        _propertiesPage = new Panel(this);
+        _propertiesPage.Dock = DockStyle.Fill;
+        _eventsPage = new Panel(this);
+        _eventsPage.Dock = DockStyle.Fill;
+        var propertiesPage = _propertiesPage;
+        var eventsPage = _eventsPage;
 
         _editor = new Panel(propertiesPage);
         _editor.Dock = DockStyle.Bottom;
@@ -157,7 +173,17 @@ public class PropertyGrid : Panel
         _events.SelectedIndexChanged += this.OnEventChosen;
         _events.DoubleClick += this.OnEventDoubleClicked;
 
+        ShowEvents(false);
         ShowSurface(null);
+    }
+
+    /// Shows the events, or the properties, and presses the button that says so.
+    void ShowEvents(bool events)
+    {
+        _propertiesPage.Visible = !events;
+        _eventsPage.Visible = events;
+        _showProperties.Checked = !events;
+        _showEvents.Checked = events;
     }
 
     /// Raised when a handler is wired by double-clicking an event, with the

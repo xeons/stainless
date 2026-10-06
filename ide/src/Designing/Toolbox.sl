@@ -19,23 +19,35 @@ module Ide.Designing;
 
 import Standard.Collections;
 import Forms;
+import Forms.Platform;
 
 public closure void ToolChosenHandler(String typeName);
 
-/// A list of the types the designer can make.
+/// A list of the types the designer can make, each beside its picture.
 public class Toolbox : Panel
 {
-    private late ListBox _types;
+    private late ListView _types;
+    private String[] _names;
     private bool _clearing;
 
     public Toolbox(WindowedControl parent)
     {
         _clearing = false;
+        _names = ListDesignableTypes();
         base(parent);
-        _types = new ListBox(this);
+        _types = new ListView(this);
         _types.Dock = DockStyle.Fill;
-        _types.Items = ListDesignableTypes();
+        _types.View = ListViewStyle.List;
+        for (nuint i = 0u; i < _names.Length; i++)
+            _types.AddRow(_names[i], (int)i);
         _types.SelectedIndexChanged += this.OnTypeChosen;
+    }
+
+    /// One picture per type, in the order `ListDesignableTypes` names them.
+    public ImageList? Images
+    {
+        get => _types.Images;
+        set => _types.Images = value;
     }
 
     /// Raised when a type is picked; the next click on a form places one.
@@ -53,10 +65,9 @@ public class Toolbox : Panel
     /// the program reports nothing, so this raises `Chosen` itself.
     public void ChooseType(String typeName)
     {
-        var names = ListDesignableTypes();
-        for (nuint i = 0u; i < names.Length; i++)
+        for (nuint i = 0u; i < _names.Length; i++)
         {
-            if (names[i] == typeName)
+            if (_names[i] == typeName)
             {
                 _types.SelectedIndex = (int)i;
                 Chosen(typeName);
@@ -66,8 +77,9 @@ public class Toolbox : Panel
 
     private void OnTypeChosen(Control sender)
     {
-        if (_clearing || _types.SelectedIndex < 0)
+        int at = _types.SelectedIndex;
+        if (_clearing || at < 0 || (nuint)at >= _names.Length)
             return;
-        Chosen(_types.GetItemAt((nuint)_types.SelectedIndex));
+        Chosen(_names[(nuint)at]);
     }
 }

@@ -227,6 +227,14 @@ public class Shell : Form
     /// about. Both backends raise the item before `Show` returns, so this lives
     /// for the length of one call and is cleared after it.
     TreeEntry? _menuTarget;
+    /// The files and projects opened lately, and the two submenus showing them.
+    RecentItems _recent;
+    MenuItem? _recentFilesMenu;
+    MenuItem? _recentProjectsMenu;
+    /// False during the self test, whose scratch files are nobody's history.
+    bool _remembersRecent;
+    /// The tab a context menu is about, while it is showing.
+    EditorTab? _tabMenuTarget;
 
     /// The project in front, and the file it was read from. Null when the
     /// window is showing loose files, which is still a thing it does: a
@@ -289,19 +297,22 @@ public class Shell : Form
     /// an S on it. One, because the shell shows the lowest-numbered one.
     static readonly int ProgramIcon = 1;
 
-    static readonly int IconBuild   = 0;
-    static readonly int IconRebuild = 1;
-    static readonly int IconClean   = 2;
-    static readonly int IconRun     = 3;
-    static readonly int IconStop    = 4;
+    static readonly int IconNew     = 0;
+    static readonly int IconOpen    = 1;
+    static readonly int IconSave    = 2;
+    static readonly int IconBuild   = 3;
+    static readonly int IconRebuild = 4;
+    static readonly int IconClean   = 5;
+    static readonly int IconRun     = 6;
+    static readonly int IconStop    = 7;
 
-    static readonly int IconStart     = 5;
-    static readonly int IconPause     = 6;
-    static readonly int IconStopDebug = 7;
-    static readonly int IconStepInto  = 8;
-    static readonly int IconStepOver  = 9;
-    static readonly int IconStepOut   = 10;
-    static readonly int IconRestart   = 11;
+    static readonly int IconStart     = 8;
+    static readonly int IconPause     = 9;
+    static readonly int IconStopDebug = 10;
+    static readonly int IconStepInto  = 11;
+    static readonly int IconStepOver  = 12;
+    static readonly int IconStepOut   = 13;
+    static readonly int IconRestart   = 14;
 
     public Shell()
     {
@@ -316,6 +327,8 @@ public class Shell : Form
         _watches = new List<String>();
         _preferredPane = "";
         _chrome = new OfficeXpRenderer();
+        _recent = ReadRecent(GetRecentPath());
+        _remembersRecent = true;
         base(WindowBorder.Sizable);
         Text = "Stainless";
         SetBounds(0, 0, 1000, 700);
@@ -396,6 +409,10 @@ public class Shell : Form
         if (_icons != null)
             _tools.Images = _icons;
 
+        _tools.Add("New", IconNew).Click += (sender) => this.NewDocument();
+        _tools.Add("Open", IconOpen).Click += (sender) => this.ChooseFileToOpen();
+        _tools.Add("Save", IconSave).Click += (sender) => this.SaveCurrent();
+        _tools.AddSeparator();
         _tools.Add("Build", IconBuild).Click += this.OnBuild;
         _tools.Add("Rebuild", IconRebuild).Click += this.OnRebuild;
         _tools.Add("Clean", IconClean).Click += this.OnClean;
@@ -411,7 +428,7 @@ public class Shell : Form
         commands.Text = "";
         commands.Break = false;     // share the row with the picker
         commands.Control = _tools;
-        commands.Width = 380;
+        commands.Width = 560;
 
         // The debug commands on a row of their own. Start Debugging and Run
         // are both a green triangle; separating the rows is what tells them
@@ -461,6 +478,8 @@ public class Shell : Form
 
         var tools = _dock.AddPane(Panes.Toolbox, "Toolbox", DockEdge.Left);
         _toolbox = new Toolbox(tools);
+        if (BuildToolboxIcons(ListDesignableTypes()) is ImageList pictures)
+            _toolbox.Images = pictures;
         _toolbox.Dock = DockStyle.Fill;
         _toolbox.Chosen += (typeName) => this.OnToolChosen(typeName);
 
@@ -550,6 +569,12 @@ public class Shell : Form
         _tabs = new TabControl(_dock.Documents);
         _tabs.Dock = DockStyle.Fill;
         _tabs.SelectedIndexChanged += this.OnTabChanged;
+        // Where the platform draws none, the context menu, a middle click and
+        // Close tab are still there.
+        _tabs.ShowCloseButtons = true;
+        _tabs.TabClosing += this.OnTabClosing;
+        _tabs.ContextMenu += this.OnTabContextMenu;
+        _tabs.MouseUp += this.OnTabMouseUp;
 
         // Once, after every pane exists, rather than after each -- see
         // `DockHost.ArrangeWells`.
@@ -707,6 +732,7 @@ public class Shell : Form
         // is what makes Build mean "build this program" without anyone having
         // opened the project by hand.
         AdoptProjectFor(path);
+        RememberRecent(false, path);
 
         ShowStatus("Opened " + path);
         return true;
@@ -799,6 +825,10 @@ public class Shell : Form
         file.Add("&Save").Click += this.OnSave;
         file.Add("Save &As...").Click += this.OnSaveAs;
         file.Add(MenuItem.CreateSeparator());
+        _recentFilesMenu = file.Add("Recent &files");
+        _recentProjectsMenu = file.Add("Recent pro&jects");
+        FillRecentMenus();
+        file.Add(MenuItem.CreateSeparator());
         file.Add("&Close tab").Click += this.OnCloseTab;
         file.Add(MenuItem.CreateSeparator());
         file.Add("E&xit").Click += this.OnExit;
@@ -874,18 +904,116 @@ public class Shell : Form
         size.Add(MenuItem.CreateSeparator());
         size.Add("&Reset").Click += this.OnResetSize;
 
+        var help = _menuBar.Add("&Help");
+        help.Add("&About Stainless IDE").Click += this.OnAbout;
+
         Menu = _menuBar;
     }
 
     // ------------------------------------------------------------- the file
 
-    void OnNew(MenuItem sender)
+    /// Puts a file or project at the top of its recent list, saves the lists
+    /// and rebuilds the menus showing them.
+    void RememberRecent(bool project, String path)
+    {
+        if (!_remembersRecent || path.ByteLength() == 0u)
+            return;
+        String absolute = GetAbsolutePath(path);
+        if (project)
+            _recent.RememberProject(absolute);
+        else
+            _recent.RememberFile(absolute);
+        SaveRecent(_recent, GetRecentPath());
+        FillRecentMenus();
+        // The bar is built from the items when it is set, so a changed
+        // submenu reaches the window by setting it again.
+        Menu = _menuBar;
+    }
+
+    /// Each submenu lists its paths, numbered as the keys that choose them, or
+    /// says it is empty.
+    void FillRecentMenus()
+    {
+        FillRecentMenu(_recentFilesMenu, _recent.Files, false);
+        FillRecentMenu(_recentProjectsMenu, _recent.Projects, true);
+    }
+
+    void FillRecentMenu(MenuItem? menu, List<String> paths, bool projects)
+    {
+        if (menu == null)
+            return;
+        var items = ((MenuItem)menu).Items;
+        items.Clear();
+        if (paths.IsEmpty)
+        {
+            var none = ((MenuItem)menu).Add("(none)");
+            none.Enabled = false;
+            return;
+        }
+        for (nuint i = 0u; i < paths.Count; i++)
+        {
+            String path = paths[i];
+            // `&` in a path would underline the letter after it; doubled, it
+            // is a plain ampersand.
+            String key = i < 9u ? "&" + FromInteger((long)(i + 1u)) + " " : "";
+            var item = ((MenuItem)menu).Add(key + path.Replace("&", "&&"));
+            if (projects)
+                item.Click += (sender) => this.OpenRecentProject(path);
+            else
+                item.Click += (sender) => this.OpenRecentFile(path);
+        }
+    }
+
+    /// A recent file that has gone since it was opened is taken off the list
+    /// rather than offered again.
+    void OpenRecentFile(String path)
+    {
+        if (OpenFile(path))
+            return;
+        ShowStatus(path + " could not be opened.");
+        ForgetRecent(_recent.Files, path);
+    }
+
+    void OpenRecentProject(String path)
+    {
+        if (OpenProject(path))
+            return;
+        ForgetRecent(_recent.Projects, path);
+    }
+
+    void ForgetRecent(List<String> list, String path)
+    {
+        for (nuint i = 0u; i < list.Count; i++)
+        {
+            if (list[i] == path)
+            {
+                list.RemoveAt(i);
+                break;
+            }
+        }
+        SaveRecent(_recent, GetRecentPath());
+        FillRecentMenus();
+        Menu = _menuBar;
+    }
+
+    void OnAbout(MenuItem sender)
+    {
+        var dialog = new AboutDialog();
+        dialog.CenterOnScreen();
+        dialog.ShowModal();
+    }
+
+    void OnNew(MenuItem sender) => NewDocument();
+    void OnOpen(MenuItem sender) => ChooseFileToOpen();
+    void OnSave(MenuItem sender) => SaveCurrent();
+
+    void NewDocument()
     {
         OpenBlankTab();
         ShowStatus("A new file.");
     }
 
-    void OnOpen(MenuItem sender)
+    void ChooseFileToOpen()
     {
         var dialog = new OpenDialog();
         dialog.Title = "Open";
@@ -899,7 +1027,7 @@ public class Shell : Form
             ShowStatus("Could not read " + chosen.Value);
     }
 
-    void OnSave(MenuItem sender)
+    void SaveCurrent()
     {
         var now = Current;
         if (now != null)
@@ -922,6 +1050,115 @@ public class Shell : Form
         if (!ConfirmCloseTab(tab))
             return;
         CloseTab(tab);
+    }
+
+    /// The editor tab a page belongs to, or null.
+    EditorTab? FindTabOfPage(TabPage? page)
+    {
+        if (page == null)
+            return null;
+        foreach (var tab in _openTabs)
+        {
+            if (tab.Page == page)
+                return tab;
+        }
+        return null;
+    }
+
+    /// Closes a tab after asking about unsaved changes. Answers whether it
+    /// closed, so a run of them can stop at the first one cancelled.
+    bool AskToCloseTab(EditorTab tab)
+    {
+        if (!ConfirmCloseTab(tab))
+            return false;
+        CloseTab(tab);
+        return true;
+    }
+
+    void OnTabClosing(TabControl sender, TabPage page)
+    {
+        if (FindTabOfPage(page) is EditorTab tab)
+            AskToCloseTab(tab);
+    }
+
+    /// A middle click closes the tab under it, as in a browser.
+    void OnTabMouseUp(Control sender, MouseEventArgs args)
+    {
+        if (args.Button != MouseButton.Middle)
+            return;
+        if (FindTabOfPage(_tabs.PageAt(args.Location)) is EditorTab tab)
+            AskToCloseTab(tab);
+    }
+
+    void OnTabContextMenu(Control sender, ContextMenuEventArgs args)
+    {
+        // From the keyboard there is no pointer, so the menu is about the tab
+        // showing.
+        var page = args.FromKeyboard ? _tabs.SelectedPage : _tabs.PageAt(args.Location);
+        if (FindTabOfPage(page) is not EditorTab tab)
+            return;
+        args.Handled = true;
+        _tabMenuTarget = tab;
+
+        String path = tab.Editor.Contents.Location;
+        var menu = new PopupMenu();
+        menu.Add("&Close").Click += this.OnTabMenuClose;
+        var others = menu.Add("Close &Others");
+        others.Enabled = _openTabs.Count > 1u;
+        others.Click += this.OnTabMenuCloseOthers;
+        menu.Add("Close &All").Click += this.OnTabMenuCloseAll;
+        menu.Add(MenuItem.CreateSeparator());
+        var copied = menu.Add("Copy &Full Path");
+        copied.Enabled = path.ByteLength() != 0u;
+        copied.Click += this.OnTabMenuCopyPath;
+        var shown = menu.Add(RevealVerb);
+        shown.Enabled = path.ByteLength() != 0u;
+        shown.Click += this.OnTabMenuReveal;
+        menu.Show(_tabs, args.Location);
+        _tabMenuTarget = null;
+    }
+
+    void OnTabMenuClose(MenuItem sender)
+    {
+        if (_tabMenuTarget is EditorTab tab)
+            AskToCloseTab(tab);
+    }
+
+    void OnTabMenuCloseOthers(MenuItem sender)
+    {
+        if (_tabMenuTarget is not EditorTab keep)
+            return;
+        foreach (var tab in ToList(_openTabs))
+        {
+            if (tab != keep && !AskToCloseTab(tab))
+                return;
+        }
+    }
+
+    void OnTabMenuCloseAll(MenuItem sender)
+    {
+        foreach (var tab in ToList(_openTabs))
+        {
+            if (!AskToCloseTab(tab))
+                return;
+        }
+    }
+
+    void OnTabMenuCopyPath(MenuItem sender)
+    {
+        if (_tabMenuTarget is EditorTab tab)
+            Clipboard.SetText(GetAbsolutePath(tab.Editor.Contents.Location));
+    }
+
+    /// A document's path made absolute, which is what the clipboard and a file
+    /// manager want of one opened by a relative name.
+    String GetAbsolutePath(String path) =>
+        IsPathRooted(path) ? path : Join(CurrentDirectory(), path);
+
+    void OnTabMenuReveal(MenuItem sender)
+    {
+        if (_tabMenuTarget is EditorTab tab)
+            ShowInFileManager(GetAbsolutePath(tab.Editor.Contents.Location), false);
     }
 
     /// Offers to save a tab that has been edited. Answers whether closing it
@@ -1253,6 +1490,7 @@ public class Shell : Form
         _projectPath = path;
         UpdateTitle();
         ShowProjectTree();
+        RememberRecent(true, path);
 
         var project = (ProjectFile)read.Value;
         ShowStatus("Project " + project.Name + " " + project.Version + ".");
@@ -2570,7 +2808,7 @@ public class Shell : Form
     {
         var target = _menuTarget;
         if (target != null)
-            ShowInFileManager((TreeEntry)target);
+            ShowInFileManager(((TreeEntry)target).FullPath, ((TreeEntry)target).IsFolder);
     }
 
     /// Shows a file on disk, in whatever the platform's file manager is.
@@ -2580,28 +2818,27 @@ public class Shell : Form
     /// moment to come up would take this window with it. Nothing is done with
     /// the answer -- there is nothing useful to say about a file manager that
     /// declined to open, and the file is still right there in the tree.
-    void ShowInFileManager(TreeEntry entry)
+    void ShowInFileManager(String path, bool isFolder)
     {
         #if WINDOWS
         // `/select,<path>` is **one** argument, comma and all: Explorer parses
         // the switch itself rather than taking the path as a second token.
         String program = "explorer.exe";
-        String[] arguments = ["/select," + entry.FullPath];
-        if (entry.IsFolder)
-            arguments = [entry.FullPath];
+        String[] arguments = ["/select," + path];
+        if (isFolder)
+            arguments = [path];
         #elif MACOS
         // `-R` selects the item in its folder, as Explorer's `/select` does.
         String program = "open";
-        String[] arguments = ["-R", entry.FullPath];
+        String[] arguments = ["-R", path];
         #else
         String program = "xdg-open";
-        String folder = entry.IsFolder ? entry.FullPath
-                                       : Path.GetDirectoryName(entry.FullPath);
+        String folder = isFolder ? path : Path.GetDirectoryName(path);
         String[] arguments = [folder];
         #endif
 
         Background.Run(() => Process.RunProcess(program, arguments), finished => { });
-        ShowStatus("Showing " + entry.FullPath);
+        ShowStatus("Showing " + path);
     }
 
     /// A row of the Error List was double-clicked, which goes to exactly where
@@ -4036,6 +4273,7 @@ public class Shell : Form
     /// machine.
     public bool RunSelfTest()
     {
+        _remembersRecent = false;
         bool ok = true;
         var editor = Editor;
 
@@ -5015,11 +5253,60 @@ public class Shell : Form
 
         ok = TestDesigner() && ok;
         ok = TestToolboxAndGrid() && ok;
+        ok = TestTabClosingAndRecent() && ok;
 
         if (ok)
         {
             Console.WriteLine("  editing, undo, word selection, lexing, the clipboard,");
             Console.WriteLine("  text size, tabs, the project, the docked panes and the designer");
+        }
+        return ok;
+    }
+
+    /// A tab's close button closes it, a point inside a page is over no tab,
+    /// and the recent lists keep the newest first and no more than they should.
+    bool TestTabClosingAndRecent()
+    {
+        bool ok = true;
+
+        #if !MACOS
+        if (!_tabs.ShowCloseButtons)
+        {
+            Console.WriteLine("FAIL: the tabs have no close buttons");
+            ok = false;
+        }
+        #endif
+
+        var spare = AddTab(new Document());
+        nuint before = _openTabs.Count;
+        _tabs.OnPlatformTabClosing(spare.Page.Index);
+        if (_openTabs.Count != before - 1u || FindTabOfPage(spare.Page) != null)
+        {
+            Console.WriteLine("FAIL: a tab's close button left it open");
+            ok = false;
+        }
+
+        if (_tabs.PageAt(Point.FromXY(_tabs.Width / 2, _tabs.Height - 8)) != null)
+        {
+            Console.WriteLine("FAIL: a point inside the page was taken for a tab");
+            ok = false;
+        }
+
+        var recent = new RecentItems();
+        recent.RememberFile("a.sl");
+        recent.RememberFile("b.sl");
+        recent.RememberFile("a.sl");
+        if (recent.Files.Count != 2u || recent.Files[0u] != "a.sl" || recent.Files[1u] != "b.sl")
+        {
+            Console.WriteLine("FAIL: reopening a recent file did not move it to the front");
+            ok = false;
+        }
+        for (int i = 0; i < 15; i++)
+            recent.RememberProject("p" + Standard.Text.FromInteger(i) + ".json");
+        if (recent.Projects.Count != RecentLimit || recent.Projects[0u] != "p14.json")
+        {
+            Console.WriteLine("FAIL: the recent projects grew past their limit");
+            ok = false;
         }
         return ok;
     }

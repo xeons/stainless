@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// The toolbar's icons: PNGs that travel inside the binary.
+// The toolbar's and the toolbox's icons: PNGs that travel inside the binary.
 //
 // **`[Embed]` rather than a resource script, and not for the reason that first
 // suggests itself.** Resources are not Windows-only here: the compiler
@@ -38,9 +38,11 @@
 // as `RCDATA` and come back through `Resources.Bytes` and `Image.FromBytes`,
 // but that is this file's job done the long way round.
 //
-// **They are ordinary PNGs** in `icons/`, editable in anything. Redrawing one
-// is opening it, changing it and rebuilding -- there is no generator to run
-// and no intermediate form to regenerate.
+// **They are ordinary PNGs** in `icons/16/`, editable in anything. Redrawing
+// one is opening it, changing it and rebuilding -- there is no generator to
+// run and no intermediate form to regenerate. `icons/24/` and `icons/32/` are
+// the same pictures drawn larger, for a window drawn at more than 96 DPI;
+// this one is not, so only the sixteens are embedded.
 //
 // The one thing this asks for is a decoder: `Image.FromBytes` needs GDI+ on
 // Windows or libgd on Linux. Where neither is there, `BuildIcons` answers null
@@ -51,50 +53,132 @@ import Standard.Collections;
 import Forms;
 import Forms.Drawing;
 
-/// The files themselves, in the order the toolbar's buttons want them.
+/// The toolbar's pictures, in the order its buttons want them.
 ///
 /// `readonly`, so they land in the read-only section and no thread can be the
 /// one that changed them.
 public static class IconFiles
 {
-    [Embed("icons/build.png")]
+    [Embed("icons/16/new.png")]
+    public static readonly byte[] New;
+
+    [Embed("icons/16/open.png")]
+    public static readonly byte[] Open;
+
+    [Embed("icons/16/save.png")]
+    public static readonly byte[] Save;
+
+    [Embed("icons/16/build.png")]
     public static readonly byte[] Build;
 
-    [Embed("icons/rebuild.png")]
+    [Embed("icons/16/rebuild.png")]
     public static readonly byte[] Rebuild;
 
-    [Embed("icons/clean.png")]
+    [Embed("icons/16/clean.png")]
     public static readonly byte[] Clean;
 
-    [Embed("icons/run.png")]
+    [Embed("icons/16/run.png")]
     public static readonly byte[] Run;
 
-    [Embed("icons/stop.png")]
+    [Embed("icons/16/stop.png")]
     public static readonly byte[] Stop;
 
-    [Embed("icons/start.png")]
+    [Embed("icons/16/start.png")]
     public static readonly byte[] Start;
 
-    [Embed("icons/pause.png")]
+    [Embed("icons/16/pause.png")]
     public static readonly byte[] Pause;
 
-    [Embed("icons/stopdebug.png")]
+    [Embed("icons/16/stopdebug.png")]
     public static readonly byte[] StopDebug;
 
-    [Embed("icons/stepinto.png")]
+    [Embed("icons/16/stepinto.png")]
     public static readonly byte[] StepInto;
 
-    [Embed("icons/stepover.png")]
+    [Embed("icons/16/stepover.png")]
     public static readonly byte[] StepOver;
 
-    [Embed("icons/stepout.png")]
+    [Embed("icons/16/stepout.png")]
     public static readonly byte[] StepOut;
 
-    [Embed("icons/restart.png")]
+    [Embed("icons/16/restart.png")]
     public static readonly byte[] Restart;
 }
 
-/// Every icon as one list, or null if they could not be decoded.
+/// One picture per type the designer can make, named as the type is.
+public static class ToolboxIconFiles
+{
+    [Embed("icons/16/button.png")]
+    public static readonly byte[] Button;
+
+    [Embed("icons/16/label.png")]
+    public static readonly byte[] Label;
+
+    [Embed("icons/16/textbox.png")]
+    public static readonly byte[] TextBox;
+
+    [Embed("icons/16/checkbox.png")]
+    public static readonly byte[] CheckBox;
+
+    [Embed("icons/16/radiobutton.png")]
+    public static readonly byte[] RadioButton;
+
+    [Embed("icons/16/togglebutton.png")]
+    public static readonly byte[] ToggleButton;
+
+    [Embed("icons/16/listbox.png")]
+    public static readonly byte[] ListBox;
+
+    [Embed("icons/16/combobox.png")]
+    public static readonly byte[] ComboBox;
+
+    [Embed("icons/16/checklistbox.png")]
+    public static readonly byte[] CheckListBox;
+
+    [Embed("icons/16/spinedit.png")]
+    public static readonly byte[] SpinEdit;
+
+    [Embed("icons/16/progressbar.png")]
+    public static readonly byte[] ProgressBar;
+
+    [Embed("icons/16/trackbar.png")]
+    public static readonly byte[] TrackBar;
+
+    [Embed("icons/16/treeview.png")]
+    public static readonly byte[] TreeView;
+
+    [Embed("icons/16/listview.png")]
+    public static readonly byte[] ListView;
+
+    [Embed("icons/16/panel.png")]
+    public static readonly byte[] Panel;
+
+    [Embed("icons/16/groupbox.png")]
+    public static readonly byte[] GroupBox;
+
+    [Embed("icons/16/tabcontrol.png")]
+    public static readonly byte[] TabControl;
+
+    [Embed("icons/16/tabpage.png")]
+    public static readonly byte[] TabPage;
+
+    [Embed("icons/16/image.png")]
+    public static readonly byte[] Image;
+
+    [Embed("icons/16/paintbox.png")]
+    public static readonly byte[] PaintBox;
+
+    [Embed("icons/16/shape.png")]
+    public static readonly byte[] Shape;
+
+    [Embed("icons/16/bevel.png")]
+    public static readonly byte[] Bevel;
+
+    [Embed("icons/16/timer.png")]
+    public static readonly byte[] Timer;
+}
+
+/// Every toolbar icon as one list, or null if they could not be decoded.
 ///
 /// The order MUST match the `Icon*` constants in `Shell.sl`. A toolbar whose
 /// pictures are off by one is a toolbar where Clean says Run.
@@ -105,21 +189,67 @@ public static class IconFiles
 public ImageList? BuildIcons()
 {
     var list = new ImageList(16, 16);
-
-    if (!AddIcon(list, IconFiles.Build))     return null;
-    if (!AddIcon(list, IconFiles.Rebuild))   return null;
-    if (!AddIcon(list, IconFiles.Clean))     return null;
-    if (!AddIcon(list, IconFiles.Run))       return null;
-    if (!AddIcon(list, IconFiles.Stop))      return null;
-    if (!AddIcon(list, IconFiles.Start))     return null;
-    if (!AddIcon(list, IconFiles.Pause))     return null;
+    if (!AddIcon(list, IconFiles.New)) return null;
+    if (!AddIcon(list, IconFiles.Open)) return null;
+    if (!AddIcon(list, IconFiles.Save)) return null;
+    if (!AddIcon(list, IconFiles.Build)) return null;
+    if (!AddIcon(list, IconFiles.Rebuild)) return null;
+    if (!AddIcon(list, IconFiles.Clean)) return null;
+    if (!AddIcon(list, IconFiles.Run)) return null;
+    if (!AddIcon(list, IconFiles.Stop)) return null;
+    if (!AddIcon(list, IconFiles.Start)) return null;
+    if (!AddIcon(list, IconFiles.Pause)) return null;
     if (!AddIcon(list, IconFiles.StopDebug)) return null;
-    if (!AddIcon(list, IconFiles.StepInto))  return null;
-    if (!AddIcon(list, IconFiles.StepOver))  return null;
-    if (!AddIcon(list, IconFiles.StepOut))   return null;
-    if (!AddIcon(list, IconFiles.Restart))   return null;
-
+    if (!AddIcon(list, IconFiles.StepInto)) return null;
+    if (!AddIcon(list, IconFiles.StepOver)) return null;
+    if (!AddIcon(list, IconFiles.StepOut)) return null;
+    if (!AddIcon(list, IconFiles.Restart)) return null;
     return list;
+}
+
+/// The toolbox's icons, one per type in `typeNames` and in its order, or
+/// null if they could not be decoded. A type with no picture of its own gets
+/// the button's, so the indices stay in step.
+public ImageList? BuildToolboxIcons(String[] typeNames)
+{
+    var list = new ImageList(16, 16);
+    foreach (var name in typeNames)
+    {
+        if (!AddIcon(list, FindToolboxIconFile(name)))
+            return null;
+    }
+    return list;
+}
+
+byte[] FindToolboxIconFile(String typeName)
+{
+    switch (typeName)
+    {
+        case "Button": return ToolboxIconFiles.Button;
+        case "Label": return ToolboxIconFiles.Label;
+        case "TextBox": return ToolboxIconFiles.TextBox;
+        case "CheckBox": return ToolboxIconFiles.CheckBox;
+        case "RadioButton": return ToolboxIconFiles.RadioButton;
+        case "ToggleButton": return ToolboxIconFiles.ToggleButton;
+        case "ListBox": return ToolboxIconFiles.ListBox;
+        case "ComboBox": return ToolboxIconFiles.ComboBox;
+        case "CheckListBox": return ToolboxIconFiles.CheckListBox;
+        case "SpinEdit": return ToolboxIconFiles.SpinEdit;
+        case "ProgressBar": return ToolboxIconFiles.ProgressBar;
+        case "TrackBar": return ToolboxIconFiles.TrackBar;
+        case "TreeView": return ToolboxIconFiles.TreeView;
+        case "ListView": return ToolboxIconFiles.ListView;
+        case "Panel": return ToolboxIconFiles.Panel;
+        case "GroupBox": return ToolboxIconFiles.GroupBox;
+        case "TabControl": return ToolboxIconFiles.TabControl;
+        case "TabPage": return ToolboxIconFiles.TabPage;
+        case "Image": return ToolboxIconFiles.Image;
+        case "PaintBox": return ToolboxIconFiles.PaintBox;
+        case "Shape": return ToolboxIconFiles.Shape;
+        case "Bevel": return ToolboxIconFiles.Bevel;
+        case "Timer": return ToolboxIconFiles.Timer;
+        default: return ToolboxIconFiles.Button;
+    }
 }
 
 /// Decodes one embedded PNG and adds it.
