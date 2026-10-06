@@ -571,6 +571,13 @@ public sealed class Builtins
         // as hex at every site. Negative is failure, which is the whole of the
         // convention; these are the handful the language's own machinery uses
         // or hands back, not a transcription of winerror.h.
+        // --- Standard.CompilerVersion ------------------------------------------
+        //
+        // The compiler that built the program and the commit it was built from,
+        // as `stainless --version` prints it: what an About box says, since a
+        // program carries no version of its own.
+        Constant(Standard, "CompilerVersion", String, Driver.CompilerVersion.Informational);
+
         Constant(Com, "Ok", PrimitiveTypeSymbol.Int, 0);
         Constant(Com, "False", PrimitiveTypeSymbol.Int, 1);
         Constant(Com, "NoInterface", PrimitiveTypeSymbol.Int, unchecked((int)0x80004002));

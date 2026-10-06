@@ -642,6 +642,16 @@ public class BinderTests
     }
 
     /// <summary>
+    /// The compiler's version is a constant every program can name, qualified
+    /// or not, and it is a String.
+    /// </summary>
+    [Fact]
+    public void TheCompilerVersionIsAStringConstant() =>
+        Assert.Empty(Front.ModuleCodes(
+            "public String Built() => Standard.CompilerVersion;\n" +
+            "public String Again() => CompilerVersion;"));
+
+    /// <summary>
     /// A generic is a template rather than a type, and two of them are still
     /// the ordinary duplicate.
     /// </summary>

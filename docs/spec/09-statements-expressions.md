@@ -539,6 +539,12 @@ error[SLT0049]: 'Mask' is declared 'int', and a floating-point literal is not on
 A character literal suits an integer, as it does in C#, so
 `const int Newline = '\n';` is fine.
 
+One constant comes from the compiler rather than from source:
+`Standard.CompilerVersion` is the version of the compiler that built the
+program and the commit it was built from, as `stainless --version` prints it --
+`0.2.641+7f05eda`, or with `-dirty` after it for a tree that differed from the
+commit. A program has no version of its own, so this is what its About box says.
+
 ```csharp
 public static readonly int Base = 20;
 public static readonly String Greeting = "hello";
