@@ -36,22 +36,26 @@ public static class DiagnosticInventory
         page.Append("edit that file, not this one.\n\n");
         page.Append($"{Codes.All.Count} codes: ");
         page.Append($"{Codes.All.Count(d => d.Severity == Severity.Error)} errors and ");
-        page.Append($"{Codes.All.Count(d => d.Severity == Severity.Warning)} warnings.\n");
+        page.Append($"{Codes.All.Count(d => d.Severity == Severity.Warning)} warnings.\n\n");
+        page.Append("A code is `SL`, the letter of its category, and a number within it:\n\n");
+        page.Append("| Letter | Category | Covers | Codes |\n");
+        page.Append("|---|---|---|---|\n");
+        foreach (var category in Codes.Categories)
+            page.Append($"| {category.Letter} | {category.Name} | {category.Covers} | " +
+                        $"{Codes.All.Count(d => d.Letter == category.Letter)} |\n");
 
-        string? band = null;
-        foreach (var descriptor in Codes.All.OrderBy(d => d.Code, StringComparer.Ordinal))
+        foreach (var category in Codes.Categories)
         {
-            string here = descriptor.Code[..4];
-            if (here != band)
+            page.Append($"\n## {category.Letter}: {category.Name}\n\n");
+            page.Append("| Code | Severity | Means |\n");
+            page.Append("|---|---|---|\n");
+            foreach (var descriptor in Codes.All.Where(d => d.Letter == category.Letter)
+                                               .OrderBy(d => d.Code, StringComparer.Ordinal))
             {
-                band = here;
-                page.Append($"\n## {band}xx\n\n");
-                page.Append("| Code | Severity | Means |\n");
-                page.Append("|---|---|---|\n");
+                page.Append($"| {descriptor.Code} | {SeverityName(descriptor.Severity)} | ");
+                page.Append(descriptor.Title.Replace("|", "\\|"));
+                page.Append(" |\n");
             }
-            page.Append($"| {descriptor.Code} | {SeverityName(descriptor.Severity)} | ");
-            page.Append(descriptor.Title.Replace("|", "\\|"));
-            page.Append(" |\n");
         }
         return page.ToString();
     }

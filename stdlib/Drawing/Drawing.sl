@@ -325,7 +325,7 @@ const int RtldLazyLocal = 0x00001;
 /// really a JPEG is a thing that happens.
 ///
 /// An out pointer rather than an `ImageFormat?`, because an enum is a value and
-/// only a class reference may be optional (SL0271).
+/// only a class reference may be optional (SLT0021).
 bool SniffFormat(byte[] data, ImageFormat* found)
 {
     nuint size = data.Length;

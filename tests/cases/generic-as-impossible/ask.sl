@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: 0BSD
 //
 // An 'as' that can never succeed is an error where it is written with the
-// types known (SL0612), and null inside a generic, where the template asks it
+// types known (SLT0070), and null inside a generic, where the template asks it
 // for every type argument.
 module GenericAsImpossible;
 

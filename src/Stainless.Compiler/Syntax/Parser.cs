@@ -122,7 +122,7 @@ public sealed class Parser
 
     /// <summary>
     /// What stands in for an expression that could not be read. The same
-    /// zero SL0100 leaves behind, so nothing downstream has a second shape
+    /// zero SLP0012 leaves behind, so nothing downstream has a second shape
     /// to know about.
     /// </summary>
     private ExpressionSyntax Unreadable(int start) =>

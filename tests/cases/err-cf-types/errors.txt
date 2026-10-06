@@ -1,6 +1,6 @@
 # a CF type with a message, a class on a CF type, [CFType] on a protocol or with a bad name
-SL0927
+SLI0067
 # a mutable CF type, which shares its base's CFTypeID, asked of an object
-SL0518
-SL0942
-SL0952
+SLF0020
+SLI0071
+SLI0078

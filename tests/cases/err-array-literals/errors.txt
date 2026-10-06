@@ -1,10 +1,10 @@
 # an empty literal with nothing to give it an element type
-SL0548
+SLT0059
 # an inline array whose length does not match
-SL0547
+SLT0058
 # elements that reach no common type
-SL0549
+SLT0060
 # an element that does not fit the element type it was given
-SL0265
+SLT0018
 # a target that is not an array
-SL0546
+SLT0057

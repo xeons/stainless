@@ -102,7 +102,7 @@ internal static class Program
               dialog template or an application manifest gets there.
               A system with no resource section carries it all the same, for
               Standard.Resources to read; what only Windows acts on is inert
-              there, and SL0700 names it.
+              there, and SLD0010 names it.
 
               A library the linker can find for itself is named with '-l'
               instead of by path: '-l user32' rather than the full path into

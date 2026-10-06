@@ -15,7 +15,7 @@ This is required — a file that does not say which module it belongs to is an
 error. The name is never inferred from the file's path:
 
 ```
-error[SL0332]: this file does not say which module it belongs to; start it with
+error[SLN0018]: this file does not say which module it belongs to; start it with
 a declaration such as 'module App.Thing;'
 ```
 
@@ -77,9 +77,9 @@ may carry depends on whose layout it is:
 | In a later declaration | of a class | of anything else |
 |---|---|---|
 | a method or a property | added | added |
-| a field | added, after the fields before it | SL0551 — the layout is C's, or the runtime's |
-| a base or interface list | taken, if no other declaration has one | SL0551 |
-| a different kind | SL0550 | SL0550 |
+| a field | added, after the fields before it | SLC0063 — the layout is C's, or the runtime's |
+| a base or interface list | taken, if no other declaration has one | SLC0063 |
+| a different kind | SLC0062 | SLC0062 |
 
 **A class may be written in two halves**, which is what a
 [form designer](../slfm.md) needs: the generated file holds the base list, the
@@ -132,7 +132,7 @@ accepted wherever the others are and also means the module, because there is
 no narrower unit for it to name; on a setter it is the usual way to narrow one
 ([§7](07-functions-members.md)).
 
-A declaration has one visibility (SL0507), and each modifier is written once (SL0109).
+A declaration has one visibility (SLC0047), and each modifier is written once (SLC0001).
 `public internal` and `public protected` contradict themselves, `private
 internal` names one visibility twice, and `static static` says nothing twice. The one pair that combines
 is `protected internal`, which is C#'s union of the two — its module, or a
@@ -204,13 +204,13 @@ diagnostic names the underlying type because that is the type there is. What it
 buys is a signature that says what it is for.
 
 It is a module-level declaration, like a type, and `public` makes it visible to
-importers the same way. An alias inside a type is refused (SL0525): a module is
+importers the same way. An alias inside a type is refused (SLC0060): a module is
 what this language has instead of a namespace, and that is where a name lives.
 
 A ring of aliases names no type, and is refused whether or not anything uses it:
 
 ```
-error[SL0522]: 'Ring' is defined in terms of itself, so it names no type
+error[SLC0059]: 'Ring' is defined in terms of itself, so it names no type
 ```
 
 **Distinctness comes from the type, not the alias** — see [§2.2.2](02-types.md#222-struct-hwnd__--a-type-declared-and-not-laid-out).
@@ -221,7 +221,7 @@ If two imported modules both export a type called `Buffer`, using it bare is an
 error rather than a silent pick:
 
 ```
-error[SL0273]: 'Buffer' is ambiguous between 'Net.Buffer' and 'Disk.Buffer';
+error[SLN0015]: 'Buffer' is ambiguous between 'Net.Buffer' and 'Disk.Buffer';
 qualify it with its module name
 ```
 
@@ -299,13 +299,13 @@ and the cases are `TError`'s, and one that produces nothing returns the error
 itself with `None` for success, as most of `Standard.File` does. The error
 type's own name may be written in front of the case or left off.
 
-**A `@failure` that names no case of that type is SL0744**, and a tag on a
-declaration that reports no failure at all is SL0833. What is *not*
+**A `@failure` that names no case of that type is SLL0011**, and a tag on a
+declaration that reports no failure at all is SLL0016. What is *not*
 checked is whether the case can actually occur: the compiler knows the name
 exists and no more, so the claim is still the author's.
 
 **One spelling of each.** A word that is nearly a tag — `@summary`, `@return`,
-`@throws` — is an unknown tag (SL0739) rather than a second way to write one,
+`@throws` — is an unknown tag (SLL0006) rather than a second way to write one,
 and the diagnostic says what to write instead.
 
 ### 1.8.2 A tag is checked
@@ -315,20 +315,20 @@ tag is checked against the declaration under it. Each is a warning: a mistake
 in a block is a mistake in prose, never a reason to refuse the program.
 
 ```
-warning[SL0740]: 'ReadAllText' has no parameter named 'pth'; it has 'path'
-warning[SL0741]: 'Add' documents some of its parameters and not 'b'; document
+warning[SLL0007]: 'ReadAllText' has no parameter named 'pth'; it has 'path'
+warning[SLL0008]: 'Add' documents some of its parameters and not 'b'; document
 all of them or none
-warning[SL0742]: 'Add' has no type parameter named 'T'; it takes none
-warning[SL0743]: '@value' says nothing about 'ReadAllText'; it belongs on a
+warning[SLL0009]: 'Add' has no type parameter named 'T'; it takes none
+warning[SLL0010]: '@value' says nothing about 'ReadAllText'; it belongs on a
 property or a field
-warning[SL0744]: 'IOError' has no case named 'Vanished'; it has 'None',
+warning[SLL0011]: 'IOError' has no case named 'Vanished'; it has 'None',
 'NotFound', 'AccessDenied', 'AlreadyExists', 'NotADirectory', 'IsADirectory',
 'Invalid', 'EndOfFile', 'Closed', 'Unknown' and 'InvalidData'
-warning[SL0745]: 'Standard.NoSuchModule' is not a type, a member or a module
+warning[SLL0012]: 'Standard.NoSuchModule' is not a type, a member or a module
 this file can see
 ```
 
-SL0741 is C#'s CS1573 and exists for its reason: a parameter left out of a
+SLL0008 is C#'s CS1573 and exists for its reason: a parameter left out of a
 documented set reads as an oversight, and nothing else says whether it is.
 
 **A `cref` is a name, resolved the way a name in code is.** `@see Substring`,

@@ -96,7 +96,7 @@ public class StaticMethodTests
 
     /// <summary>An overload differing only by `static` is still a collision.</summary>
     [Fact]
-    public void ItDoesNotOverloadOnStaticAlone() => Assert.Contains("SL0211",
+    public void ItDoesNotOverloadOnStaticAlone() => Assert.Contains("SLN0006",
         Front.ModuleCodes("""
             public class C {
                 public int Read() { return 1; }
@@ -109,7 +109,7 @@ public class StaticMethodTests
 
     /// <summary>There is no receiver, so there is nothing for `this` to name.</summary>
     [Fact]
-    public void ThisIsRefused() => Assert.Contains("SL0228", Front.ModuleCodes("""
+    public void ThisIsRefused() => Assert.Contains("SLN0010", Front.ModuleCodes("""
         public class C { int v; public C() { v = 1; } public static int Get() { return this.v; } }
         int Main() { return 0; }
         """));
@@ -118,7 +118,7 @@ public class StaticMethodTests
     [Theory]
     [InlineData("return v;")]
     [InlineData("return Read();")]
-    public void AnInstanceMemberIsRefused(string body) => Assert.Contains("SL0576",
+    public void AnInstanceMemberIsRefused(string body) => Assert.Contains("SLN0022",
         Front.ModuleCodes("""
             public class C {
                 int v;
@@ -134,8 +134,8 @@ public class StaticMethodTests
     /// right, because the fix is a spelling and the reader may not know it.
     /// </summary>
     [Theory]
-    [InlineData("var b = Box.Make(); var c = b.Make();", "SL0646")]
-    [InlineData("int n = Box.Read();", "SL0576")]
+    [InlineData("var b = Box.Make(); var c = b.Make();", "SLN0023")]
+    [InlineData("int n = Box.Read();", "SLN0022")]
     public void TheWrongReceiverIsRefused(string body, string code) =>
         Assert.Contains(code, With(body));
 
@@ -147,14 +147,14 @@ public class StaticMethodTests
     [InlineData("virtual")]
     [InlineData("abstract")]
     [InlineData("override")]
-    public void ADispatchWordIsRefused(string word) => Assert.Contains("SL0507",
+    public void ADispatchWordIsRefused(string word) => Assert.Contains("SLC0047",
         Front.ModuleCodes(
             "public class C { public " + word + " static int Get() { return 1; } }\n" +
             "int Main() { return 0; }"));
 
     /// <summary>`protected` is about what a derived object reaches through itself.</summary>
     [Fact]
-    public void ProtectedIsRefused() => Assert.Contains("SL0507", Front.ModuleCodes("""
+    public void ProtectedIsRefused() => Assert.Contains("SLC0047", Front.ModuleCodes("""
         public class C { protected static int Get() { return 1; } }
         int Main() { return 0; }
         """));
@@ -164,7 +164,7 @@ public class StaticMethodTests
     /// says so with <c>abstract</c>.
     /// </summary>
     [Fact]
-    public void ABodilessInterfaceMemberMustBeAbstract() => Assert.Contains("SL0574", Front.ModuleCodes("""
+    public void ABodilessInterfaceMemberMustBeAbstract() => Assert.Contains("SLC0070", Front.ModuleCodes("""
         public interface I { static int Get(); }
         int Main() { return 0; }
         """));
@@ -190,7 +190,7 @@ public class StaticMethodTests
     /// <summary>At module scope the word says nothing that was not already true.</summary>
     [Fact]
     public void AModuleLevelFunctionIsRefused() =>
-        Assert.Contains("SL0828", Front.ModuleCodes("static int Free() { return 1; }\nint Main() { return 0; }"));
+        Assert.Contains("SLC0123", Front.ModuleCodes("static int Free() { return 1; }\nint Main() { return 0; }"));
 
     /// <summary>
     /// Only a class may be static, because only a class has instances for the
@@ -202,7 +202,7 @@ public class StaticMethodTests
     [InlineData("public static enum E { A }")]
     [InlineData("public static delegate void D();")]
     public void AStaticTypeIsRefused(string declaration) =>
-        Assert.Contains("SL0828", Front.ModuleCodes(declaration + "\nint Main() { return 0; }"));
+        Assert.Contains("SLC0123", Front.ModuleCodes(declaration + "\nint Main() { return 0; }"));
 
     /// <summary>A static class holds static members and has no instances.</summary>
     [Fact]
@@ -220,11 +220,11 @@ public class StaticMethodTests
     [InlineData("public int Read() { return 1; }")]
     [InlineData("public int Value { get { return 1; } }")]
     public void AStaticClassRefusesAnInstanceMember(string member) =>
-        Assert.Contains("SL0640", Front.ModuleCodes(
+        Assert.Contains("SLC0087", Front.ModuleCodes(
             "public static class C { " + member + " }\nint Main() { return 0; }"));
 
     [Fact]
-    public void AStaticClassCannotBeMade() => Assert.Contains("SL0583", Front.ModuleCodes("""
+    public void AStaticClassCannotBeMade() => Assert.Contains("SLC0071", Front.ModuleCodes("""
         public static class C { public static int N = 1; }
         int Main() { var c = new C(); return 0; }
         """));
@@ -232,7 +232,7 @@ public class StaticMethodTests
     /// <summary>
     /// Storage may be mutable. The rule that it could not was the Swift 6 and
     /// Rust 2024 answer, and this language took C#'s instead: what a static
-    /// holds is warned about (SL0377) rather than refused.
+    /// holds is warned about (SLO0015) rather than refused.
     /// </summary>
     [Fact]
     public void MutableStorageIsAllowed() =>
@@ -241,7 +241,7 @@ public class StaticMethodTests
     /// <summary>But it still needs a value, because nothing else would give it one.</summary>
     [Fact]
     public void StorageNeedsAnInitializer() =>
-        Assert.Contains("SL0376", Front.ModuleCodes("static int Count;\nint Main() { return 0; }"));
+        Assert.Contains("SLO0014", Front.ModuleCodes("static int Count;\nint Main() { return 0; }"));
 
     /// <summary>
     /// Storage inside a type is what a <c>static</c> field is, and it may be

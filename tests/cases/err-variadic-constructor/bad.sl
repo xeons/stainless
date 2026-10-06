@@ -7,13 +7,13 @@ public class Bag
 {
     public int Count;
 
-    Bag(int count, ...)                             // SL0493: a constructor
+    Bag(int count, ...)                             // SLI0021: a constructor
     {
         Count = count;
     }
 }
 
-T First<T>(T value, ...)                            // SL0493: a generic
+T First<T>(T value, ...)                            // SLI0021: a generic
 {
     return value;
 }

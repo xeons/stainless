@@ -55,7 +55,7 @@
 // data but *description* -- `RT_MENU`, `RT_DIALOG` and `RT_ACCELERATOR` are a
 // declarative UI format that Windows itself interprets, and nothing on another
 // system reads them. A build for a target with no resource section leaves the
-// script out and says so (SL0700).
+// script out and says so (SLD0010).
 //
 // ## Names
 //

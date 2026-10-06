@@ -450,7 +450,7 @@ public sealed class FieldSymbol(string name, TypeSymbol type, NamedTypeSymbol co
     /// What the field holds.
     ///
     /// Settable for one reason: a struct field that makes its struct contain
-    /// itself is reported during layout (SL0216) and becomes the error type
+    /// itself is reported during layout (SLC0006) and becomes the error type
     /// there. Every walk over fields after that -- whether a struct carries
     /// references, whether it may be sent, how an ABI passes it -- recurses
     /// through field types and would never come back out of the cycle.
@@ -1042,7 +1042,7 @@ public sealed class DelegateTypeSymbol : NamedTypeSymbol
 /// **The difference from a delegate is the second word.** A delegate is one
 /// pointer, which is what makes it a C function pointer and what stops it
 /// carrying anything: a lambda that reads a name from around it cannot become
-/// one (SL0381). A closure is a pointer *and* a receiver, so a bound method
+/// one (SLT0034). A closure is a pointer *and* a receiver, so a bound method
 /// and a capturing lambda are both expressible — which is what an event
 /// handler has to be, and what Delphi means by <c>of object</c>.
 ///
@@ -1920,7 +1920,7 @@ public sealed class ClassTypeSymbol : NamedTypeSymbol
     ///
     /// A class with one is entered into the factory table the runtime answers
     /// <c>DllGetClassObject</c> from, which is why it also requires a
-    /// constructor taking no arguments (SL0611): activation supplies none.
+    /// constructor taking no arguments (SLI0035): activation supplies none.
     /// </summary>
     public Guid? Clsid { get; set; }
 
@@ -2063,7 +2063,7 @@ public static class TypeExtensions
     /// is then no longer a type that may cross <c>extern "C"</c>.
     ///
     /// A struct may not contain itself — layout rejects that cycle with
-    /// SL0216 — but the cycle is reported and left in the tree, so the walk
+    /// SLC0006 — but the cycle is reported and left in the tree, so the walk
     /// carries its own guard rather than trusting that there is none. Without
     /// it, every question asked about such a struct after layout ran until the
     /// stack was gone.

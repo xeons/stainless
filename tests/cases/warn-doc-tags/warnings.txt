@@ -3,12 +3,12 @@
 # function in the file gets all of it right and is what says these fire on the
 # mistake rather than on the tags. A parameter documented twice and a
 # failure on a function that cannot fail are claims it can check too.
-SL0739
-SL0740
-SL0741
-SL0742
-SL0743
-SL0744
-SL0745
-SL0832
-SL0833
+SLL0006
+SLL0007
+SLL0008
+SLL0009
+SLL0010
+SLL0011
+SLL0012
+SLL0015
+SLL0016

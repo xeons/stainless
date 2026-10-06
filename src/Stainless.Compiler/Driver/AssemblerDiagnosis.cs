@@ -52,7 +52,7 @@ public static partial class AssemblerDiagnosis
 
     /// <summary>
     /// Reports each error in the output against the block and line it came
-    /// from, as SL0723. Anything that cannot be placed is reported against the
+    /// from, as SLI0048. Anything that cannot be placed is reported against the
     /// first block, with LLVM's words, rather than dropped.
     /// </summary>
     public static void Report(

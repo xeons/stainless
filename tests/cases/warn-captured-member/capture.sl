@@ -8,7 +8,7 @@
 // It is also the one capture rule that reads like the opposite of itself.
 // `if (busy)` inside a handler is a line nobody reads twice, and what it means
 // is "if `busy` was set when this handler was made" -- which is almost always
-// no. SL0610 is what says so.
+// no. SLL0004 is what says so.
 //
 // This is not a made-up shape. It is what a GUI backend's guard against
 // reporting its own writes back to the program looks like, and writing it this
@@ -36,7 +36,7 @@ public class Guarded
 
         Body = () =>
         {
-            if (_busy)              // SL0610
+            if (_busy)              // SLL0004
                 return;
             Console.WriteLine("ran");
         };
@@ -61,7 +61,7 @@ public class Counted
     public Counted()
     {
         Total = 0;
-        Report = () => { Console.WriteLine(Text.FromInteger((long)Total)); };  // SL0610
+        Report = () => { Console.WriteLine(Text.FromInteger((long)Total)); };  // SLL0004
     }
 
     public void Bump() => Total = Total + 1;
@@ -159,7 +159,7 @@ public class Stale
         _busy = false;
         Body = () =>
         {
-            if (Busy)                   // SL0610
+            if (Busy)                   // SLL0004
                 return;
             Console.WriteLine("stale ran");
         };
@@ -183,7 +183,7 @@ public struct Tally
 
     public Act Show()
     {
-        return () => { Console.WriteLine("tally " + Text.FromInteger((long)Count)); };  // SL0610
+        return () => { Console.WriteLine("tally " + Text.FromInteger((long)Count)); };  // SLL0004
     }
 }
 

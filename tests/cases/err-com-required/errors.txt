@@ -1,2 +1,2 @@
 # a com class with a CLSID and a required member a factory cannot set
-SL0611
+SLI0035

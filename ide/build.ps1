@@ -19,7 +19,7 @@ param(
 #
 # **Not `Stop` for the compiler.** Windows PowerShell 5.1 wraps each line a
 # native program writes to stderr in an ErrorRecord, and under `Stop` that makes
-# the first *warning* a terminating error: `stainless` prints one SL0377 today,
+# the first *warning* a terminating error: `stainless` prints one SLO0015 today,
 # so `-Test` died before running a single test and reported it as
 # NativeCommandError. An exit code is what says whether a build failed; a line
 # on stderr is not.

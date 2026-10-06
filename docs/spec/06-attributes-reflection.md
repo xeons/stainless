@@ -17,7 +17,7 @@ public attribute JsonIgnore { }
 ```
 
 It is written in brackets before a declaration, with **constant** arguments —
-they are stored in the binary, not evaluated (SL0344):
+they are stored in the binary, not evaluated (SLC0020):
 
 ```csharp
 [JsonName("full_name")]
@@ -40,16 +40,16 @@ public attribute Column { String Name; int Width; bool Hidden; }
 [Column("zip", 5, false)]              // all positional
 ```
 
-`=` rather than the `name:` a call uses (SL0727), because an attribute is a
+`=` rather than the `name:` a call uses (SLC0095), because an attribute is a
 value being built and not a call being made: what stands to the left of the
 sign is a field, and the line reads as the assignment it is. It is also what C#
 writes, so the shape is one a reader already knows.
 
-**The positional arguments come first** (SL0726). Letting the two orders mix
+**The positional arguments come first** (SLC0094). Letting the two orders mix
 would mean counting past the named ones to work out which field a later bare
 value belongs to, which is the work naming them was supposed to remove. Each
-field may be given once (SL0725), by either route, and a name the attribute
-does not declare is an error (SL0724) rather than a value that goes nowhere.
+field may be given once (SLC0093), by either route, and a name the attribute
+does not declare is an error (SLC0092) rather than a value that goes nowhere.
 
 **A field given neither way keeps its type's default** — a zero, `false`, or
 nothing at all for a `String`. That is what makes a field optional without an
@@ -60,7 +60,7 @@ field that was left out from one written as `0`.
 ### Where an attribute may go
 
 On a type, an enum, a field, a property, an event, and a `static`. Anywhere
-else is an error (SL0728) rather than a line the compiler drops: an attribute
+else is an error (SLC0096) rather than a line the compiler drops: an attribute
 may decide something — `[Embed]`
 ([§8.8](08-interop-libraries.md#88-embedding-a-file)) decides what a static
 holds — and a declaration that quietly ignored one would compile to a
@@ -93,7 +93,7 @@ Only a type marked `[Reflect]` carries field metadata. Everything else emits
 nothing at all, and `typeof` on it is an error:
 
 ```
-error[SL0346]: 'Plain' carries no metadata, so 'typeof' cannot name it; mark
+error[SLT0026]: 'Plain' carries no metadata, so 'typeof' cannot name it; mark
 its declaration '[Reflect]'
 ```
 

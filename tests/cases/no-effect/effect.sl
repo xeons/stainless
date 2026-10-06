@@ -3,7 +3,7 @@
 // assignment, a call, ++ and --, new, and a conditional or a ?. whose inside
 // qualifies -- and everything else is warned about. Documented in §9.13.
 //
-// This program still compiles and runs: SL0222 is a warning, because the code
+// This program still compiles and runs: SLL0001 is a warning, because the code
 // is well typed and the author may have meant it.
 module NoEffect;
 
@@ -20,7 +20,7 @@ int Main()
     count++;
     Next();
 
-    // Neither of these could. Both are SL0222.
+    // Neither of these could. Both are SLL0001.
     count + 1;
     count;
 

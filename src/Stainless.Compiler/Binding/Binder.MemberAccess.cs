@@ -243,7 +243,7 @@ public sealed partial class Binder
 
         // `Aes.BlockSize` -- a value inlined here, belonging to the type.
         // Before the statics, because a constant has no storage to read and
-        // the two cannot collide: SL0205 refuses a type that declares both.
+        // the two cannot collide: SLN0005 refuses a type that declares both.
         if (!syntax.ThroughPointer && ResolveTypePrefix(syntax.Target, syntax.Member) is { } constantOwner &&
             constantOwner.FindConstant(syntax.Member) is { } inlined)
         {
@@ -410,7 +410,7 @@ public sealed partial class Binder
 
             // A check can only be about a name. Narrowing a field would prove
             // something about one evaluation and let it be read from another,
-            // which is the rule variants already follow (SL0285).
+            // which is the rule variants already follow (SLF0006).
             else if (NarrowableSubject(receiver) is null)
                 diagnostics.Report(Codes.MaybeNullUsedWithoutCheck, syntax.Span,
                     $"'{receiver.Type.Name}' may be null, and this is not something a check " +
@@ -463,7 +463,7 @@ public sealed partial class Binder
             // which is the one thing a closure can hold and a delegate cannot.
             // It is offered as a group and settled by whatever it is being
             // stored in; if nothing settles it, BindFunctionReference reports
-            // SL0250 and the message is the one it always was.
+            // SLT0012 and the message is the one it always was.
             var instances = bound.Where(m => !m.IsStatic).ToList();
 
             if (instances.Count > 0)
@@ -609,7 +609,7 @@ public sealed partial class Binder
 
     /// <summary>
     /// The case a name would build if it were written bare in this file, or
-    /// null. It is what SL0414 refuses to let a module-level function shadow.
+    /// null. It is what SLN0019 refuses to let a module-level function shadow.
     /// </summary>
     private VariantCaseSymbol? CaseNamed(FileScope scope, string name)
     {

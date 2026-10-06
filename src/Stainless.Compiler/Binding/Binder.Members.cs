@@ -79,7 +79,7 @@ public sealed partial class Binder
 
                     // Templates wait, since their members depend on type
                     // arguments, and a declaration that lost its name to
-                    // another has no type to give members to: SL0201 or SL0550
+                    // another has no type to give members to: SLN0001 or SLC0062
                     // has said so, and a second complaint in the shape of a
                     // crash helps nobody. Neither is in the map.
                     case TypeDeclSyntax typeDecl:
@@ -1054,7 +1054,7 @@ public sealed partial class Binder
         }
 
         // An event on an interface needs no case of its own: an event is storage
-        // as well as a pair of methods, and SL0300 already refuses every member
+        // as well as a pair of methods, and SLC0009 already refuses every member
         // of a type that has no state.
 
         // Named after the event, and hidden from lookup exactly as a property's

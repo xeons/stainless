@@ -243,7 +243,7 @@ public class EmbedTests
         var diagnostic = Front.Only(
             Diagnostics("""[Embed("stub.bin")] static readonly byte[] S;"""));
 
-        Assert.Equal("SL0705", diagnostic.Code);
+        Assert.Equal("SLD0013", diagnostic.Code);
     }
 
     private static DiagnosticBag Diagnostics(string body)
@@ -253,24 +253,24 @@ public class EmbedTests
     }
 
     [Theory]
-    [InlineData("""Embed()""", "SL0703")]
-    [InlineData("""Embed("stub.bin", ".a", "r", "more")""", "SL0343")]
-    [InlineData("""Embed(Path)""", "SL0704")]
-    [InlineData("""Embed("stub.bin", Access = Path)""", "SL0704")]
-    [InlineData("""Embed("missing.bin")""", "SL0706")]
-    [InlineData("""Embed("data")""", "SL0706")]
-    [InlineData("""Embed("")""", "SL0706")]
-    [InlineData("""Embed("stub.bin", Access = "x")""", "SL0707")]
-    [InlineData("""Embed("stub.bin", Access = "rwx")""", "SL0708")]
-    [InlineData("""Embed("stub.bin", Section = ".a b")""", "SL0709")]
-    [InlineData("""Embed("stub.bin", Section = ".a\tb")""", "SL0709")]
-    [InlineData("""Embed("stub.bin", Section = "")""", "SL0709")]
-    [InlineData("""Embed("stub.bin", Section = ".text")""", "SL0711")]
-    [InlineData("""Embed("stub.bin", Section = ".data")""", "SL0711")]
-    [InlineData("""Embed("stub.bin", Section = ".bss")""", "SL0711")]
-    [InlineData("""Embed("stub.bin", Alignment = "8")""", "SL0724")]
-    [InlineData("""Embed("stub.bin", Access = "r", Access = "r")""", "SL0725")]
-    [InlineData("""Embed("stub.bin", Section = ".a", "rw")""", "SL0726")]
+    [InlineData("""Embed()""", "SLD0011")]
+    [InlineData("""Embed("stub.bin", ".a", "r", "more")""", "SLC0019")]
+    [InlineData("""Embed(Path)""", "SLD0012")]
+    [InlineData("""Embed("stub.bin", Access = Path)""", "SLD0012")]
+    [InlineData("""Embed("missing.bin")""", "SLD0014")]
+    [InlineData("""Embed("data")""", "SLD0014")]
+    [InlineData("""Embed("")""", "SLD0014")]
+    [InlineData("""Embed("stub.bin", Access = "x")""", "SLD0015")]
+    [InlineData("""Embed("stub.bin", Access = "rwx")""", "SLD0016")]
+    [InlineData("""Embed("stub.bin", Section = ".a b")""", "SLD0017")]
+    [InlineData("""Embed("stub.bin", Section = ".a\tb")""", "SLD0017")]
+    [InlineData("""Embed("stub.bin", Section = "")""", "SLD0017")]
+    [InlineData("""Embed("stub.bin", Section = ".text")""", "SLD0019")]
+    [InlineData("""Embed("stub.bin", Section = ".data")""", "SLD0019")]
+    [InlineData("""Embed("stub.bin", Section = ".bss")""", "SLD0019")]
+    [InlineData("""Embed("stub.bin", Alignment = "8")""", "SLC0092")]
+    [InlineData("""Embed("stub.bin", Access = "r", Access = "r")""", "SLC0093")]
+    [InlineData("""Embed("stub.bin", Section = ".a", "rw")""", "SLC0094")]
     public void EachRuleHasItsCode(string attribute, string code)
     {
         var scratch = new Scratch();
@@ -284,25 +284,25 @@ public class EmbedTests
     /// Where <c>[Embed]</c> may not go, each named by what it was written on.
     /// </summary>
     [Theory]
-    [InlineData("""public class Held { [Embed("stub.bin")] public byte[] Bytes; }""", "SL0728")]
-    [InlineData("""[Embed("stub.bin")] public class Held { }""", "SL0728")]
+    [InlineData("""public class Held { [Embed("stub.bin")] public byte[] Bytes; }""", "SLC0096")]
+    [InlineData("""[Embed("stub.bin")] public class Held { }""", "SLC0096")]
     [InlineData("""public class Held { [Embed("stub.bin")] public byte[] B { get; set; } }""",
-                "SL0728")]
-    [InlineData("""[Embed("stub.bin")] public void F() { }""", "SL0728")]
-    [InlineData("""[Embed("stub.bin")] using Bytes = byte[];""", "SL0728")]
-    [InlineData("""[Embed("stub.bin")] const int Size = 1;""", "SL0728")]
-    [InlineData("""[Embed("stub.bin")] extern "C" int errno;""", "SL0728")]
+                "SLC0096")]
+    [InlineData("""[Embed("stub.bin")] public void F() { }""", "SLC0096")]
+    [InlineData("""[Embed("stub.bin")] using Bytes = byte[];""", "SLC0096")]
+    [InlineData("""[Embed("stub.bin")] const int Size = 1;""", "SLC0096")]
+    [InlineData("""[Embed("stub.bin")] extern "C" int errno;""", "SLC0096")]
     public void AnEmbedGoesOnAStaticAndNowhereElse(string body, string code) =>
         Assert.Contains(code, new Scratch().Codes(body));
 
     [Fact]
     public void AStaticWithAnEmbedHasNoInitializer() =>
-        Assert.Equal(["SL0731"], new Scratch().Codes(
+        Assert.Equal(["SLD0021"], new Scratch().Codes(
             """[Embed("stub.bin")] static readonly byte[] S = null;"""));
 
     [Fact]
     public void AnEmbedIsBytesAndNothingElse() =>
-        Assert.Equal(["SL0730"], new Scratch().Codes(
+        Assert.Equal(["SLD0020"], new Scratch().Codes(
             """[Embed("stub.bin")] static readonly String S;"""));
 
     /// <summary>
@@ -311,11 +311,11 @@ public class EmbedTests
     /// </summary>
     [Fact]
     public void AStaticWithoutAnEmbedStillNeedsAValue() =>
-        Assert.Equal(["SL0376"], new Scratch().Codes("static readonly int Count;"));
+        Assert.Equal(["SLO0014"], new Scratch().Codes("static readonly int Count;"));
 
     [Fact]
     public void OneStaticCarriesOneFile() =>
-        Assert.Equal(["SL0539"], new Scratch().Codes(
+        Assert.Equal(["SLC0061"], new Scratch().Codes(
             """[Embed("stub.bin"), Embed("data/table.bin")] static readonly byte[] S;"""));
 
     [Fact]
@@ -346,7 +346,7 @@ public class EmbedTests
             [Embed("stub.bin", Section = ".shared", Access = "rw")] static byte[] C;
             """);
 
-        Assert.Equal(["SL0711"], codes);
+        Assert.Equal(["SLD0019"], codes);
     });
 
     /// <summary>
@@ -381,7 +381,7 @@ public class EmbedTests
         Under(TargetPlatform.X64Windows, () =>
         {
             scratch.Bind(body, out var diagnostics);
-            var warning = Assert.Single(diagnostics.Items, d => d.Code == "SL0710");
+            var warning = Assert.Single(diagnostics.Items, d => d.Code == "SLD0018");
             Assert.Equal(Severity.Warning, warning.Severity);
             Assert.Contains("'.embedde'", warning.Message);
         });
@@ -477,18 +477,18 @@ public class EmbedTests
             Assert.Empty(scratch.Codes(
                 """[Embed("stub.bin", Section = "__DATA_CONST,__a_sixteen_byte")] static readonly byte[] S;"""));
 
-            Assert.Equal(["SL0709"], scratch.Codes(
+            Assert.Equal(["SLD0017"], scratch.Codes(
                 """[Embed("stub.bin", Section = ".stub", Access = "rx")] static readonly byte[] S;"""));
-            Assert.Equal(["SL0709"], scratch.Codes(
+            Assert.Equal(["SLD0017"], scratch.Codes(
                 """[Embed("stub.bin", Section = "__DATA,__seventeen_bytes")] static readonly byte[] S;"""));
 
             // A known segment with the wrong access, a zero-fill section, and
             // memory no segment allows.
-            Assert.Equal(["SL0711"], scratch.Codes(
+            Assert.Equal(["SLD0019"], scratch.Codes(
                 """[Embed("stub.bin", Section = "__TEXT,__const")] static readonly byte[] S;"""));
-            Assert.Equal(["SL0711"], scratch.Codes(
+            Assert.Equal(["SLD0019"], scratch.Codes(
                 """[Embed("stub.bin", Section = "__DATA,__bss", Access = "rw")] static byte[] S;"""));
-            Assert.Equal(["SL0708"], scratch.Codes(
+            Assert.Equal(["SLD0016"], scratch.Codes(
                 """[Embed("stub.bin", Access = "rwx")] static byte[] S;"""));
         });
     }
@@ -504,7 +504,7 @@ public class EmbedTests
         Under(TargetPlatform.X64Linux, () =>
         {
             scratch.Bind(body, out var diagnostics);
-            var error = Assert.Single(diagnostics.Items, d => d.Code == "SL0709");
+            var error = Assert.Single(diagnostics.Items, d => d.Code == "SLD0017");
             Assert.Contains("Mach-O", error.Message);
         });
     }

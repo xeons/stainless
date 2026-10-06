@@ -59,14 +59,14 @@ void TestDiagnostics(Harness harness)
 {
     Console.WriteLine("diagnostics");
 
-    String line = "{\"severity\":\"error\",\"code\":\"SL0265\","
+    String line = "{\"severity\":\"error\",\"code\":\"SLT0018\","
         + "\"message\":\"cannot convert 'String' to 'int'\","
         + "\"file\":\"C:\\\\Code\\\\src\\\\main.sl\",\"line\":5,\"column\":13,\"length\":14}";
 
     var message = BuildMessage.Parse(line);
     harness.Check("a diagnostic is recognised", message.IsDiagnostic);
     harness.Check("and is an error", message.IsError);
-    harness.CheckSame("with its code", "SL0265", message.Code);
+    harness.CheckSame("with its code", "SLT0018", message.Code);
     harness.CheckSame("and its message", "cannot convert 'String' to 'int'", message.Message);
     harness.Check("and its place", message.Line == 5u && message.Column == 13u);
     harness.Check("and something to underline", message.Length == 14u);
@@ -77,7 +77,7 @@ void TestDiagnostics(Harness harness)
     // double-click opens nothing.
     harness.CheckSame("with the path unescaped", "C:\\Code\\src\\main.sl", message.File);
 
-    String warning = "{\"severity\":\"warning\",\"code\":\"SL0222\","
+    String warning = "{\"severity\":\"warning\",\"code\":\"SLL0001\","
         + "\"message\":\"this expression has no effect\","
         + "\"file\":\"a.sl\",\"line\":2,\"column\":1,\"length\":3}";
 
@@ -87,7 +87,7 @@ void TestDiagnostics(Harness harness)
     // Something read back from a library's metadata has no file. It must not
     // look like a place, or a double-click goes hunting for line zero of
     // nothing.
-    String placeless = "{\"severity\":\"error\",\"code\":\"SL0999\","
+    String placeless = "{\"severity\":\"error\",\"code\":\"SLT0999\","
         + "\"message\":\"no source here\"}";
 
     var third = BuildMessage.Parse(placeless);
@@ -125,7 +125,7 @@ void TestDisplayText(Harness harness)
 {
     Console.WriteLine("describing");
 
-    String line = "{\"severity\":\"error\",\"code\":\"SL0265\","
+    String line = "{\"severity\":\"error\",\"code\":\"SLT0018\","
         + "\"message\":\"cannot convert 'String' to 'int'\","
         + "\"file\":\"C:\\\\Code\\\\src\\\\main.sl\",\"line\":5,\"column\":13,\"length\":14}";
 
@@ -133,15 +133,15 @@ void TestDisplayText(Harness harness)
     // list of diagnostics is read for what is wrong, and a path first buries
     // every one of them behind the part they all share.
     harness.CheckSame("a diagnostic reads as one line",
-                      "error[SL0265]: cannot convert 'String' to 'int'   main.sl:5:13",
+                      "error[SLT0018]: cannot convert 'String' to 'int'   main.sl:5:13",
                       BuildMessage.Parse(line).ToDisplayText());
 
-    String warning = "{\"severity\":\"warning\",\"code\":\"SL0222\","
+    String warning = "{\"severity\":\"warning\",\"code\":\"SLL0001\","
         + "\"message\":\"no effect\",\"file\":\"/home/b/a.sl\",\"line\":2,"
         + "\"column\":1,\"length\":3}";
 
     harness.CheckSame("and a warning says so, with a unix path",
-                      "warning[SL0222]: no effect   a.sl:2:1",
+                      "warning[SLL0001]: no effect   a.sl:2:1",
                       BuildMessage.Parse(warning).ToDisplayText());
 
     String placeless = "{\"severity\":\"error\",\"code\":\"\",\"message\":\"the linker refused\"}";

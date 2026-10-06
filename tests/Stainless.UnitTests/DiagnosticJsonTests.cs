@@ -42,13 +42,13 @@ public class DiagnosticJsonTests
     {
         var file = Source("int x = 1;\nint y = 2;\n");
         var diagnostic = new Diagnostic(
-            Severity.Error, "SL0265", "cannot convert 'String' to 'int'",
+            Severity.Error, "SLT0018", "cannot convert 'String' to 'int'",
             new SourceSpan(file, 15, 18));
 
         var json = Parse(diagnostic);
 
         Assert.Equal("error", json.GetProperty("severity").GetString());
-        Assert.Equal("SL0265", json.GetProperty("code").GetString());
+        Assert.Equal("SLT0018", json.GetProperty("code").GetString());
         Assert.Equal("cannot convert 'String' to 'int'", json.GetProperty("message").GetString());
         Assert.Equal("test.sl", json.GetProperty("file").GetString());
         Assert.Equal(2, json.GetProperty("line").GetInt32());
@@ -65,7 +65,7 @@ public class DiagnosticJsonTests
     {
         var file = Source("alpha\nbeta gamma\n");
         var diagnostic = new Diagnostic(
-            Severity.Warning, "SL0222", "this expression has no effect",
+            Severity.Warning, "SLL0001", "this expression has no effect",
             new SourceSpan(file, 11, 16));
 
         var json = Parse(diagnostic);
@@ -82,7 +82,7 @@ public class DiagnosticJsonTests
     [InlineData(Severity.Note, "note")]
     public void NamesEverySeverity(Severity severity, string expected)
     {
-        var diagnostic = new Diagnostic(severity, "SL0001", "something", default);
+        var diagnostic = new Diagnostic(severity, "SLP0001", "something", default);
         Assert.Equal(expected, Parse(diagnostic).GetProperty("severity").GetString());
     }
 
@@ -94,7 +94,7 @@ public class DiagnosticJsonTests
     [Fact]
     public void LeavesThePlaceOutWhenThereIsNoFile()
     {
-        var json = Parse(new Diagnostic(Severity.Error, "SL0999", "no source here", default));
+        var json = Parse(new Diagnostic(Severity.Error, "SLT0999", "no source here", default));
 
         Assert.Equal("no source here", json.GetProperty("message").GetString());
         Assert.False(json.TryGetProperty("file", out _));
@@ -111,7 +111,7 @@ public class DiagnosticJsonTests
     {
         var file = new SourceText(@"C:\Users\b\src\main.sl", "x\n");
         var json = Parse(new Diagnostic(
-            Severity.Error, "SL0001", "something", new SourceSpan(file, 0, 1)));
+            Severity.Error, "SLP0001", "something", new SourceSpan(file, 0, 1)));
 
         Assert.Equal(@"C:\Users\b\src\main.sl", json.GetProperty("file").GetString());
     }
@@ -125,7 +125,7 @@ public class DiagnosticJsonTests
     public void EscapesWhateverAMessageCarries()
     {
         string awkward = "a \"quoted\" thing\nwith a tab\there and a \\ too";
-        var json = Parse(new Diagnostic(Severity.Error, "SL0001", awkward, default));
+        var json = Parse(new Diagnostic(Severity.Error, "SLP0001", awkward, default));
 
         Assert.Equal(awkward, json.GetProperty("message").GetString());
     }
@@ -140,7 +140,7 @@ public class DiagnosticJsonTests
     {
         var file = Source("int x = 1;\n");
         string rendered = new Diagnostic(
-            Severity.Error, "SL0265", "a\nmessage\nwith\nnewlines",
+            Severity.Error, "SLT0018", "a\nmessage\nwith\nnewlines",
             new SourceSpan(file, 0, 3)).RenderJson();
 
         Assert.DoesNotContain('\n', rendered);

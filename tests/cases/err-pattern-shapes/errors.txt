@@ -1,16 +1,16 @@
 # A list pattern over something that is not a sequence, two runs, a stray
 # one, a run of an inline array named, a method read as a member, a wrong
 # name for a position, too many positions, and a name under 'not'.
-SL0774
-SL0775
-SL0775
-SL0775
-SL0776
-SL0776
-SL0609
-SL0609
-SL0619
-SL0835
-SL0836
-SL0639
-SL0637
+SLF0042
+SLF0043
+SLF0043
+SLF0043
+SLF0044
+SLF0044
+SLF0031
+SLF0031
+SLF0032
+SLF0047
+SLF0048
+SLF0035
+SLF0034

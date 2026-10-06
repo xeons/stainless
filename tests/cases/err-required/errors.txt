@@ -1,6 +1,6 @@
 # Three declarations that cannot be required, three constructions that leave
 # members unset, and a 'new()' constraint that could not set them.
-SL0783
-SL0784
-SL0328
-SL0838
+SLC0105
+SLC0106
+SLG0006
+SLC0124

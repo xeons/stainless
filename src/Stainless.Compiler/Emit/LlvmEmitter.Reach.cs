@@ -99,7 +99,7 @@ public sealed partial class LlvmEmitter
     /// -- that another Stainless compilation will bind against this -- and that
     /// surface is exactly the public declarations the metadata describes.
     /// Protected is exported alongside public, and only from a public type: a
-    /// dispatched method must be public or protected (SL0506), so a protected
+    /// dispatched method must be public or protected (SLC0046), so a protected
     /// one can be filling a slot that a class derived in another binary has to
     /// copy into its own table or replace. A consumer that is not deriving
     /// still cannot reach it -- what keeps it protected is the binder, and the

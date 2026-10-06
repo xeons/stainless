@@ -50,13 +50,13 @@ constant is built as C builds one: `~(uint128)0`, `(int128)1 << 100`.
 Division and the conversions to and from the floats are calls into
 compiler-rt, which each target's C library carries; on Windows the compiler
 links LLVM's copy, since the MSVC runtime has none. They need a 64-bit target
-(SL0831): clang has no `__int128` on a 32-bit one, and nothing there divides
+(SLT0084): clang has no `__int128` on a 32-bit one, and nothing there divides
 one.
 
 `void` is the absence of a value rather than a value of no size, so the only
-place it can be written is what a function returns (SL0309). There is no
+place it can be written is what a function returns (SLT0024). There is no
 variable, field, parameter or type argument of it, and no array or slice of one
-(SL0309). `void*` is not a value of it but a pointer, and means what
+(SLT0024). `void*` is not a value of it but a pointer, and means what
 C's does: any pointer converts to `void*` without a cast, as it does to
 `byte*`, and between any two other pointer types it takes one.
 
@@ -73,7 +73,7 @@ char16 right = (char16)a;       // allowed, and says so at the call site
 ```
 
 ```
-error[SL0527]: 'char' and 'char16' are different encodings, not different
+error[SLT0056]: 'char' and 'char16' are different encodings, not different
 widths of one, so one does not become the other on its own; a cast '(char16)'
 moves the bits across and re-encodes nothing
 ```
@@ -93,17 +93,17 @@ const int Tab  = '\t';           // still an ordinary integer constant
 ```
 
 ```
-error[SL0527]: U+00E9 takes 2 bytes of UTF-8, so it is not one 'char';
+error[SLT0056]: U+00E9 takes 2 bytes of UTF-8, so it is not one 'char';
 declare it 'char16' or 'char32'
 
-error[SL0526]: U+D800 is not a Unicode scalar value, so \u cannot name it;
+error[SLP0031]: U+D800 is not a Unicode scalar value, so \u cannot name it;
 scalars stop at U+10FFFF and the surrogate range U+D800 to U+DFFF is reserved
 for UTF-16 pairs
 ```
 
-**One scalar means one**, so `''` is not a character (SL0010); `'\0'` is how
+**One scalar means one**, so `''` is not a character (SLP0010); `'\0'` is how
 the zero one is written. And `\u` takes exactly four hex digits where `\U`
-takes eight (SL0008) — a short one is a mistake rather than a smaller number,
+takes eight (SLP0008) — a short one is a mistake rather than a smaller number,
 since `"\u12"` reading as U+0012 is a value nobody wrote. `\x` is the
 exception and is a byte in one digit or two, as in C.
 
@@ -154,7 +154,7 @@ struct is still laid out as C would lay it out, but it can no longer be handed
 compiler stops it at the boundary:
 
 ```
-error[SL0284]: 'Holder' holds a reference, so parameter 'h' cannot cross
+error[SLI0002]: 'Holder' holds a reference, so parameter 'h' cannot cross
 extern "C"; C would copy its bytes and leave the count behind. Pass a struct of
 plain data, or a raw pointer
 ```
@@ -193,22 +193,22 @@ the bytes C expects: a constructor adds no header and no hidden field.
 **The slot is zeroed first.** A field the constructor did not write holds what
 `Point value;` would have left there, so the two ways of making one agree. A
 field whose type has no zero value MUST be written on every path through every
-constructor (SL0813, [§2.16.2](#2162-fields)).
+constructor (SLO0030, [§2.16.2](#2162-fields)).
 
-**A constructor taking no arguments is refused** (SL0738). `Point value;`
+**A constructor taking no arguments is refused** (SLC0100). `Point value;`
 declares one and runs nothing, so such a constructor would run for some of them
 and not for others — a rule the reader cannot see at the point of use. The zero
 value is what an unconstructed struct is, and that stays true — for a struct
 that has one.
 
-**`new` on a struct that declares no constructor is refused** (SL0245), rather
+**`new` on a struct that declares no constructor is refused** (SLC0008), rather
 than meaning the zero value. A struct with no constructor is written
 `Point value;`, and having two spellings for it would make `new` mean one thing
 on a struct with constructors and another on a struct without.
 
 `: this(...)` delegates to another of the struct's own constructors, on the
-same terms as a class's ([section 2.4.3](#243-inheritance)). `base(...)` is SL0515:
-only a class derives from another. A union has no constructor at all (SL0207),
+same terms as a class's ([section 2.4.3](#243-inheritance)). `base(...)` is SLC0054:
+only a class derives from another. A union has no constructor at all (SLC0002),
 because which of its members is live is exactly what it does not record, and a
 variant is made by naming one of its cases.
 
@@ -238,7 +238,7 @@ That is C's own idiom, and it is the reason both features want doing together.
 things, so passing one where the other belongs is caught:
 
 ```
-error[SL0262]: argument 1 of 'Width' expects 'HWND__*', but 'HDC__*' was given
+error[SLT0015]: argument 1 of 'Width' expects 'HWND__*', but 'HDC__*' was given
 ```
 
 It costs nothing. Neither type is ever laid out, emitted, or present at run
@@ -251,18 +251,18 @@ written type passes through — a field, a local, a parameter, a return type, an
 array element, a `sizeof` and a generic argument all arrive there:
 
 ```
-error[SL0524]: 'HWND__' is declared without a body, so its size is not known
+error[SLI0023]: 'HWND__' is declared without a body, so its size is not known
 here and there is no value of it to have; write 'HWND__*', which is what an
 incomplete type is for
 ```
 
-Only a `struct` may be written this way (SL0523). A class is reached through a
+Only a `struct` may be written this way (SLI0022). A class is reached through a
 pointer this compiler has to lay out; a union and a variant are nothing but
 their contents; and a generic one has nothing for a type parameter to appear in.
 
 **It is not a forward declaration.** Stainless has none, because declaration
 order never matters: a type is either complete or opaque for the whole program,
-and a second declaration of the same name is the ordinary duplicate (SL0201).
+and a second declaration of the same name is the ordinary duplicate (SLN0001).
 
 A generated C header says exactly what the source said — the tag declared and
 never defined, and the alias as the typedef it is:
@@ -351,8 +351,8 @@ elements would have to either take part in the type's identity — making
 which leaves two names for one field. Where a name is wanted it is wanted at
 the *use* site, and that is what `var (low, high) = ...` is for.
 
-**At least two elements** (SL0606): one value in parentheses is that value.
-Every element is a value (SL0607), so a call returning nothing cannot be one.
+**At least two elements** (SLP0037): one value in parentheses is that value.
+Every element is a value (SLT0069), so a call returning nothing cannot be one.
 
 A tuple is a type like any other: nested in another tuple, held in a
 `List<(int, String)>`, inferred through a generic — `T FirstOf<T, U>((T, U) p)`
@@ -367,7 +367,7 @@ the tuple is going somewhere that says what that is:
 ```csharp
 (String?, int) Find(String key) => found ? (name, at) : (null, -1);
 Report((Ok(5), "five"));
-var loose = (null, 1);                  // SL0756: nothing says what the null is
+var loose = (null, 1);                  // SLT0076: nothing says what the null is
 ```
 
 A tuple held in a variable converts only to its own type. Converting one
@@ -402,9 +402,9 @@ stands.
 **A target is anything that can be assigned** — a variable, a field, an
 element, a property, an indexer — or a declaration, `int a` or `var a`, or
 `_`, which stores nothing. `var (a, b)` is `(var a, var b)` written once.
-Taking apart names exactly as many things as there are (SL0609).
+Taking apart names exactly as many things as there are (SLF0031).
 
-**A declaration belongs to a statement** (SL0771). `(int a, var b) = t;`
+**A declaration belongs to a statement** (SLF0040). `(int a, var b) = t;`
 declares two locals in the enclosing block; inside a larger expression there
 is no block for them to belong to. A deconstruction that only assigns is an
 expression, and its value is the tuple it stored — so `(a, b) = (c, d) = t`
@@ -431,14 +431,14 @@ var (low, high) = range;
 ```
 
 A value that has neither a tuple's shape nor a `Deconstruct` for that many
-names cannot be taken apart (SL0608). A record has one generated
+names cannot be taken apart (SLF0030). A record has one generated
 ([section 2.4.6](#246-record--a-class-written-as-its-constructor)), and
 `KeyValuePair` has one, so `foreach (var (key, value) in dictionary)` names
 both halves.
 
 **`foreach` takes each element apart** as it reaches it:
 `foreach (var (key, count) in totals)`, or `foreach ((int k, String v) in
-pairs)`. The loop only declares: a name that already exists is SL0772,
+pairs)`. The loop only declares: a name that already exists is SLF0041,
 because the loop variable belongs to one iteration and a place outside the
 loop does not.
 
@@ -491,7 +491,7 @@ public struct ProcessSerialNumber {    // 8 bytes, on a two-byte boundary
 ```
 
 `[Packed]` is `[Pack(1)]`, and the two together say nothing one of them does
-not (SL0421).
+not (SLI0005).
 
 `[Align]` combines with either: `[Packed] [Align(4)]` means nothing padded
 inside, and the whole of it on a four-byte boundary.
@@ -510,11 +510,11 @@ public struct Event {        // 16 bytes, on a four-byte boundary
 }
 ```
 
-Only a struct's or a union's field may be packed, and not a bit-field (SL0463).
+Only a struct's or a union's field may be packed, and not a bit-field (SLI0006).
 A header written for a library carrying one cannot be compiled by MSVC, which
 has no way to say it, and says so.
 
-**N may be up to 4096, a page** (SL0466), and the boundary holds wherever the
+**N may be up to 4096, a page** (SLI0008), and the boundary holds wherever the
 value lives: a local, a static, a field of an object, an array's element,
 what a closure captured. `malloc` promises sixteen, so an object or array
 whose storage needs more is allocated over-sized by the runtime and placed on
@@ -524,8 +524,8 @@ from sharing one.
 
 They apply to a `struct`, and `[Pack]` to a `union` as well, and to nothing else. A class's fields sit behind an
 object header the compiler owns, and a variant's payload area is not a field the
-source arranged, so neither is a layout the programmer is choosing (SL0463,
-SL0728).
+source arranged, so neither is a layout the programmer is choosing (SLI0006,
+SLC0096).
 
 A generated C header states each -- `#pragma pack(push, 1)` around a packed
 struct, `#pragma pack(push, N)` around one with `[Pack(N)]`, and `__declspec(align(n))` or `__attribute__((aligned(n)))` behind a
@@ -560,17 +560,17 @@ one explicitly; the default is the host's, and it reaches C++ names, bit-fields
 and how a struct is passed — Win64 asks only how big one is, System V asks what
 is in it. See [§3.4 of abi.md](../abi.md#34-how-a-struct-is-passed).
 
-**A bit-field has no address** (SL0230), for the reason C refuses `&s.flags`.
-It cannot be passed by `ref` (SL0443) and cannot be pointed at.
+**A bit-field has no address** (SLT0004), for the reason C refuses `&s.flags`.
+It cannot be passed by `ref` (SLT0041) and cannot be pointed at.
 
 Reading one is a load of the storage unit, a shift and a mask; writing one is a
 read, a splice and a write, so the neighbours sharing the unit are untouched.
 
-Not here yet: the zero-width field that closes a storage unit (SL0473), and
-unnamed padding fields. `[Packed]` together with bit-fields is refused (SL0470)
+Not here yet: the zero-width field that closes a storage unit (SLI0015), and
+unnamed padding fields. `[Packed]` together with bit-fields is refused (SLI0012)
 rather than guessed, because gcc packs the bits and MSVC keeps the unit and
 there is nothing yet to say which this language means. `[Reflect]` is refused on
-a type with bit-fields (SL0475), because the field tables describe a byte offset
+a type with bit-fields (SLI0017), because the field tables describe a byte offset
 and a bit-field has not got one.
 
 ## 2.4 `class` — reference type, ARC managed
@@ -629,8 +629,8 @@ the initializers run there.
 
 **A field with no initializer is written by every constructor** when its type
 has no zero value: a `String` field that no path writes would be read as a
-null. `required` counts (SL0813, [§2.16.2](#2162-fields)). The write MUST come
-before the object can be reached (SL0938), or the field is `late`
+null. `required` counts (SLO0030, [§2.16.2](#2162-fields)). The write MUST come
+before the object can be reached (SLO0033), or the field is `late`
 ([§2.16.5](#2165-late-fields)).
 
 **A constructor that chains to `this(...)` does not run them**, because the one
@@ -638,7 +638,7 @@ it delegates to already did, and running them twice would undo whatever that
 constructor decided. The base class's initializers are not here either: the
 base's own constructor runs them, after this class's.
 
-**An initializer cannot read the object** (SL0633) — not `this`, not another
+**An initializer cannot read the object** (SLC0084) — not `this`, not another
 field, not a method. It runs before the constructor's body and in declaration
 order, so what it would read is whatever the allocation left, which is zero.
 A constructor is where one field's value may depend on another. Everything else
@@ -647,7 +647,7 @@ is in reach: a literal, a `const`, a static, a call to a free function, a `new`.
 **Only a class has them**, and a struct with a primary constructor
 ([§2.4.5](#245-a-primary-constructor)), every constructor of which runs that
 one. Any other `struct` is made by declaring one — `Point p;` — and there is no
-moment there for an initializer to run at, so one is refused (SL0617) rather
+moment there for an initializer to run at, so one is refused (SLC0075) rather
 than silently skipped.
 
 ### 2.4.2 Making one with its members written out
@@ -671,7 +671,7 @@ already keeps for `GetEnumerator` ([§9.4](09-statements-expressions.md#94-forea
 without `Standard.Collections` appearing anywhere in the program.
 
 Which of the two a brace list is comes from its entries, and **they may not be
-mixed** (SL0618): one that did both would be two different things at once, and
+mixed** (SLC0076): one that did both would be two different things at once, and
 a reader would have to know the type to see which each entry was. The other
 refusals are the ones an assignment would have given anyway — no such member,
 a property with no setter, a member that is not visible — plus a type with no
@@ -753,7 +753,7 @@ Dog dog = new Kennel().Adopt();             // no cast
 It costs nothing, because a reference is one pointer whatever its static type:
 the slot holds the override, and what it hands back is already a valid `Animal`.
 A get-only property may narrow its type the same way. One with a setter may not
-(SL0502), because a caller holding the base could store any `Animal` through it.
+(SLC0042), because a caller holding the base could store any `Animal` through it.
 A value type is never narrowed, and neither is an interface implementation,
 which matches its interface's signature exactly as C# requires.
 
@@ -781,7 +781,7 @@ public override int Value { get => base.Value; }
 
 would otherwise call itself for ever. A member the base declares `abstract`
 has no implementation there, so `base.M()` or `base.P` naming one is an
-error (SL0806) rather than a call to nothing.
+error (SLC0115) rather than a call to nothing.
 
 **Construction is in two phases: an object can be reached only once every
 field it has holds a value**, as
@@ -825,8 +825,8 @@ Field initializers run first of all, in the first phase: they cannot read the
 object, so nothing in them can tell.
 
 **Every field with no zero value MUST have its value by the end of the first
-phase** (SL0938), and none may be read before it has one (SL0811). Before a
-written `base(...)`, reaching the object is refused (SL0937), as is returning:
+phase** (SLO0033), and none may be read before it has one (SLO0028). Before a
+written `base(...)`, reaching the object is refused (SLO0032), as is returning:
 the base would never be built. A field whose value needs the finished object --
 a child that is handed its parent, a peer handed the control it reports to --
 is declared `late` instead ([section 2.16.5](#2165-late-fields)).
@@ -835,24 +835,24 @@ A constructor writes the call once, in one place or the other, and nothing may
 follow the `:` but these two calls:
 
 ```
-error[SL0516]: 'base(...)' is a statement of the constructor's body itself,
+error[SLC0055]: 'base(...)' is a statement of the constructor's body itself,
 once: the base class is built exactly once, on every path, when this class's
 fields have their values
-error[SL0517]: 'Shape' has no constructor that takes no arguments, so 'Circle'
+error[SLC0056]: 'Shape' has no constructor that takes no arguments, so 'Circle'
 has to say which one to run: write 'base(...)' in its constructor, after the
 statements that give its fields their values
-error[SL0937]: this reaches the object before 'base(...)' has run; until then a
+error[SLO0032]: this reaches the object before 'base(...)' has run; until then a
 constructor may only give this class's own fields their values and read them
 back, because the object is not whole
-error[SL0938]: 'Button._native' has no value yet when 'base(...)' runs, and
+error[SLO0033]: 'Button._native' has no value yet when 'base(...)' runs, and
 'IPushButtonPeer' has no zero value: ... Give it its value before this, so that
 nothing can find the object without it
-error[SL0811]: '_items' is read here before the constructor has given it a
+error[SLO0028]: '_items' is read here before the constructor has given it a
 value, and 'List<int>' has no zero value: ...
-error[SL0732]: a constructor may be followed by ': base(...)' or ': this(...)'
+error[SLP0041]: a constructor may be followed by ': base(...)' or ': this(...)'
 and nothing else; there are no initializer lists here, because a field is
 initialized where it is declared or in the body
-error[SL0733]: this constructor already chains after its parameters, so the
+error[SLP0042]: this constructor already chains after its parameters, so the
 body must not chain again; the two spellings are one call and a constructor
 makes it once
 ```
@@ -863,7 +863,7 @@ inherits must say `override`, and what it overrides must be `virtual` or
 hidden member has nothing to say it about.
 
 ```
-error[SL0503]: 'Derived.Value' has the same name and parameters as
+error[SLC0043]: 'Derived.Value' has the same name and parameters as
 'Base.Value'; write 'override' to replace it
 ```
 
@@ -893,7 +893,7 @@ public class Pair
 ```
 
 ```
-error[SL0521]: the constructors of 'Ring' delegate to each other in a ring, so
+error[SLC0058]: the constructors of 'Ring' delegate to each other in a ring, so
 none of them ever builds anything
 ```
 
@@ -917,11 +917,11 @@ enforced by the ABI digest rather than by convention (see
 [§5 of packages.md](../packages.md#5-the-digest)).
 
 Three kinds of class are not in a library's metadata at all, so none of them is
-there to derive from: a `com class` (SL0419), whose tear-offs are laid out after
+there to derive from: a `com class` (SLD0007), whose tear-offs are laid out after
 its fields by the compilation that built it; a class that implements an
-interface (SL0419), whose dispatch tables are indexed by ids assigned across one
-whole program; and a class with a generic virtual method (SL0419). A class the
-runtime provides, such as `String`, cannot be derived from either (SL0513).
+interface (SLD0007), whose dispatch tables are indexed by ids assigned across one
+whole program; and a class with a generic virtual method (SLD0007). A class the
+runtime provides, such as `String`, cannot be derived from either (SLC0052).
 
 ### 2.4.4 `is`, `as`, and casting down
 
@@ -975,7 +975,7 @@ The value tested is taken where the test is evaluated, so an `&&` that stops
 before the test takes nothing: in `ready && Load() is Square s`, `Load` is not
 called when `ready` is false. Read anywhere else — after an `||` the test may
 have lost, as an argument, after a loop — the name may never have been
-assigned, and it is refused there (SL0585). C# puts it in scope and refuses
+assigned, and it is refused there (SLF0024). C# puts it in scope and refuses
 the read as unassigned; the effect is the same, and a name here is never
 visible where it could hold nothing.
 
@@ -985,7 +985,7 @@ What follows `is` is any pattern, not only a type ([§9.1.1](09-statements-expre
 `x is { }` narrow a local `C?` exactly as `x != null` does
 ([§2.5](#25-pointers-and-nullability)).
 
-A *class* is what may be named: `x is INamed n` is refused (SL0587), because a
+A *class* is what may be named: `x is INamed n` is refused (SLF0026), because a
 reference does not convert down to an interface and there would be nothing for
 `n` to be.
 
@@ -1039,7 +1039,7 @@ if (node.Next is Node n) { return n.Value; }    // 'node.Next' read once
 A test that could never be true is a mistake rather than a constant false:
 
 ```
-error[SL0518]: no object is both a 'Circle' and a 'Unrelated': neither derives
+error[SLF0020]: no object is both a 'Circle' and a 'Unrelated': neither derives
 from the other
 ```
 
@@ -1063,13 +1063,13 @@ gets no test at all: `square as Shape` is the ordinary widening and emits
 nothing.
 
 What it refuses is what could never be anything but null, since `as` is for a
-question with two answers and these have one (SL0625, SL0647):
+question with two answers and these have one (SLT0072, SLT0073):
 
 ```
-error[SL0625]: no object is both a 'Alpha' and a 'Beta': neither derives from
+error[SLT0072]: no object is both a 'Alpha' and a 'Beta': neither derives from
 the other, so this would always be null
 
-error[SL0647]: 'as' answers with an optional already, so the '?' says it twice;
+error[SLT0073]: 'as' answers with an optional already, so the '?' says it twice;
 write 'as Alpha'
 ```
 
@@ -1084,7 +1084,7 @@ A COM interface is the other refusal, and it is not about the answer being
 known: `QueryInterface` is a call the object answers, and answers again, so a
 test followed by a conversion would ask twice and could be told two different
 things. `(IThing)x` asks once, and ends the program if the answer was no —
-which is the same bargain a binding `is` refuses for the same reason (SL0587).
+which is the same bargain a binding `is` refuses for the same reason (SLF0026).
 
 ### 2.4.5 A primary constructor
 
@@ -1123,10 +1123,10 @@ field and the destructor releases it.
 
 **Every other constructor runs the primary one**, with `: this(...)`, since it is
 the one that gives the parameters and the fields kept from them their values
-(SL0785). Only the primary constructor runs the initializers, so a struct with
+(SLC0107). Only the primary constructor runs the initializers, so a struct with
 one may have them too: every `new` of it runs one. `: Shape("circle")` after the
 name is the primary constructor's `base(...)`, and goes on the first entry of the
-list (SL0839); a record passes its parameters on the same way.
+list (SLC0125); a record passes its parameters on the same way.
 
 **On a struct, kept fields are part of the value.** They come after every field
 the struct declares, in the order of the parameter list, which is where C would
@@ -1137,8 +1137,8 @@ one whose parameters only initialize its fields is eight. They are not
 described to reflection, which describes what a type declares.
 
 A `ref`, `in` or `out` parameter names the caller's storage, which does not
-outlive the call, so a member body may not name one (SL0787). A static member
-has no instance to read a kept parameter from (SL0576).
+outlive the call, so a member body may not name one (SLC0109). A static member
+has no instance to read a kept parameter from (SLN0022).
 
 ### 2.4.6 `record` — a class written as its constructor
 
@@ -1216,7 +1216,7 @@ in its way but the generating; until then, it is a struct with a constructor,
 an `Equals` and a `GetHashCode` ([§2.2.1](#221-a-structs-constructor)).
 
 ```
-error[SL0734]: there is no 'record struct' yet; write 'record' for a class, or
+error[SLC0097]: there is no 'record struct' yet; write 'record' for a class, or
 a struct with a constructor, 'Equals' and 'GetHashCode' of its own, which may
 implement 'IEquatable' and 'IHashable' as a record's would
 ```
@@ -1241,7 +1241,7 @@ is asked, which is what C#'s `EqualityContract` is for. Here it is
 both sides. A name beginning with `$` cannot be written, so it collides with
 nothing. The cost is a virtual call per side on each `Equals`.
 
-**Only a record may derive from a record** (SL0804). A class deriving from one
+**Only a record may derive from a record** (SLC0114). A class deriving from one
 would be compared and copied as the record, and what it added would be
 silently left out of both. A record may derive from a class that is not one,
 which C# refuses: it is how a record shares state with a hierarchy that was not
@@ -1249,7 +1249,7 @@ written as records, and nothing about the record's own members depends on its
 base being one.
 
 ```
-error[SL0804]: 'Shape' is a record, and only a record may derive from one
+error[SLC0114]: 'Shape' is a record, and only a record may derive from one
 ```
 
 **`record` is contextual**, as `closure` and `where` are: it is read as a
@@ -1300,12 +1300,12 @@ var summed = point with { Y = point.X + point.Y };
 Three things are refused:
 
 ```
-error[SL0735]: 'with' makes a copy of a record with some of it changed, and
+error[SLC0098]: 'with' makes a copy of a record with some of it changed, and
 'Plain' is not a record; give it positional parameters, or write out the
 construction this would have made
-error[SL0736]: 'Point' has no parameter or settable property named 'Z', so
+error[SLC0099]: 'Point' has no parameter or settable property named 'Z', so
 there is nothing for this to change; it takes 'X', 'Y'
-error[SL0725]: 'X' is given a value twice here, and the second would silently be
+error[SLC0093]: 'X' is given a value twice here, and the second would silently be
 the one that counted
 ```
 
@@ -1381,7 +1381,7 @@ anywhere in the body does:
 if (x != null)
 {
     x = Next();
-    x.Value                     // error[SL0248]: the proof was about the old value
+    x.Value                     // error[SLO0001]: the proof was about the old value
 }
 ```
 
@@ -1395,7 +1395,7 @@ result may be a different value by the time it is read, so neither carries a
 proof, and putting it in a local first is both the fix and what the code meant:
 
 ```
-error[SL0248]: 'Node?' may be null, and this is not something a check can be
+error[SLO0001]: 'Node?' may be null, and this is not something a check can be
 about: a field or a call result may be a different value by the time it is
 read. Put it in a local, check that against null, and reach 'Value' through it
 ```
@@ -1416,7 +1416,7 @@ be ([§9.7](09-statements-expressions.md#97----and-)).
 `T[]?` is `C?`'s pointer with an array behind it. A closure is two words, and
 its null is a null function word: `Notify?` is those two words, compared with
 `null` as both, and a call through one is refused until a check has said there
-is a function to call (SL0248):
+is a function to call (SLO0001):
 
 ```csharp
 Notify? handler = null;
@@ -1425,7 +1425,7 @@ if (handler is { } run)
 ```
 
 Only a class, an interface, an array and a closure may be optional; `nuint?` and
-a struct's `Point?` are SL0271, and `Optional<T>` is what says "a value or none"
+a struct's `Point?` are SLT0021, and `Optional<T>` is what says "a value or none"
 for them ([§2.8.1](#281-optionalt--a-value-or-none)).
 
 **A `weak C?` is never narrowed.** It may die between the check and the use,
@@ -1445,7 +1445,7 @@ int Sum(Point* p)
 ```
 
 ```
-error[SL0494]: 'Point' is not a pointer, so '->' does not apply to it; write '.X'
+error[SLT0055]: 'Point' is not a pointer, so '->' does not apply to it; write '.X'
 ```
 
 A module, a variant and an enum are names rather than values, so none of them is
@@ -1490,13 +1490,13 @@ Area(Circle(2.0));                // and so does a parameter
 
 The bare form is the one `Ok` and `Fail` have always used, and it obeys the same
 rule a lambda does: it takes its type from where it is going. It cannot be
-inferred *from*, so `var s = Circle(2.0);` is SL0553. A generic variant is
+inferred *from*, so `var s = Circle(2.0);` is SLT0061. A generic variant is
 built this way, or named with its type arguments in front of the case, as in
 `Tree<int>.Leaf(1)` ([§4.4.1](04-generics.md#441-writing-type-arguments-at-a-call)).
 
 Because a bare case name resolves before any function of that name would, **a
 module-level function may not be named after a case of a variant its file can
-see** (SL0414). A *method* still may: a method is reached through its receiver,
+see** (SLN0019). A *method* still may: a method is reached through its receiver,
 and nothing there is ambiguous.
 
 **Asking which case.** `v.Case` is a bool — one load of the tag and one
@@ -1511,7 +1511,7 @@ case is there first. This is the whole point of the type, and it is checked
 rather than trusted:
 
 ```csharp
-shape.Radius                  // error[SL0285]: nothing has established that
+shape.Radius                  // error[SLF0006]: nothing has established that
                               // 'shape' is 'Circle'
 if (shape.Circle) { shape.Radius }    // fine
 ```
@@ -1520,7 +1520,7 @@ The proof comes from the same shapes that narrow anything else — an `if`, its
 negation, `&&`, `||`, a ternary, an early return — and it is taken away again by
 anything that could have changed the value. A variant with exactly two cases
 narrows on a false test as well as a true one, which is why `if (!r.Ok)` proves
-`Fail`. Only a variant held in a local or a parameter can carry a proof (SL0285),
+`Fail`. Only a variant held in a local or a parameter can carry a proof (SLF0006),
 for the reason given in [§2.8](#28-resultt-terror--how-a-function-fails).
 
 **This is the short form, and it is usually the one to write.** A reader that
@@ -1547,14 +1547,14 @@ if (node.Payload is Circle c)
     return c.Radius;
 ```
 
-A field or a call result carries no narrowing (SL0285), because either could be
+A field or a call result carries no narrowing (SLF0006), because either could be
 a different value by the time the payload is read. `is` says so explicitly: the
 value is evaluated once and what came out of it has a name. That name is a copy
 of the case's payload — the same struct `case Circle c:` binds — and it is in
-scope where the test is known to have matched, and nowhere else (SL0585).
+scope where the test is known to have matched, and nowhere else (SLF0024).
 `value is Number(var held)` takes the payload apart instead, a field per
 position ([§9.1.1](09-statements-expressions.md#911-patterns)). A case
-that carries nothing has nothing to name (SL0586); `if (value is Null)` is the
+that carries nothing has nothing to name (SLF0025); `if (value is Null)` is the
 whole question there.
 
 **Switching over one** covers the cases rather than constant values, and needs
@@ -1575,7 +1575,7 @@ double Area(Shape shape)
 Leaving a case out without a `default` is an error that names what is missing:
 
 ```
-error[SL0436]: this switch over 'Shape' does not cover 'Rect' and 'Empty'; a
+error[SLF0017]: this switch over 'Shape' does not cover 'Rect' and 'Empty'; a
 variant is the choice between its cases, so a switch that leaves one out has no
 answer for it. Add the case, or a 'default'
 ```
@@ -1601,11 +1601,11 @@ bytes, and copies with a `memcpy` like any other struct.
 
 **Where a variant may go.** It is a struct, so it goes wherever a struct goes:
 across `extern "C"` if no case holds a reference and not at all if one does
-(SL0284), into an array, into a field, across a thread when everything every
+(SLI0002), into an array, into a field, across a thread when everything every
 case carries could cross on its own. Two things it does not do yet: cross a
-library boundary as a binary (SL0419 — the metadata carries layouts, and a
+library boundary as a binary (SLD0007 — the metadata carries layouts, and a
 variant's cases are what a consumer would switch on), and carry `[Reflect]`
-(SL0728 — the field tables would describe the tag and the payload, which are not
+(SLC0096 — the field tables would describe the tag and the payload, which are not
 fields the program has).
 
 ## 2.7 `union` — every member at offset zero
@@ -1637,7 +1637,7 @@ which case is present and will not let you read another; a union knows nothing
 and will let you read any of them. Reach for a variant unless a C header is
 telling you what shape to be.
 
-**No member may hold a counted reference** (SL0468) — nor a struct that holds
+**No member may hold a counted reference** (SLI0010) — nor a struct that holds
 one, at any depth. Which member is live is exactly what a union does not record,
 so a copy could not know what to retain and a drop could not know what to
 release. That is not a restriction added for safety; it is the question a union
@@ -1655,9 +1655,9 @@ public struct Tagged
 }
 ```
 
-A union has no constructor (SL0207) and no destructor, and it implements no
+A union has no constructor (SLC0002) and no destructor, and it implements no
 interface, because an interface reference is a counted pointer and a union is a
-plain C value (SL0314). Which member is live is exactly what a union does not
+plain C value (SLC0016). Which member is live is exactly what a union does not
 record, so there is nothing for a constructor to have established. `[Packed]` and `[Align]` apply to one as
 they do to a struct. A generated C header writes it as a C `union`, member for
 member.
@@ -1698,7 +1698,7 @@ further in. Two nameless members at the same depth both declaring it is an
 error rather than a guess:
 
 ```
-error[SL0492]: 'Value' is ambiguous: 2 nameless members of 'Ambiguous' declare
+error[SLN0020]: 'Value' is ambiguous: 2 nameless members of 'Ambiguous' declare
 it. Give one of them a name, so that the one you mean can be said
 ```
 
@@ -1757,11 +1757,11 @@ Result<int, Why> Doubled(int n)
 }
 
 Result<int, Why> held = Ok(4);                  // and from a declared local
-var loose = Ok(4);                              // error[SL0553]: nothing to infer from
+var loose = Ok(4);                              // error[SLT0061]: nothing to infer from
 ```
 
 For the same reason a module-level function may not be named `Ok` or `Fail`
-(SL0414) — the general rule for any variant's case, [§2.6](#26-variant--a-value-that-is-one-of-several-things). A *method* still may.
+(SLN0019) — the general rule for any variant's case, [§2.6](#26-variant--a-value-that-is-one-of-several-things). A *method* still may.
 
 **`Value` and `Error` are readable only where it is known which one is there.**
 This is the general rule for a variant's payload, and it is what makes a Result
@@ -1769,7 +1769,7 @@ different from a pair of fields that happen to sit together:
 
 ```csharp
 var read = File.ReadAllText(path);
-read.Value                     // error[SL0285]: nothing has established that
+read.Value                     // error[SLF0006]: nothing has established that
                                // 'read' succeeded
 ```
 
@@ -1803,12 +1803,12 @@ var r = Get();
 if (!r.Ok)
     return 0;
 r = Get();
-return r.Value;               // error[SL0285]: the proof was about the old value
+return r.Value;               // error[SLF0006]: the proof was about the old value
 ```
 
 **What is not narrowed.** Only a Result held in a local or a parameter can
 carry a proof, because that is the only thing a check can be *about*; a field
-or a call result is refused with SL0285, and putting it in a local first is
+or a call result is refused with SLF0006, and putting it in a local first is
 both the fix and what the code wanted to say. A caller with a sensible default
 needs no proof at all:
 
@@ -1858,11 +1858,11 @@ confused with.
 
 Three rules:
 
-- Only inside a function returning a `Result` (SL0570). There is nowhere else
+- Only inside a function returning a `Result` (SLF0022). There is nowhere else
   for the failure to go, and aborting instead would be a decision the caller
   never made. A caller with a sensible default wants `GetValueOrDefault`.
-- The operand must be a `Result` (SL0569).
-- **The error types must match** (SL0571). `try` passes a failure on unchanged;
+- The operand must be a `Result` (SLF0021).
+- **The error types must match** (SLF0023). `try` passes a failure on unchanged;
   converting one error type to another is a decision about what the failure
   means, and this refuses to make it silently.
 
@@ -1874,7 +1874,7 @@ in one — `Ok(try P(a) + try P(b))` — and each returns on its own failure.
 
 `C?` is a nullable reference: the null is the pointer, so it costs nothing and
 the compiler narrows it ([§2.5](#25-pointers-and-nullability)), and so is `T[]?`. A **value type has no spare bit to be null
-with**, so `nuint?` is refused (SL0271), and the usual stand-in is a magic
+with**, so `nuint?` is refused (SLT0021), and the usual stand-in is a magic
 number — a lookup answering with the largest `nuint` there is, and every caller
 agreeing to read that as "not there".
 
@@ -2045,7 +2045,7 @@ reached through the object rather than carried alongside it. So `IShape?`,
 a class, and passing a `IShape` costs the same as passing any reference.
 
 **A `struct` may implement an interface too**, and keeps the promise with
-members of its own. What it may not do is become a reference to one (SL0302):
+members of its own. What it may not do is become a reference to one (SLC0010):
 an interface reference is counted, and a struct is a plain C value with
 nowhere to keep a count. A struct is taken where a generic parameter
 `T : IShape` is, and every call on it is to its own member, in place, with no
@@ -2056,7 +2056,7 @@ to its layout, so it crosses `extern "C"` as it did before.
 public struct Square : IShape { public double Side; public double Area() => Side * Side; }
 
 double Measure<T>(T shape) where T : IShape => shape.Area();   // fine
-IShape held = square;                                          // SL0302
+IShape held = square;                                          // SLC0010
 ```
 
 That is what lets a struct be a dictionary key or be sorted: `Guid`,
@@ -2132,7 +2132,7 @@ compile, and `((IGreeter)person).Greet()` does. It costs nothing a slot did not
 already cost — the default is an ordinary function, emitted once per interface
 (once per instantiation of a generic one), and its address is what goes in
 the table of every class that supplies nothing. An interface still has no
-state, so a default property is computed; `field` in one is refused (SL0300).
+state, so a default property is computed; `field` in one is refused (SLC0009).
 
 **A member may be written under an interface's name**, `void IShape.Draw()`.
 It fills that interface's slot and is reached no other way — not by name on the
@@ -2148,10 +2148,10 @@ public class Crate : ISized
 ```
 
 It takes no modifier, since it is as visible as the interface and dispatched
-because the interface is (SL0795); it has to name an interface the type
-implements and a member of that interface (SL0794); and a property written
+because the interface is (SLC0112); it has to name an interface the type
+implements and a member of that interface (SLC0111); and a property written
 this way has its accessors written out, since an automatic one would want
-storage named after a property the class may also have (SL0793). Its symbol
+storage named after a property the class may also have (SLC0110). Its symbol
 carries the interface's name, so it never collides with a member written
 plainly.
 
@@ -2159,7 +2159,7 @@ plainly.
 that is how two defaults for one member meet. The one that applies is the
 most specific: the one whose interface extends every other that supplies one.
 When no single one does, the class must decide by implementing the member
-itself, which is C#'s CS8705 (SL0796):
+itself, which is C#'s CS8705 (SLC0113):
 
 ```csharp
 public interface IA { String Which() => "A"; }
@@ -2167,7 +2167,7 @@ public interface IB : IA { String IA.Which() => "B"; }
 public interface IC : IA { String IA.Which() => "C"; }
 
 public class OnlyB : IB { }                 // "B"
-public class Both : IB, IC { }              // SL0796: IB and IC tie
+public class Both : IB, IC { }              // SLC0113: IB and IC tie
 public interface ID : IB, IC { String IA.Which() => "D"; }
 public class Merged : ID { }                // "D", which beats both
 ```
@@ -2236,14 +2236,14 @@ var mixed = [1, 2L, 3];                 // long[], as `flag ? 1 : 2L` is a long
 An empty one has nothing to settle from and needs to be told:
 
 ```
-error[SL0548]: an empty array literal has no element type and nothing here says
+error[SLT0059]: an empty array literal has no element type and nothing here says
 what it should be; write 'new T[0]', or give the variable a type
 
-error[SL0549]: this element is 'String' and the ones before it are 'int'; an
+error[SLT0060]: this element is 'String' and the ones before it are 'int'; an
 array holds one type, so either make them agree or give the array a type of its
 own
 
-error[SL0547]: 'int[3]' holds exactly 3 elements, and this literal has 2; an
+error[SLT0058]: 'int[3]' holds exactly 3 elements, and this literal has 2; an
 inline array is its elements, so there is nowhere to keep a different number of
 them
 ```
@@ -2283,18 +2283,18 @@ Because the length is part of the type it is known without a value to ask:
 ```csharp
 int[4] counters;
 counters.Length         // 4, a constant, not a load
-counters[9]             // error[SL0490], at compile time
+counters[9]             // error[SLT0053], at compile time
 counters[variable]      // bounds checked, against a constant
 ```
 
-A length must be an integer literal or a `const` holding one (SL0487) and at
-least 1 (SL0488).
+A length must be an integer literal or a `const` holding one (SLT0050) and at
+least 1 (SLT0051).
 
-**An inline array may not hold a counted reference** (SL0486): every copy of
+**An inline array may not hold a counted reference** (SLO0020): every copy of
 whatever held it would have to retain each element, which is the question a
 union cannot answer either. `T[]` is one counted object rather than N of them.
 
-**An inline array may not be a parameter by value** (SL0491). C decays an array
+**An inline array may not be a parameter by value** (SLT0054). C decays an array
 parameter to a pointer and Stainless has no decay, so passing one by value
 would be both a silent copy of every element and a different ABI from the C it
 is meant to match. `ref T[N]` is the one that lines up — it is `T (*)[N]` on
@@ -2371,18 +2371,18 @@ it yields: `var all = [..numbers, 4L]` is a `long[]` when `numbers` is an
 `int[]`.
 
 ```
-error[SL0778]: '..' spreads the elements of an array, a slice or anything with
+error[SLT0080]: '..' spreads the elements of an array, a slice or anything with
 a 'GetEnumerator()', and 'int' is none of those
 
-error[SL0779]: 'int[4]' holds exactly 4 elements, and this '..' has no length
+error[SLT0081]: 'int[4]' holds exactly 4 elements, and this '..' has no length
 until it runs; only an inline array's is known here
 
-error[SL0546]: 'Sealed' has no 'Add' taking one element, so there is nothing
+error[SLT0057]: 'Sealed' has no 'Add' taking one element, so there is nothing
 for an array literal's elements to be added with
 ```
 
-A spread whose elements do not convert to the element type is SL0837,
-and an inline array spread of the wrong length is SL0547.
+A spread whose elements do not convert to the element type is SLT0086,
+and an inline array spread of the wrong length is SLT0058.
 
 ## 2.12 `Span<T>` and `ReadOnlySpan<T>` — part of an array
 
@@ -2435,7 +2435,7 @@ Span<Trace> Middle()
 ```
 
 That is the trade. A slice costs a reference count per copy and is not a value C
-can be handed (SL0284, as for any struct holding a reference). What it buys is
+can be handed (SLI0002, as for any struct holding a reference). What it buys is
 that there are no lifetimes to explain: a slice is safe by the same rule
 everything else here is safe by.
 
@@ -2488,7 +2488,7 @@ that may be cleared is a `Span<C?>`. The empty span is the zero of the type —
 its array is a `T[]?`, never read while its length is zero.
 
 The names are recognised by one type argument: a program's own `Span`, with
-none, is still its own. `T[:]` is not a type (SL0807); `[:]` belongs to an
+none, is still its own. `T[:]` is not a type (SLP0052); `[:]` belongs to an
 expression, where it cuts one.
 
 ### 2.12.1 `ReadOnlySpan<T>`
@@ -2510,8 +2510,8 @@ only where it writes, as `Sort` and `Reverse` do.
 
 **A write through one is refused**, however it is spelled. Assigning an
 element, `+=` and `++` on one, setting a field or a property of a struct
-element (SL0808), passing one by `ref` or `out` (SL0444), and calling a struct
-method that writes the element it is called on (SL0809) are all the same
+element (SLT0082), passing one by `ref` or `out` (SLT0042), and calling a struct
+method that writes the element it is called on (SLT0083) are all the same
 write. A method that only reads is called in place, with no copy.
 
 **Cutting one keeps it read-only**: `seen[1:3]` of a `ReadOnlySpan<int>` is
@@ -2708,7 +2708,7 @@ itself, so a 32-bit call through a delegate that did not say so returns to a
 stack pointer several words adrift — and the program does not fail at that
 call, it fails later, somewhere else.
 
-A `closure` may not name one (SL0828). It is a pointer *and* a receiver, passed
+A `closure` may not name one (SLC0123). It is a pointer *and* a receiver, passed
 by machinery this language emits at both ends, so there is no foreign function
 for a convention to describe.
 
@@ -2797,11 +2797,11 @@ return type, as it is off a lambda's body
 
 **What it is not**
 
-- **Not a C function pointer** (SL0381). Sixteen bytes cannot go where eight
+- **Not a C function pointer** (SLT0034). Sixteen bytes cannot go where eight
   are expected, so a closure never satisfies a `delegate` and never crosses
   `extern "C"`. Declare a `delegate` for that, and take the context as an
   argument the way C does.
-- **Not inferrable by `var`** (SL0553), for the reason a bare function name is
+- **Not inferrable by `var`** (SLT0061), for the reason a bare function name is
   not: `counter.Add` names a method, and which closure type it becomes is what
   the declaration says.
 - **Not empty.** A closure's zero would call address zero, so it has no zero
@@ -2853,8 +2853,8 @@ subscriber **in the order they subscribed**, each with the arguments the raise
 was written with.
 
 **Only `+=` and `-=` cross the boundary.** From outside the declaring type,
-those two operators are all there is: an event cannot be read (SL0824), assigned
-(SL0825) or raised (SL0823). That is the difference between an event and a
+those two operators are all there is: an event cannot be read (SLC0121), assigned
+(SLC0122) or raised (SLC0120). That is the difference between an event and a
 public field of closure type, and the whole reason the word exists — one
 subscriber must not be able to see the others, replace them all, or fire the
 event on the publisher's behalf.
@@ -2874,12 +2874,12 @@ That is deliberately not C#, where an unsubscribed event is null and raising it
 throws — which is why almost every C# codebase writes `Changed?.Invoke(...)` at
 every raise site.
 
-**A handler must return `void`** (SL0819). Raising calls every subscriber, so
+**A handler must return `void`** (SLC0118). Raising calls every subscriber, so
 there is no single value to return; C# keeps the last one's and discards the
 rest. A handler that needs to report something takes an argument to report
 through.
 
-**The type must be a `closure`** (SL0818), not a `delegate`: a subscriber is
+**The type must be a `closure`** (SLC0117), not a `delegate`: a subscriber is
 almost always a method on an object, and a delegate is one pointer with nowhere
 to keep the object. A plain function subscribes by way of a lambda, which is
 what gives it one.
@@ -2932,7 +2932,7 @@ a subscriber that could clear the list could throw away everybody else's. A
 publisher that is being taken apart is the one that knows its subscribers are
 no longer wanted.
 
-**Events are not static** (SL0820): the subscribers would outlive every object
+**Events are not static** (SLC0119): the subscribers would outlive every object
 that added one, and nothing would ever take them off.
 
 An event lowers to a hidden array of subscribers and four methods —
@@ -3008,14 +3008,14 @@ var say = (String text) => { Console.WriteLine(text); };              // void(St
 **Or it is written in front of the parameters**, as C# 10 writes it, which
 then must be in parentheses. It is what settles a body whose value would not
 say — a `null`, a `default` — and it is not converted to what a target returns:
-a written result that differs is SL0765.
+a written result that differs is SLF0037.
 
 ```csharp
 var maybe = Node? (bool make) => make ? new Node(5) : null;
-Transform wrong = long (x) => x;        // SL0765: Transform returns int
+Transform wrong = long (x) => x;        // SLF0037: Transform returns int
 ```
 
-What this does not reach is a lambda that has not said enough (SL0553): a
+What this does not reach is a lambda that has not said enough (SLT0061): a
 parameter with no type, as in `var f = x => x;`, which has nothing to infer
 from — that is the whole of what a target type was supplying — and a block
 whose `return`s agree on no one type, or return a value on one path and
@@ -3032,9 +3032,9 @@ area(height: 5);        // 50
 That type is the only place a call can see it. A declared `closure`, a
 `delegate` and an interface carry no defaults, so the same lambda assigned to
 one of those has a parameter every call must fill, and saying so is a warning
-(SL0766) — C#'s rule, for C#'s reason: the default belongs to the declaration a
+(SLL0013) — C#'s rule, for C#'s reason: the default belongs to the declaration a
 call reads, and there is no other declaration here. It must be a constant, as
-a function's is (SL0613, [§7.1.2](07-functions-members.md#712-a-parameter-with-a-default)).
+a function's is (SLC0072, [§7.1.2](07-functions-members.md#712-a-parameter-with-a-default)).
 
 **Two or more parameters named `_` are discards**: `(_, _) => 0` takes two
 arguments and names neither, so neither can be read. One `_` alone is still a
@@ -3044,7 +3044,7 @@ name, as it always was.
 
 ```csharp
 Transform twice = static x => x * 2;
-Transform scaled = static x => x * factor;      // SL0764: reads 'factor'
+Transform scaled = static x => x * factor;      // SLF0036: reads 'factor'
 ```
 
 A local, a parameter, `this`, a member reached through it and a method called
@@ -3085,13 +3085,13 @@ reach the variable the copy was taken from:
 
 ```csharp
 int count = 0;
-ForEach(lines, (l) => count++);         // SL0829: `count` is still 0
+ForEach(lines, (l) => count++);         // SLL0014: `count` is still 0
 
 int n = 0;
 var next = () => { n++; return n; };    // 1, 2, 3...; `n` is still 0
 ```
 
-**A write to a copy that nothing reads again is a warning** (SL0829), because
+**A write to a copy that nothing reads again is a warning** (SLL0014), because
 its effect can never be seen. A write is `=`, a compound assignment, `++` or
 `--`, an `out` argument or a deconstruction, into the copy or into part of a
 struct it holds. The lambda reading the copy anywhere else in its body, or
@@ -3106,7 +3106,7 @@ copy under the member's name, and a write to it means the field: the fix is
 `this.count`. In a struct there is no such fix, because `this` is the value and
 is copied too; return the new value instead. A local function is stricter
 still: it is given its captures at each call, so it may not write one at all
-(SL0769, [section 7.1.4](07-functions-members.md#714-local-functions)).
+(SLF0039, [section 7.1.4](07-functions-members.md#714-local-functions)).
 
 To have a lambda change a variable around it, keep the state in an object the
 lambda holds -- a field of `this`, or a small class -- or have the lambda
@@ -3154,7 +3154,7 @@ copy of a reference still names the one object — which is also why the closure
 keeps it alive. There is no spelling that reads a struct's original storage
 from a lambda; pass what the lambda needs as a parameter instead.
 
-**A captured member that something else writes is a warning** (SL0610), because
+**A captured member that something else writes is a warning** (SLL0004), because
 the rule above reads like the opposite of itself at the one place it matters:
 
 ```csharp
@@ -3165,7 +3165,7 @@ class Peer
     public Peer()
     {
         OnChanged(() => {
-            if (busy) { return; }       // SL0610: `busy` is a copy
+            if (busy) { return; }       // SLL0004: `busy` is a copy
             Report();
         });
     }
@@ -3200,7 +3200,7 @@ its own closure a reference cycle. ARC cannot collect one, so break it with a
 
 Parameter types may be written or left out; left out, they come from the target,
 which is the only thing that knows them. A lambda with no target is an error —
-`var f = x => x;` has nothing to infer from, and SL0553 says so.
+`var f = x => x;` has nothing to infer from, and SLT0061 says so.
 
 A closure is a class, so crossing a thread boundary with one warns unless it is
 declared `threadsafe` ([§9.5](09-statements-expressions.md#95-what-may-cross-a-thread-boundary)) — which it cannot be, having no declaration to
@@ -3219,12 +3219,12 @@ initializer, and an array of them by something that supplies every element.
 ```csharp
 public struct Holder { public byte[] Data; public int Count; }
 
-Holder held = default;                  // error[SL0810]
-String[] names = new String[3];         // error[SL0812]
+Holder held = default;                  // error[SLO0027]
+String[] names = new String[3];         // error[SLO0029]
 ```
 
 ```
-error[SL0810]: 'Holder' has no zero value: 'Holder.Data' is a 'byte[]', which
+error[SLO0027]: 'Holder' has no zero value: 'Holder.Data' is a 'byte[]', which
 is never null, so 'default' would hand out a null where the type says there is
 none. Build the value with a constructor, or make the reference nullable
 ```
@@ -3238,7 +3238,7 @@ none. Build the value with a constructor, or make the reference nullable
 | a class, an interface, a com interface, `String`, `T[]` | no: never null |
 | a `closure` | no: its function word would be null, and a call does not ask |
 | a struct, a tuple | when every field has one |
-| `T[N]` | when `T` has one, which it always does, since an inline array holds no counted reference (SL0486) |
+| `T[N]` | when `T` has one, which it always does, since an inline array holds no counted reference (SLO0020) |
 | a `union` | yes: it holds no counted reference |
 | a `variant` | when its first case, whose tag is zero, has one: `Optional<String>`'s zero is `None`, and `Result<String, TError>` has none |
 | `Span<T>`, `ReadOnlySpan<T>` | yes: the empty span, whose array is a `T[]?` |
@@ -3252,11 +3252,11 @@ it from the metadata.
 
 | Refused | | Instead |
 |---|---|---|
-| `default(T)`, or a bare `default` | SL0810 | a constructor, or a nullable type |
-| a local read before each slot of it that has no zero value is written | SL0811 | assign it on every path first ([§2.16.1](#2161-locals)) |
-| `new T[n]` | SL0812 | `[a, b, c]`, `Array.Create`, `Array.Repeat`, a `List<T>` ([§2.16.3](#2163-arrays)) |
-| a constructor that can finish without writing such a field | SL0813 | write it, or give it an initializer or `required` ([§2.16.2](#2162-fields)) |
-| an automatic static property with no `= value` | SL0814 | give it one |
+| `default(T)`, or a bare `default` | SLO0027 | a constructor, or a nullable type |
+| a local read before each slot of it that has no zero value is written | SLO0028 | assign it on every path first ([§2.16.1](#2161-locals)) |
+| `new T[n]` | SLO0029 | `[a, b, c]`, `Array.Create`, `Array.Repeat`, a `List<T>` ([§2.16.3](#2163-arrays)) |
+| a constructor that can finish without writing such a field | SLO0030 | write it, or give it an initializer or `required` ([§2.16.2](#2162-fields)) |
+| an automatic static property with no `= value` | SLO0031 | give it one |
 
 ### 2.16.1 Locals
 
@@ -3277,7 +3277,7 @@ writes its storage. A read of the whole, a `ref` to it, a method called on it,
 or a read of a field not yet written is the error:
 
 ```
-error[SL0811]: 'made' is read here before 'made.Data' has been assigned, and
+error[SLO0028]: 'made' is read here before 'made.Data' has been assigned, and
 'byte[]' has no zero value: a 'byte[]' is never null. Assign it on every path
 before this, or give it a value where it is declared
 ```
@@ -3291,7 +3291,7 @@ walk stands down in a function that uses `goto`, as the one for `out` does
 ### 2.16.2 Fields
 
 **Every constructor writes every field whose type has no zero value, on every
-path through it** (SL0813), unless something already does:
+path through it** (SLO0030), unless something already does:
 
 - an initializer ([§2.4.1](#241-a-field-with-a-value)), which runs at its head;
 - `: this(...)`, which hands the whole obligation to the constructor it calls;
@@ -3316,7 +3316,7 @@ override could write nothing.
 neither is reported at the class.
 
 **The write MUST come in the constructor's first phase**
-([section 2.4.3](#243-inheritance)), before anything reaches the object (SL0938):
+([section 2.4.3](#243-inheritance)), before anything reaches the object (SLO0033):
 a call to a helper reaches it, so a field a helper writes has its value too
 late to count. That closes `this` escaping a constructor: a base constructor's
 virtual call, or `this` handed to something, finds every field with no zero
@@ -3334,7 +3334,7 @@ public MainForm()
 
 ### 2.16.3 Arrays
 
-`new T[n]` for a `T` with no zero value is refused (SL0812). `new T[0]` has no
+`new T[n]` for a `T` with no zero value is refused (SLO0029). `new T[0]` has no
 element to be a zero, and stays legal for every `T`. What replaces the rest
 depends on what the site is doing:
 
@@ -3382,7 +3382,7 @@ collection knows which of its slots are full -- a count, a flag per bucket --
 and keeps that itself, as `List<T>`, `Dictionary`, `HashSet`, `Queue`,
 `Stack`, `SortedList`, `LinkedList` and the sort's scratch all do.
 
-A slot does not cross `extern "C"` (SL0284): whether it is laid out as its
+A slot does not cross `extern "C"` (SLI0002): whether it is laid out as its
 element or as an optional of it depends on the element, which is not a
 promise C can be held to.
 
@@ -3400,11 +3400,11 @@ nothing null that may not be.
 
 **Checked per instantiation**, as everything in a template is
 ([§4.3](04-generics.md#43-what-a-constraint-does-and-does-not-do)):
-`default(T)` in `Box<T>` is nothing in `Box<int>` and SL0810 in `Box<String>`,
+`default(T)` in `Box<T>` is nothing in `Box<int>` and SLO0027 in `Box<String>`,
 reported in the template with the instantiation named. A template says what it
-needs with `where T : zeroable` (SL0328), and a member that needs it says so in
+needs with `where T : zeroable` (SLG0006), and a member that needs it says so in
 a `where` of its own, so an instantiation that fails it simply lacks that
-member (SL0816, [§4.3.3](04-generics.md#433-a-members-own-where)):
+member (SLG0024, [§4.3.3](04-generics.md#433-a-members-own-where)):
 
 ```csharp
 public void Clear() where T : zeroable      // Span<String> has no Clear
@@ -3448,7 +3448,7 @@ Without `late`, the ways out are each worse:
   is ready.
 
 **What `late` means.** A field declared `late` may be given its value after the
-object can be reached. No constructor is held to writing it (SL0813, SL0938).
+object can be reached. No constructor is held to writing it (SLO0030, SLO0033).
 Its storage starts empty, as every reference's does, and **every read checks
 that it has a value and stops the program when it has none**, naming the
 field:
@@ -3472,7 +3472,7 @@ the form as their parent. Reflection treats a `late` field as one that may be
 empty ([section 6.5](06-attributes-reflection.md#65-what-is-emitted)).
 
 Only a class's field whose type is a reference that is never null may be
-`late` (SL0940): a field that may be empty is an optional, one with a zero value
+`late` (SLO0034): a field that may be empty is an optional, one with a zero value
 has it, and a `required` field is given its value by every `new`.
 
 ## 2.17 `vfloat4` -- SIMD vectors
@@ -3524,24 +3524,24 @@ new vfloat4()                   // zero
 ```
 
 A lane is converted as an argument would be, and the count has to come out
-right (SL0944).
+right (SLT0091).
 
 **A lane is storage.** `v.x`, `v.y`, `v.z` and `v.w` name the first four,
 `v[i]` names any one -- checked against the count, at compile time for a
-constant (SL0490) -- and either may be assigned, incremented or passed by
+constant (SLT0053) -- and either may be assigned, incremented or passed by
 `ref`. Up to four letters read several lanes as a vector, in the order
 written, and a vector with an even count has halves: `lo`, `hi`, `even` and
-`odd`. A swizzle may be assigned when it names each lane once (SL0931):
+`odd`. A swizzle may be assigned when it names each lane once (SLT0088):
 `v.zw = p` writes two lanes and leaves the rest.
 
 **Operators work lane by lane**: `+ - * / %` on every vector, `& | ^ ~ << >>
 >>>` on integer lanes. A lane value on one side fills every lane, so `v * 2`
 scales. Arithmetic wraps as SIMD does, whatever `checked` says; an integer
 division by zero in any lane stops the program, as it does for a number.
-Two different vectors do not mix (SL0232): one is cast to the other first.
+Two different vectors do not mix (SLT0006): one is cast to the other first.
 
 **`==` is a `bool`**, true when every lane is equal, and `!=` is its opposite.
-A vector is not ordered as a whole, so `<` is refused (SL0232); comparing lane
+A vector is not ordered as a whole, so `<` is refused (SLT0006); comparing lane
 by lane gives a mask, which is a function and not an operator.
 
 **Its functions are static members of the type**, as .NET's are, so they are
@@ -3572,8 +3572,8 @@ mask `Select` takes. A lane given where a vector is wanted fills it, so
 `vfloat4.One` are what they say. Each is an LLVM intrinsic or a few vector
 instructions; `Dot` and `Sum` add the lanes in order, as a loop would, so a
 float answer is the same on every target. A function that does not exist
-(SL0247), or is not for these lanes (SL0934), or is given the wrong count
-(SL0260) is refused.
+(SLN0013), or is not for these lanes (SLT0089), or is given the wrong count
+(SLT0014) is refused.
 
 **A cast converts each lane**, as each lane alone would convert -- saturating
 from float to integer, wrapping from wider integer to narrower -- between
@@ -3588,7 +3588,7 @@ System V passes eight bytes as a `double` and anything wider than sixteen in
 memory; AAPCS64 passes three lanes as four 32-bit ones and anything wider than
 sixteen behind a pointer; 32-bit Windows passes three in SSE registers and the
 rest behind pointers, which no Stainless signature spells, so a fourth by value
-is refused there (SL0933). A struct holding vectors is classified as C
+is refused there (SLI0069). A struct holding vectors is classified as C
 classifies it, as a homogeneous aggregate on ARM included. A C header names
 each vector with a `typedef` of `ext_vector_type`, which MSVC cannot read, so
 such a header refuses MSVC.

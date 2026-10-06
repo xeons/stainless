@@ -100,7 +100,7 @@ against each other entry by entry and answer identically, so
 [tests/cases/resources-portable](../tests/cases/resources-portable) has one
 expected output and no `#if` in it. What does not travel is the *operating
 system*: a manifest, an icon and a dialog template are carried and readable
-elsewhere and inert, and SL0700 names them when a program has any. See
+elsewhere and inert, and SLD0010 names them when a program has any. See
 [§2.3 of packages.md](packages.md#23-resources).
 
 ## Which debugger reads it
@@ -137,7 +137,7 @@ that can be switched on — see [docs/dwarf.md](dwarf.md), which measured it.
 instead of the rendered form, which is what an editor should read:
 
 ```
-{"severity":"error","code":"SL0265","message":"cannot convert 'String' to 'int'",
+{"severity":"error","code":"SLT0018","message":"cannot convert 'String' to 'int'",
  "file":"C:\\Code\\src\\main.sl","line":5,"column":13,"length":14}
 ```
 

@@ -4,7 +4,7 @@ module DeclarationLimits;
 import Standard.Reflection;
 
 // A variant's tag is one byte, so 255 cases is the limit. This has 256.
-public variant TooMany // SL0432
+public variant TooMany // SLC0034
 {
     Case0;
     Case1;
@@ -267,7 +267,7 @@ public variant TooMany // SL0432
 // `[Reflect]` emits a type's fields, and a variant's fields are a tag and a
 // blob of bytes. Its shape is its cases, which the field tables cannot say.
 [Reflect]
-public variant Reflected // SL0728
+public variant Reflected // SLC0096
 {
     Round(double radius);
     Empty;
@@ -279,6 +279,6 @@ public U Pick<U>(U only, U other) => other;
 
 int Main()
 {
-    int chosen = Pick(1, 2);                    // SL0453
+    int chosen = Pick(1, 2);                    // SLG0011
     return chosen - 1;
 }

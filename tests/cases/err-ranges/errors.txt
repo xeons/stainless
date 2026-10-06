@@ -1,10 +1,10 @@
 # no length to count back from: a pointer, a class with no Count
-SL0777
+SLT0079
 # a count, but no indexer taking an integer
-SL0241
+SLT0009
 # ^4 and ^0 of an inline array of three
-SL0490
+SLT0053
 # a range over an inline array, and over a class with no Slice
-SL0452
+SLT0047
 # '^' and '..' of something that is not an integer
-SL0242
+SLT0010

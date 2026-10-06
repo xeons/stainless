@@ -52,7 +52,7 @@ public class InterfaceTests
 
     [Fact]
     public void AnInterfaceOverloadStillNeedsDifferentParameters() =>
-        Assert.Equal(["SL0211"], Front.ModuleCodes(
+        Assert.Equal(["SLN0006"], Front.ModuleCodes(
             """
             public interface IWriter
             {
@@ -63,7 +63,7 @@ public class InterfaceTests
 
     [Fact]
     public void AClassMustImplementEveryOverload() =>
-        Assert.Equal(["SL0305"], Front.ModuleCodes(
+        Assert.Equal(["SLC0013"], Front.ModuleCodes(
             """
             public interface IWriter
             {
@@ -91,7 +91,7 @@ public class InterfaceTests
 
     [Fact]
     public void ADefaultIsNotAMemberOfTheClass() =>
-        Assert.Equal(["SL0247"], Front.ModuleCodes(
+        Assert.Equal(["SLN0013"], Front.ModuleCodes(
             """
             public interface IGreeter { String Greet() => "hello"; }
             public class Quiet : IGreeter { }
@@ -143,7 +143,7 @@ public class InterfaceTests
 
     [Fact]
     public void TwoDefaultsNeitherMoreSpecificAreAmbiguous() =>
-        Assert.Equal(["SL0796"], Front.ModuleCodes(
+        Assert.Equal(["SLC0113"], Front.ModuleCodes(
             """
             public interface IA { String Which() => "A"; }
             public interface IB : IA { String IA.Which() => "B"; }
@@ -153,7 +153,7 @@ public class InterfaceTests
 
     [Fact]
     public void AnInterfaceMayTakeADefaultAwayAgain() =>
-        Assert.Equal(["SL0305"], Front.ModuleCodes(
+        Assert.Equal(["SLC0013"], Front.ModuleCodes(
             """
             public interface IA { String Which() => "A"; }
             public interface IB : IA { String IA.Which(); }
@@ -162,7 +162,7 @@ public class InterfaceTests
 
     [Fact]
     public void AnExplicitMemberIsNotReachedByName() =>
-        Assert.Equal(["SL0247"], Front.ModuleCodes(
+        Assert.Equal(["SLN0013"], Front.ModuleCodes(
             """
             public interface IShape { double Area(); }
             public class Square : IShape { double IShape.Area() => 1.0; }
@@ -204,14 +204,14 @@ public class InterfaceTests
 
     [Fact]
     public void AStructIsNeverAReferenceToAnInterface() =>
-        Assert.Equal(["SL0302"], Front.ModuleCodes(
+        Assert.Equal(["SLC0010"], Front.ModuleCodes(
             "public interface IShape { double Area(); }\n" +
             "public struct Flat : IShape { public double Area() => 0.0; }\n" +
             "IShape Held(Flat flat) => flat;"));
 
     [Fact]
     public void AStaticRequirementMustBeSupplied() =>
-        Assert.Contains("SL0305", Front.ModuleCodes(Additive +
+        Assert.Contains("SLC0013", Front.ModuleCodes(Additive +
             "public struct Bare : IAdditive<Bare> { }"));
 
     [Fact]
@@ -227,7 +227,7 @@ public class InterfaceTests
     [InlineData("var zero = IAdditive<Money>.Zero;")]
     [InlineData("var two = IAdditive<Money>.Twice(new Money(1));")]
     public void AStaticRequirementIsNotReachedThroughItsInterface(string statement) =>
-        Assert.Equal(["SL0797"], Front.ModuleCodes(Additive + Money +
+        Assert.Equal(["SLG0020"], Front.ModuleCodes(Additive + Money +
             "void Use() { " + statement + " }"));
 
     /// <summary>
@@ -306,7 +306,7 @@ public class InterfaceTests
 
     [Fact]
     public void AGenericInterfaceMethodMustBeImplemented() =>
-        Assert.Equal(["SL0305"], Front.ModuleCodes(
+        Assert.Equal(["SLC0013"], Front.ModuleCodes(
             """
             public interface IStore { T Keep<T>(T value); }
             public class Forgetful : IStore { }
@@ -323,7 +323,7 @@ public class InterfaceTests
 
     [Fact]
     public void AnInstantiationThatGrowsItselfIsRefused() =>
-        Assert.Equal(["SL0798"], Front.ModuleCodes(
+        Assert.Equal(["SLG0021"], Front.ModuleCodes(
             """
             public class Box<T> { }
             int Deep<T>(T value, int n) => n == 0 ? 0 : Deep(new Box<T>(), n - 1);
@@ -337,7 +337,7 @@ public class InterfaceTests
     /// </summary>
     [Fact]
     public void ATypeThatGrowsItselfIsRefusedAlone() =>
-        Assert.Equal(["SL0798"], Front.ModuleCodes(
+        Assert.Equal(["SLG0021"], Front.ModuleCodes(
             """
             class Cell<T>
             {
@@ -378,7 +378,7 @@ public class InterfaceTests
     [InlineData("ISink<Animal> s = new Kennel(); ISink<Animal> t = (ISink<Dog>)s;")]
     [InlineData("IBoth<Animal> s = new Kennel();")]
     public void AVariantInterfaceConvertsOneWayOnly(string statement) =>
-        Assert.Contains("SL0265", Front.ModuleCodes(Variant + "void Use() { " + statement + " }"));
+        Assert.Contains("SLT0018", Front.ModuleCodes(Variant + "void Use() { " + statement + " }"));
 
     [Fact]
     public void AClassGetsATableForWhatItStandsFor()
@@ -401,7 +401,7 @@ public class InterfaceTests
     [InlineData("public interface ISink<in T> { void Put(T item); }\npublic interface IBad<out T> { ISink<T> Sink(); }")]
     [InlineData("public closure void Bad<out T>(T value);")]
     public void AVariantParameterAppearsOnlyWhereItsVarianceLets(string declaration) =>
-        Assert.Contains("SL0801", Front.ModuleCodes(declaration));
+        Assert.Contains("SLG0023", Front.ModuleCodes(declaration));
 
     [Theory]
     [InlineData("public interface IGood<out T> { T Get(); static void Take(T item) { } }")]
@@ -433,7 +433,7 @@ public class InterfaceTests
     [InlineData("Dog", "Dog?")]                // loses the promise it is not null
     [InlineData("long", "int")]                // a value is not a reference
     public void AnOverrideMayNotReturnSomethingElse(string declared, string written) =>
-        Assert.Equal(["SL0502"], Front.ModuleCodes(Animals +
+        Assert.Equal(["SLC0042"], Front.ModuleCodes(Animals +
             $$"""
             public class Shelter
             {
@@ -465,7 +465,7 @@ public class InterfaceTests
 
     [Fact]
     public void ACallThroughTheBaseSeesTheBaseType() =>
-        Assert.Equal(["SL0265"], Front.ModuleCodes(Animals +
+        Assert.Equal(["SLT0018"], Front.ModuleCodes(Animals +
             """
             public class Shelter { public virtual Animal Adopt() => new Dog(); }
             public class Kennel : Shelter { public override Dog Adopt() => new Dog(); }
@@ -482,7 +482,7 @@ public class InterfaceTests
 
     [Fact]
     public void AWritablePropertyMayNotNarrowItsType() =>
-        Assert.Equal(["SL0502"], Front.ModuleCodes(Animals +
+        Assert.Equal(["SLC0042"], Front.ModuleCodes(Animals +
             """
             public class Shelter { public virtual Animal Pet { get; set; } = new Animal(); }
             public class Kennel : Shelter { public override Dog Pet { get; set; } = new Dog(); }
@@ -490,7 +490,7 @@ public class InterfaceTests
 
     [Fact]
     public void AnInterfaceImplementationMayNotNarrow() =>
-        Assert.Equal(["SL0307"], Front.ModuleCodes(Animals +
+        Assert.Equal(["SLC0015"], Front.ModuleCodes(Animals +
             """
             public interface IShelter { Animal Adopt(); }
             public class Kennel : IShelter { public Dog Adopt() => new Dog(); }

@@ -113,7 +113,7 @@ public sealed partial class Binder
     private readonly List<(object Member, string Name, NamedTypeSymbol Owner, SourceSpan Span)>
         _memberCaptures = [];
 
-    /// <summary>Member captures already reported by SL0829, which SL0610 leaves alone.</summary>
+    /// <summary>Member captures already reported by SLL0014, which SLL0004 leaves alone.</summary>
     private readonly HashSet<SourceSpan> _lostMemberWrites = [];
 
     /// <summary>
@@ -1236,7 +1236,7 @@ public sealed partial class Binder
                     "does not change: a lambda captures a member it names without 'this' by " +
                     "value. " + advice);
 
-                // SL0610 would point at the same capture with the same fix.
+                // SLL0004 would point at the same capture with the same fix.
                 Remember(_lostMemberWrites, member.Span);
                 continue;
             }

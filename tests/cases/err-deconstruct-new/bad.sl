@@ -17,6 +17,6 @@ void Deconstruct(Range range, out int low, out int high)
 
 int Main()
 {
-    var (x, y) = new (3);                       // SL0245
+    var (x, y) = new (3);                       // SLC0008
     return x + y;
 }

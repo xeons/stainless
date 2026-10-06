@@ -498,7 +498,7 @@ int Main(String[] args)
 }
 ```
 
-`Main` takes either nothing or a `String[]`, and nothing else (SL0282). The
+`Main` takes either nothing or a `String[]`, and nothing else (SLD0003). The
 array holds the arguments only — the program's own name is `Env.GetProcessPath()`,
 because it is not one of them and treating it as one is the mistake C's argv
 invites. `Standard.Env` reaches the same list from anywhere, which is for code
@@ -1551,8 +1551,8 @@ parameter is asked for with `GetRequiredService`, a `T?` with `GetService`, a
 `T[]` with `GetServices`. The constructor used is the public one with most
 parameters. A class with no usable constructor, two widest ones, or a
 parameter no provider can be asked for -- a number, a struct, `ref`,
-`params`, a default -- is a compile error at the registration (SL0917, SL0918,
-SL0919); a factory, `AddSingleton<T>((ServiceProvider p) => ...)`, is the way
+`params`, a default -- is a compile error at the registration (SLC0126, SLC0127,
+SLC0128); a factory, `AddSingleton<T>((ServiceProvider p) => ...)`, is the way
 around any of them.
 
 **What is missing is found when the provider is built.** Each registration
@@ -1578,7 +1578,7 @@ registers an open generic, `typeof(ILogger<>)`, and makes `Logger<T>` for a
 the interface names its implementation instead.
 `[DefaultImplementation("Standard.Logging.Logger")]` on `ILogger<T>` makes
 `GetService<ILogger<App.Worker>>()` answer a `Logger<App.Worker>` with nothing
-registered (SL0920 when the name is not a generic class of the same arity).
+registered (SLC0129 when the name is not a generic class of the same arity).
 
 **Lifetimes are .NET's.** A singleton is made once, the first time it is asked
 for, and kept by the root; a scoped service once per scope; a transient every

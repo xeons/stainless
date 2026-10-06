@@ -510,8 +510,8 @@ public sealed partial class Binder
         // of class that could not survive that never cross in the first place:
         // a com class's tear-offs sit after its fields, and a class
         // implementing an interface is indexed by a program-wide id. The
-        // metadata writer refuses both where the library is built (SL0419,
-        // SL0419), so a referenced base is never either one.
+        // metadata writer refuses both where the library is built (SLD0007,
+        // SLD0007), so a referenced base is never either one.
         //
         // What deriving costs is that the base's table *length* is now part of
         // its contract: this class appends after the last slot, so a later
@@ -926,7 +926,7 @@ public sealed partial class Binder
     ///
     /// After the attribute pass rather than with the other com class checks,
     /// because the CLSID this turns on is read from <c>[Guid]</c> and folded
-    /// there. A class with no constructor at all is fine -- SL0813 has already
+    /// there. A class with no constructor at all is fine -- SLO0030 has already
     /// held its fields to initializers -- but one that has constructors and no
     /// empty one could never be activated, and one with <c>required</c>
     /// members would be activated with them unset: a null where its type says

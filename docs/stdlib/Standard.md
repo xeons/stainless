@@ -1680,7 +1680,7 @@ A value, or none -- for the types `T?` cannot describe.
 
 `C?` is a nullable reference: the null is the pointer, so it costs nothing
 and the compiler narrows it. A value type has no spare bit to be null with,
-so `nuint?` is refused (SL0271), and what stood in was a magic number --
+so `nuint?` is refused (SLT0021), and what stood in was a magic number --
 `IndexOf` answering with the largest `nuint` there is and every caller
 agreeing to read that as "not there".
 

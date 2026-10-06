@@ -8,12 +8,12 @@ module Bad;
 
 public attribute Label { String Name; }
 
-// SL0727: ':' names a parameter at a call; an attribute's field is set with
+// SLC0095: ':' names a parameter at a call; an attribute's field is set with
 // '=', because an attribute is a value rather than a call.
 [Label(Name: "colon")]
 public class Named { }
 
-// SL0728: a declaration nothing reads an attribute back from. Dropping one
+// SLC0096: a declaration nothing reads an attribute back from. Dropping one
 // silently is the worse answer — '[Embed]' decides what a static holds, and a
 // declaration that ignored it would compile to one that does not have it.
 [Label("alias")]

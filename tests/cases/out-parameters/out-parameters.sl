@@ -5,7 +5,7 @@
 // At the ABI it is the same pointer `ref` is. What separates them is who has
 // to have filled it in: `ref` is a variable the caller already gave a value,
 // `out` is one the callee promises to give a value to. That promise is the
-// only definite-assignment analysis in the language (SL0600), and it is here
+// only definite-assignment analysis in the language (SLO0023), and it is here
 // because this is the one place it is load-bearing -- the caller's variable
 // may never have held anything.
 //

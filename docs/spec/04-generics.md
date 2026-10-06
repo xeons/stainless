@@ -120,7 +120,7 @@ instantiated**, and the error names the type, the parameter and the missing
 interface:
 
 ```
-error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
+error[SLG0006]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
 implement 'IDescribable'; it implements 'IComparable<Half>'
 ```
 
@@ -130,7 +130,7 @@ are still checked per instantiation, so a template nobody uses is never checked
 at all, and a mistake inside one is reported against the instantiation rather
 than the declaration. An instantiation whose arguments fail a constraint is
 reported at the use and its body is not checked for them, since it was not
-written for them: `Array.Clear` on a `String[]` is one SL0328, not that and
+written for them: `Array.Clear` on a `String[]` is one SLG0006, not that and
 every error its body would then have.
 
 The reason is that definition-site checking is all or nothing. It would require
@@ -157,22 +157,22 @@ error at the use site and a signature that states its requirements.
 
 Several are separated by commas in one clause, and several clauses by repeating
 `where`. The word saying what kind of type it is — `class`, `struct`,
-`unmanaged`, `notnull` or `default` — comes first and `new()` last (SL0580):
+`unmanaged`, `notnull` or `default` — comes first and `new()` last (SLG0013):
 the order carries no meaning, but a fixed one means every clause reads the same
 way. A parameter is one kind, so two of those words contradict each other, and
-`struct` and `unmanaged` each contradict `new()` and a base class (SL0581).
+`struct` and `unmanaged` each contradict `new()` and a base class (SLG0014).
 `unmanaged`, `notnull` and `zeroable` are contextual, as in C#: they are read
 as constraints only where a constraint is, and a type of any of those names is
 still named with arguments or a qualifier.
 
 **`zeroable` is what `default(T)` needs.** A type with no zero value — a
-`String`, a class, a struct holding either — fails it (SL0328), the code every
+`String`, a class, a struct holding either — fails it (SLG0006), the code every
 unmet constraint reports. `unmanaged` implies it, and `class` contradicts it
-(SL0581): every reference that is not optional is never null. `default` would
+(SLG0014): every reference that is not optional is never null. `default` would
 read better and is taken; it is the override constraint below.
 
 ```
-error[SL0328]: 'String' cannot be used as 'T' in 'ZeroOf' because 'T' is
+error[SLG0006]: 'String' cannot be used as 'T' in 'ZeroOf' because 'T' is
 constrained to 'zeroable', and 'String' has no zero value: a 'String' is never
 null
 ```
@@ -237,25 +237,25 @@ may be, so the second is refused where C# would warn.
 
 **`default` belongs on an override**, which takes its constraints from what it
 overrides and so has no other way to say a parameter is unconstrained; anywhere
-else it says what leaving the clause out already says (SL0792). C#'s `allows
+else it says what leaving the clause out already says (SLG0019). C#'s `allows
 ref struct` has no counterpart: there is no `ref struct` to allow.
 
 **The clauses are checked where they are written**, whether or not anything
-instantiates the template. A parameter has one clause (SL0788), names each
-constraint once (SL0789) and at most one base class (SL0790); parameters may
-not constrain each other in a circle (SL0791); and a constraint naming a struct,
+instantiates the template. A parameter has one clause (SLG0015), names each
+constraint once (SLG0016) and at most one base class (SLG0017); parameters may
+not constrain each other in a circle (SLG0018); and a constraint naming a struct,
 an enum, a sealed class or anything else nothing could derive from is refused
-there rather than at the first use (SL0329). What needs an argument to answer
+there rather than at the first use (SLG0007). What needs an argument to answer
 still waits for one.
 
 **`new()` means a class, unlike C#.** There, `new T()` on a value type is
 default-initialization, so a struct satisfies the constraint. Here `new T()`
 allocates, and a struct is made where it stands rather than on the heap, so a
 struct would satisfy a constraint whose only purpose it then failed; one given
-for such a parameter is SL0328.
+for such a parameter is SLG0006.
 
 **`threadsafe` is the one constraint that is stricter than the rule it names.**
-Handing an unsynchronized object to a thread is a warning (SL0377), because the
+Handing an unsynchronized object to a thread is a warning (SLO0015), because the
 word is an assertion no compiler can check. Written in a `where` clause it is an
 error — there a library author has asked for it in their own signature, which is
 a different thing from a compiler guessing.
@@ -298,7 +298,7 @@ for whatever `T` a shared body is running for. Here there is no shared body:
 `Sum<Money>` is bound with `T` replaced by `Money`, so `T.Zero` is
 `Money.Zero`, a direct call, and `total + item` is `Money`'s operator,
 resolved exactly as it would be written out. What the interface adds is the
-promise, checked where `Money` says it implements `IAdditive<Money>` (SL0305),
+promise, checked where `Money` says it implements `IAdditive<Money>` (SLC0013),
 and the default a `static virtual` member falls back on — found by `T.Twice`
 when `Money` declares no `Twice` of its own.
 
@@ -307,13 +307,13 @@ when `Money` declares no `Twice` of its own.
 static requirement is a promise about the type, and an instance one is met by
 the struct's own member where a generic reaches it.
 
-**Reached through a type parameter, not through the interface** (SL0797),
+**Reached through a type parameter, not through the interface** (SLG0020),
 which is C#'s rule: `IAdditive<Money>.Zero` names a requirement, and the
 interface is not one of the types that meets it. A plain `static` member with a
 body is the interface's own function and is named through it,
 `IAdditive<Money>.Describe()`. A static member with no body has to say it is a
-requirement by being `abstract` (SL0574). An operator on an interface is
-`static abstract` or `static virtual` (SL0645); one operand is the interface's
+requirement by being `abstract` (SLC0070). An operator on an interface is
+`static abstract` or `static virtual` (SLC0091); one operand is the interface's
 own type argument, since that is the implementing type.
 
 **One place this is wider than C#.** A `static virtual` operator's body is
@@ -365,14 +365,14 @@ itself costs nothing, and `x is ISource<Animal>` answers as C#'s does. A
 delegate or a closure needs no table: the same function pointer, and receiver,
 answer either type.
 
-**A variant parameter appears only where its word lets it** (SL0801), C#'s
+**A variant parameter appears only where its word lets it** (SLG0023), C#'s
 CS1961: an `out` one in a return, a getter, an extended interface, or an `out`
 argument of another variant type; an `in` one in a parameter, a setter, or an
 `in` argument, where the direction turns round. A `ref` or `out` parameter,
 a property with both accessors, an array, a slice, a pointer and a tuple are
 read and written both, so neither word may reach them. A static member is not
 reached through a reference and is not checked. `in` and `out` may be written
-only on an interface's or a delegate's parameters (SL0800); a class or struct
+only on an interface's or a delegate's parameters (SLG0022); a class or struct
 holds what it holds, and a function has nothing to convert.
 
 ### 4.3.3 A member's own `where`
@@ -390,11 +390,11 @@ public struct Span<T>
 Span<int> numbers = ...;
 numbers.Clear();                            // fine
 Span<String> names = ...;
-names.Clear();                              // error[SL0816]
+names.Clear();                              // error[SLG0024]
 ```
 
 ```
-error[SL0816]: 'Span<String>' has no 'Clear': 'String' cannot be used as 'T' in
+error[SLG0024]: 'Span<String>' has no 'Clear': 'String' cannot be used as 'T' in
 'Clear' because 'T' is constrained to 'zeroable', and 'String' has no zero
 value: a 'String' is never null
 ```
@@ -406,8 +406,8 @@ conditional extension are the same idea; without it, `Span<String>` itself
 would be refused for a method it never calls.
 
 A dispatched member — virtual, abstract, an override, an interface's — is in
-every instantiation's table, so it may not have one (SL0334), and neither may a
-member of a type that is not generic (SL0331).
+every instantiation's table, so it may not have one (SLG0010), and neither may a
+member of a type that is not generic (SLG0009).
 
 ## 4.4 What is and is not supported
 
@@ -421,14 +421,14 @@ templates such as `class Node<T> { Node<T>? next; }`.
 are: `Func<TResult>`, `Func<T, TResult>` and `Func<T1, T2, TResult>` are three
 declarations, and a non-generic `Action` sits beside `Action<T>`. The number
 written at the use is which one is meant; two of one name and one arity are a
-duplicate (SL0201), and a count that matches none is SL0323.
+duplicate (SLN0001), and a count that matches none is SLG0003.
 
 **Generic functions overload on the shape of their parameters.** Two templates
 may share a name, and a call tries each one of the right arity, keeping those
 that both infer and would accept the arguments. Two or more survivors are
 ranked as any overloads are ([§7.1](07-functions-members.md#71-functions)): the one every
 argument converts to at least as well, and one argument better, is the call,
-and without one it is an ambiguity (SL0453). None is the inference error.
+and without one it is an ambiguity (SLG0011). None is the inference error.
 `Standard.Collections` has both `Sort<T>(Span<T>)` and `Sort<T>(IList<T>)`, and
 `Sort(numbers)` and `Sort(list)` each reach the right one; it has `Trim` over a
 `Span<T>` and over a `ReadOnlySpan<T>`, and a `Span<T>` reaches the first,
@@ -478,8 +478,8 @@ var none = Zero<int>();         // nothing passed could have said what T is
 
 **Only a generic candidate is considered**, as in C#. `Plain<int>(1)` on a
 function that is not generic, and a count that no template of that name takes,
-are each SL0323. A function written with type arguments and not called —
-`var f = Pick<int>;` — is SL0834: an instantiation is not a value of its own,
+are each SLG0003. A function written with type arguments and not called —
+`var f = Pick<int>;` — is SLT0085: an instantiation is not a value of its own,
 and a delegate names the overload it wants by its own signature.
 
 **`<` after a name is read the way C# reads it.** In an expression `<` is also
@@ -527,7 +527,7 @@ instead of a body: in `Select(names, Upper)`, `T` is `String` from `names`, so
 the `Upper` meant is the one taking a `String`, and what it returns is `R`.
 Where the parameter types are not known yet, a name with exactly one function
 of the right arity settles them too. An overloaded name that the known types
-do not narrow to one says nothing, and the call is SL0327.
+do not narrow to one says nothing, and the call is SLG0005.
 
 A **closure already held** — a `Func<int, String>` in a variable — is read off
 its type, argument by argument, as an instantiated interface is.
@@ -541,7 +541,7 @@ anything.
 A result that carries its parameter inside another type -- `Optional<R>
 Func<T, R>(T)`, or `List<R>` -- is matched part by part, so a lambda producing
 an `Optional<nuint>` says `R` is `nuint`. Returns that agree on no one type are
-SL0327 rather than guessed at; writing the type arguments at the call settles
+SLG0005 rather than guessed at; writing the type arguments at the call settles
 it.
 
 ### 4.4.3 A generic method that is dispatched
@@ -583,10 +583,10 @@ implementing class: `Keep<int>` is compiled for every class implementing
 
 A class implements a generic interface method with a public generic method of
 the same name and the same numbers of type parameters and parameters
-(SL0305); whether the types then agree is known per instantiation and
-reported there, once (SL0307). An `override` names one of the same shape it
-inherits (SL0499, SL0503), a concrete class answers every abstract one
-(SL0504), and one that returns something else once instantiated is SL0502, as
+(SLC0013); whether the types then agree is known per instantiation and
+reported there, once (SLC0015). An `override` names one of the same shape it
+inherits (SLC0039, SLC0043), a concrete class answers every abstract one
+(SLC0044), and one that returns something else once instantiated is SLC0042, as
 a plain override is. `base.Accept<R>(v)` calls the replaced body, as `base.M()`
 does.
 
@@ -596,13 +596,13 @@ does.
   `Keep<List<T>>` through the interface — is a new function at every step.
   C# makes the next one when the call happens, if it ever does; a compiler that
   makes them all in advance has no last one, and a type argument nested more
-  than 48 deep is SL0798. The same limit stops a plain generic function
+  than 48 deep is SLG0021. The same limit stops a plain generic function
   recursing the same way.
 - **Another binary.** A library's slots are numbered without its consumer's
   instantiations, so a class with a generic virtual method is left out of a
-  library's metadata (SL0419), as a class implementing an interface already is.
+  library's metadata (SLD0007), as a class implementing an interface already is.
 
-A `static abstract` or `static virtual` member may not be generic (SL0322): it
+A `static abstract` or `static virtual` member may not be generic (SLG0002): it
 is met by a member of each implementing type, which is not a slot an
 instantiation can fill.
 

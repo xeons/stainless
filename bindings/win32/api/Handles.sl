@@ -32,7 +32,7 @@
 // time; what crosses the boundary is a pointer, exactly as `void*` did. What it
 // buys is that passing a device context where a window belongs is caught:
 //
-//     error[SL0262]: argument 1 of 'ShowWindow' expects 'HWND__*',
+//     error[SLT0015]: argument 1 of 'ShowWindow' expects 'HWND__*',
 //     but 'HDC__*' was given
 //
 // The `__` suffix is Windows' own, and is worth keeping for the same reason it

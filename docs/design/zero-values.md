@@ -53,14 +53,14 @@ so the diagnostic can say *which* field is the problem:
 | class, interface, COM interface, `String`, `T[]` | **no** | never null |
 | `closure` | **no** | its function word is null, and a call does not ask |
 | struct, tuple, record struct | if every field has one | transitive |
-| `T[N]` inline array | if its element has one | always true today: SL0486 keeps references out |
+| `T[N]` inline array | if its element has one | always true today: SLO0020 keeps references out |
 | `union` | yes | a union may not hold a counted reference |
 | `variant` | if the case with tag 0 has one | a zero tag is the first case, its payload zeroed: `Optional<String>`'s zero is `None`, `Result<String, E>`'s is `Ok(null)` |
 | `Span<T>`, `ReadOnlySpan<T>` | yes | the empty span; its length is zero so its array word is never read |
 
 Two things this table needs that the language lacked, both built with the rule:
 
-- **`T[]?`.** Without it `byte[]?` was SL0271, so a struct or class field
+- **`T[]?`.** Without it `byte[]?` was SLT0021, so a struct or class field
   holding an array that is sometimes absent had no honest type. `T[]?` has the
   same representation as `T[]` and the same narrowing as `C?`. `Span<T>`'s own
   `_array` field is `T[]?`, which is what makes the empty span a value rather
@@ -77,7 +77,7 @@ one — nothing builds a `Result` other than by naming a case.
 ## 4. Definite assignment
 
 The language had one definite-assignment analysis, for `out` parameters
-(SL0600, `Binder.Assigns`). The prototype generalises it from "this parameter"
+(SLO0023, `Binder.Assigns`). The prototype generalises it from "this parameter"
 to any `AssignedPlace`, and the rule runs every question below through that one
 walk, with its existing stand-down for `goto`.
 
@@ -144,7 +144,7 @@ the gap, and so does this. It is narrower than today's by the whole of §1.
 
 ### 4.3 Statics
 
-A static already needs a value (SL0376). The one zero left is an automatic
+A static already needs a value (SLO0014). The one zero left is an automatic
 static property with no `= value`; for a type with no zero value it needs one,
 or a static constructor that assigns it on every path.
 
@@ -338,13 +338,13 @@ and `err-member-constraint`.
 
 | Code | Says |
 |---|---|
-| SL0810 | `default` for a type with no zero value, naming the slot: *'Holder' has no zero value: 'Holder.Data' is a 'byte[]', which is never null* |
-| SL0811 | a local read, or passed by `ref`, before every field is assigned |
-| SL0812 | `new T[n]` for such an element, pointing at `Array.Create`, a literal and `List` |
-| SL0813 | a constructor that can finish without writing such a field, at the path that does; or a field no constructor could write |
-| SL0814 | a static property of such a type with no value |
-| SL0328 | an argument that fails `zeroable`, as it reports every unmet constraint |
-| SL0816 | a member whose own `where` its type's arguments fail, named at the call |
+| SLO0027 | `default` for a type with no zero value, naming the slot: *'Holder' has no zero value: 'Holder.Data' is a 'byte[]', which is never null* |
+| SLO0028 | a local read, or passed by `ref`, before every field is assigned |
+| SLO0029 | `new T[n]` for such an element, pointing at `Array.Create`, a literal and `List` |
+| SLO0030 | a constructor that can finish without writing such a field, at the path that does; or a field no constructor could write |
+| SLO0031 | a static property of such a type with no value |
+| SLG0006 | an argument that fails `zeroable`, as it reports every unmet constraint |
+| SLG0024 | a member whose own `where` its type's arguments fail, named at the call |
 
 Inside an instantiation each names the instantiation, as a constraint failure
 does.
@@ -406,11 +406,11 @@ from it:
   specification had said that a reference-typed property's storage starts null
   whatever its type says; the pattern that relies on it, filling on first use,
   never reads the null, so the parser records whether every mention of `field`
-  in an accessor is what `??=` fills, and such storage is exempt from SL0813
-  and SL0814. Any other read of `field` makes it an ordinary field again.
-- **A member `where` on a dispatched member is SL0334**: a virtual, abstract, override or interface
+  in an accessor is what `??=` fills, and such storage is exempt from SLO0030
+  and SLO0031. Any other read of `field` makes it an ordinary field again.
+- **A member `where` on a dispatched member is SLG0010**: a virtual, abstract, override or interface
   member is in every instantiation's table, so it cannot be left out.
-- **`class, zeroable` is SL0581**, the contradiction every other pair of kinds
+- **`class, zeroable` is SLG0014**, the contradiction every other pair of kinds
   gets: a reference that is not optional is never null.
 - **`MinBy` and `MaxBy` had aborted on an empty sequence**, not answered
   `default(T)`; they now answer `None`. `Min`, `Max` and `Aggregate` keep
@@ -440,7 +440,7 @@ from it:
 - **A static read through a call was not ordered.** `static String A = F();`
   with `F` reading a later static read its zero; the sort now follows calls,
   constructors, closures and delegates through every body, and a static that
-  reaches itself that way is SL0378 as one naming itself is.
+  reaches itself that way is SLO0016 as one naming itself is.
 - **An activated com class could leave a `required` member null**, since a
-  class factory writes no initializer. It is SL0611 unless the empty
+  class factory writes no initializer. It is SLI0035 unless the empty
   constructor is `[SetsRequiredMembers]`.

@@ -29,7 +29,7 @@ written at all — the arrow is not "a `return` spelled shorter", it is the body
 
 It is a body like any other, so it works wherever a braced one does: an
 override, an interface implementation, a generic function, a recursive call. An
-`extern "C"` declaration still may not have one (SL0105), because it is a
+`extern "C"` declaration still may not have one (SLI0001), because it is a
 declaration of something defined elsewhere.
 
 **Every member that has a body may be written this way**, and which half of the
@@ -60,8 +60,8 @@ class Printer
 ```
 
 Which one a call means is decided from the arguments, exactly as it is for a
-module-level function: a call that fits none is SL0263 and one that fits
-several equally is SL0264.
+module-level function: a call that fits none is SLT0016 and one that fits
+several equally is SLT0017.
 
 **Fitting several is not the same as fitting them equally.** When more than one
 candidate fits, the one whose every argument converts at least as well as it
@@ -73,7 +73,7 @@ one is better, so a `uint` goes to `long` rather than `ulong`. It is what lets
 `Text.FromInteger` take a `byte`, a `uint` or a literal although its `long`,
 `ulong` and `nuint` overloads all accept one. `Pair(int, long)` and
 `Pair(long, int)` called with `(1, 2)` are each better for one argument, and
-that is SL0264.
+that is SLT0017.
 
 **An interface method may be overloaded too.** Each overload is a slot of its
 own in the interface's table, numbered by declaration like every other member,
@@ -134,27 +134,27 @@ Draw("ab", loud: true);           // and a name reaches past what was left out
 see. That is not an implementation note: it is the whole of the design, and
 every rule below follows from it.
 
-**It must be a constant** (SL0613) — a literal, `null`, a `const`, an enum
+**It must be a constant** (SLC0072) — a literal, `null`, a `const`, an enum
 member or `default(T)`. Anything else would be code standing in a signature and
 running at the caller, once per call site:
 
 ```
-error[SL0613]: the default for 'n' is not a constant, and a default is written
+error[SLC0072]: the default for 'n' is not a constant, and a default is written
 into every call that leaves it out -- so a call would be running this rather
 than passing it. A literal, 'null', a 'const', an enum member or 'default(T)'
 is what it may be; anything else belongs in the body
 ```
 
-**The ones that may be left out are the tail of the list** (SL0614). A default
+**The ones that may be left out are the tail of the list** (SLC0073). A default
 in the middle could only be reached by a name, and a reader counting arguments
 would have to know which of them had been filled in.
 
-**`ref`, `in` and `out` may not have one** (SL0626): all three pass the caller's
+**`ref`, `in` and `out` may not have one** (SLC0077): all three pass the caller's
 storage rather than a value, and a default has no storage to be.
 
 **Only one declaration may give it.** An `override` may not restate a default,
 and neither may a method beside the interface method it implements (both
-SL0627). C# allows both, and both are the same trap: a call reads the
+SLC0078). C# allows both, and both are the same trap: a call reads the
 declaration the *static* type gives it, so the same line would mean different
 things through a base reference and a derived one. The default belongs to the
 declaration, and there is one of it.
@@ -165,7 +165,7 @@ defaults are the same feature from two directions, and they compose.
 
 **A default takes part in overload resolution** only by making a candidate
 applicable with fewer arguments. Two candidates that both fit are ambiguous
-(SL0264) as they always were — a default does not make one of them preferred.
+(SLT0017) as they always were — a default does not make one of them preferred.
 
 **It crosses a library boundary as the value it folded to.** A default naming a
 `const` of the library's own is a name the consumer cannot read, so the metadata
@@ -221,16 +221,16 @@ it, in any order, and the elements follow the positional arguments;
 
 **A generic's type argument is read off the elements**: `First<T>(params T[]
 items)` called as `First("x", "y")` is `First<String>`. Given no elements there
-is nothing to read, and the call is SL0327 unless the argument is written.
+is nothing to read, and the call is SLG0005 unless the argument is written.
 
-What may not be `params` (SL0763): a parameter that is not the last, one passed
+What may not be `params` (SLC0101): a parameter that is not the last, one passed
 by `ref`, `in` or `out`, one with a default, anything but a `T[]`, a `Span<T>`
 or a `ReadOnlySpan<T>`,
 a delegate's or closure's parameter — a call through one passes exactly what the
 signature says — and a C function's, since C has nothing to gather with.
 
 ```
-error[SL0763]: 'values' cannot be 'params': only the last parameter may be
+error[SLC0101]: 'values' cannot be 'params': only the last parameter may be
 'params'; the elements a call gives one by one are whatever is left after the
 others, so nothing may follow them
 ```
@@ -259,7 +259,7 @@ have — a block or an arrow body, type parameters, defaults, `params`, `ref`
 and `out`. It is named from anywhere in its block, before its declaration as
 well as after, so two may call each other and one may call itself. Names are
 not overloaded, as in C#, and one may not share a name with a variable in its
-scope (SL0218).
+scope (SLN0008).
 
 **What it reads of the function around it is passed at every call.** A local,
 a parameter, and the object of the method it is in each reach it as a
@@ -270,20 +270,20 @@ and one that reads nothing is an ordinary function, which becomes a `delegate`
 like any other.
 
 **It is capture by value, and so it may not assign what it captured**
-(SL0769). Capture by value is the model every closure here has
+(SLF0039). Capture by value is the model every closure here has
 ([§2.15](02-types.md#215-lambdas-and-closures)); an assignment would change the
 copy and nothing else, and saying so beats a write that silently goes nowhere.
 A lambda's copy lasts as long as its closure, so writing it is legal there, and
-a write nothing reads again is SL0829. Return the value, or keep it in a field.
+a write nothing reads again is SLL0014. Return the value, or keep it in a field.
 The object of the method is the one thing reached by reference, as it is from a
 method: `this` is passed, and a field written through it is written.
 
-**A call has to be able to see what the function reads** (SL0768). One made
+**A call has to be able to see what the function reads** (SLF0038). One made
 before a variable the function reads is declared has no value to pass —
 C# reports the same call as reading an unassigned variable.
 
 ```
-error[SL0768]: 'Late' reads 'y' from around it, which every call passes it, and
+error[SLF0038]: 'Late' reads 'y' from around it, which every call passes it, and
 that 'y' is not in reach here -- it is declared later, or another variable has
 its name. Call it where the variable is in scope
 ```
@@ -292,11 +292,11 @@ its name. Call it where the variable is in scope
 like a module-level one, and fits a `delegate` or a `closure`. One that reads
 something becomes a closure that calls it, and what it reads is copied when the
 closure is made — the rule for a lambda, because it is one; it cannot be a
-`delegate` (SL0381). A generic one is a value only through a call that settles
-its type arguments (SL0834).
+`delegate` (SLT0034). A generic one is a value only through a call that settles
+its type arguments (SLT0085).
 
 **`static` promises it reads nothing** from around it — no variable, no object
-— and each attempt is SL0764. It is the same promise a `static` lambda makes,
+— and each attempt is SLF0036. It is the same promise a `static` lambda makes,
 written where the function is.
 
 **How the list of what it reads is worked out.** A call may be bound before the
@@ -307,7 +307,7 @@ ended up with, the function around them is bound again with what was learned.
 The lists only grow, so that settles, and a program that declares its local
 functions before using them is bound once. The one place this cannot happen is
 an initializer outside any function, where a use before the declaration is
-refused (SL0768).
+refused (SLF0038).
 
 **The symbol says where it was declared**: `Scale` above is linked as
 `Main.Scale`, one inside a method as `Type.Method.Name`, one inside another as
@@ -335,27 +335,27 @@ Bump(ref count);              // count is 2
 LengthSquared(origin);        // no copy, and origin cannot change
 ```
 
-**`ref` is written at the call as well as the declaration** (SL0445). A reader
+**`ref` is written at the call as well as the declaration** (SLT0043). A reader
 of the line should be able to see that the value may come back changed, and
 there is nothing else on it that would say so. `in` is not written at the call:
 it promises the opposite, and a promise not to change anything needs no warning.
 
 **A `ref` argument must name storage** — a local, a parameter, a field, an array
 element or a dereference. A call result or a literal has no storage to pass
-(SL0443), and a `const` local or a `static readonly` has storage that may not be
-written (SL0444). An `in` argument needs no such thing: a value with nowhere to
+(SLT0041), and a `const` local or a `static readonly` has storage that may not be
+written (SLT0042). An `in` argument needs no such thing: a value with nowhere to
 live is given a temporary, which lasts as long as the frame.
 
 **A `ref` argument is not converted.** `Bump(ref d)` where `d` is a `double` is
-an error (SL0447) rather than a widening, because the callee writes back through
+an error (SLT0045) rather than a widening, because the callee writes back through
 the pointer and a converted copy would have nowhere to put the result. An `in`
 argument converts like a value one, because what it receives may be that
 temporary.
 
-**Writing to an `in` is refused** (SL0448), including through one of its fields.
+**Writing to an `in` is refused** (SLT0046), including through one of its fields.
 Passing one on as a `ref`, or one of its fields, is refused for the same reason
-(SL0444), and so is calling a struct method that writes the struct it is called
-on, or setting one of its properties (SL0809). A struct method is given its
+(SLT0042), and so is calling a struct method that writes the struct it is called
+on, or setting one of its properties (SLT0083). A struct method is given its
 receiver by pointer, so the call is a write exactly when the method's body is
 one, directly or through another method it calls on `this`. A method that only
 reads is called on the caller's storage with no copy. C# copies the receiver
@@ -364,9 +364,9 @@ the write without a word; here the call is refused and says so. The same holds
 for a `static readonly`, a `const` and an element of a `ReadOnlySpan<T>`.
 
 **The mode is part of a signature.** Two overloads may not differ only in it
-(SL0211), a class does not implement `void Adjust(ref int)` with `void
-Adjust(int)` (SL0307), and a delegate's signature carries it. A spawned call may
-not take one at all (SL0449): it would hand a job the address of the caller's
+(SLN0006), a class does not implement `void Adjust(ref int)` with `void
+Adjust(int)` (SLC0015), and a delegate's signature carries it. A spawned call may
+not take one at all (SLO0019): it would hand a job the address of the caller's
 variable, and two jobs given the same one would race.
 
 **At the ABI a `ref T` is exactly a `T*`**, which is what lets one cross a
@@ -402,7 +402,7 @@ At the ABI it is exactly what `ref` is, a `T*`. What it adds is a promise in
 each direction: the caller need not have given the variable a value, and the
 callee has to.
 
-**The callee's half is checked** (SL0600). Every path out of the function
+**The callee's half is checked** (SLO0023). Every path out of the function
 either writes the parameter or is an error, and handing it straight on as
 somebody else's `out` counts as writing it — that callee is held to the same
 promise. A `try` whose failure returns before the write is such a path, and so
@@ -426,8 +426,8 @@ saying so is a line about the mechanism. `out var x` takes its type from the
 parameter, which means it says nothing about which overload was meant and does
 not vote on the choice.
 
-`out` is written at the call (SL0445) for the reason `ref` is, and is refused
-where the parameter is not one (SL0446).
+`out` is written at the call (SLT0043) for the reason `ref` is, and is refused
+where the parameter is not one (SLT0044).
 
 **`out` is a contextual keyword**, and the standard library is what decided it:
 `Convert.sl` and `Encoding.sl` both use `out` as a local. It is the modifier
@@ -454,11 +454,11 @@ reader cannot decode — four `bool`s in a row say nothing about which flag is
 which — and for the constructor with more parameters than anyone remembers the
 order of.
 
-**Named arguments come after positional ones** (SL0601). Mixing the two orders
+**Named arguments come after positional ones** (SLT0067). Mixing the two orders
 freely would make a reader count past the names to see where a positional one
 lands. Among themselves the names may be in any order, because each says where
 it goes. Each has to name a parameter, none may be given twice, and none may be
-left empty — all SL0601, which says which of those went wrong.
+left empty — all SLT0067, which says which of those went wrong.
 
 **A name takes part in choosing an overload**, since two candidates may call
 their parameters different things.
@@ -473,7 +473,7 @@ Log("a"))` logs `b` first. A struct argument is copied as it is evaluated, so
 a later argument that changes the variable does not reach it. A default the
 call left out is a constant and has no order to keep.
 
-`base(...)` and `this(...)` take their arguments in order (SL0602): they name a
+`base(...)` and `this(...)` take their arguments in order (SLT0068): they name a
 constructor rather than a declaration, so there is nothing for a name to match.
 
 ## 7.3 Properties
@@ -556,7 +556,7 @@ public class Account
 }
 
 var account = new Account { Id = 7, Handle = "ada" };
-account.Id = 8;                          // SL0781
+account.Id = 8;                          // SLC0103
 ```
 
 `init` is `set` with a narrower list of callers: an object initializer, a
@@ -570,12 +570,12 @@ does.
 
 An `init` property is part of a contract like a setter is: what implements an
 interface's `{ get; init; }`, or overrides a virtual one, says `init` too, and
-one declared `set` is implemented with `set` (SL0782) — otherwise a caller of
+one declared `set` is implemented with `set` (SLC0104) — otherwise a caller of
 one would be allowed a write the other forbids. A static property has no object
-that is being made, so it cannot be `init` (SL0780).
+that is being made, so it cannot be `init` (SLC0102).
 
 ```
-error[SL0781]: 'Account.Id' is 'init', so it is written while its object is
+error[SLC0103]: 'Account.Id' is 'init', so it is written while its object is
 being made and not after: in an object initializer, a 'with', or on 'this' in a
 constructor or 'init' accessor of 'Account' or a class deriving from it
 ```
@@ -596,7 +596,7 @@ public class Person
 
 var ada = new Person { Name = "ada", Age = 36 };
 var bob = new Person("bob", 40);
-var cy  = new Person { Name = "cy" };    // SL0784: 'Age' is not set
+var cy  = new Person { Name = "cy" };    // SLC0106: 'Age' is not set
 ```
 
 A field or a property marked `required` has to be given a value in the object
@@ -611,11 +611,11 @@ rather than a library type, so it needs no import. `new()` written with its type
 left off is a `new` like any other, and so is the collection a collection
 expression makes. A type argument for a `new()` constraint is refused if its
 constructor taking nothing would leave one unset, because `new T()` has no
-initializer to name them in (SL0328).
+initializer to name them in (SLG0006).
 
 Only an instance field or a property with a setter or `init` can be required
-(SL0783); and on a public type it has to be public, setter included, because
-every `new` anywhere must be able to set it (SL0838).
+(SLC0105); and on a public type it has to be public, setter included, because
+every `new` anywhere must be able to set it (SLC0124).
 
 ### 7.3.3 `field` — the property's own storage
 
@@ -646,7 +646,7 @@ there when it runs.
 **`field` is contextual.** It means the storage only inside an accessor of a
 property, and is an ordinary name everywhere else. `@field` is the ordinary name
 inside one too, and `this.field` a member of that name. A variable declared
-`field` inside an accessor is refused (SL0936): every later `field` would be
+`field` inside an accessor is refused (SLP0053): every later `field` would be
 the storage, so the variable could never be read, and an accessor that meant
 only to compute a value would quietly own storage.
 
@@ -677,7 +677,7 @@ and has no storage to reach: an interface has no state.
 - **Initialized at the declaration only when it owns storage.** `public int X
   { get; set; } = 5;` gives that storage its first value, at the head of every
   constructor, exactly as a field initializer does ([§2.4.1](02-types.md#241-a-field-with-a-value)). A property that
-  *computes* its value has no storage to give one to, and says so (SL0635).
+  *computes* its value has no storage to give one to, and says so (SLC0085).
 - **Not indexed, by itself.** `this[i]` is an indexer, which is a property that takes arguments and has a section of its own ([§7.5](#75-indexers)).
 
 ## 7.4 Operators
@@ -723,26 +723,26 @@ its operators apart from its methods, and an operator is reached by writing it.
 
 **What may not, and why.** `&&` and `\|\|` short-circuit, and an overload would
 have to evaluate both sides to be called at all — so overloading them would
-change what the operator *means* rather than what it does (SL0558). `=` is not
+change what the operator *means* rather than what it does (SLP0035). `=` is not
 an operator but a store. And the compound forms are not overloaded separately:
 `a += b` is defined as `a = a + b` and picks up whatever `+` does, which is one
 rule where two could disagree.
 
 **The rules**, each of them C#'s and each for a reason that holds here:
 
-- It belongs to a type (SL0560). A module-level one would let a program give
+- It belongs to a type (SLC0064). A module-level one would let a program give
   somebody else's type a meaning from a distance.
-- **One operand must be that type** (SL0563), so that reading `a + b` says
+- **One operand must be that type** (SLC0067), so that reading `a + b` says
   where to look for what it means.
-- It must be `public` (SL0561). An operator only its own module can write is a
+- It must be `public` (SLC0065). An operator only its own module can write is a
   method with an unusual spelling.
-- A comparison returns `bool` (SL0564), and **the pairs come together**
-  (SL0567): `==` with `!=`, `<` with `>`, `<=` with `>=`. A type that answers
+- A comparison returns `bool` (SLC0068), and **the pairs come together**
+  (SLC0069): `==` with `!=`, `<` with `>`, `<=` with `>=`. A type that answers
   one and not the other is a trap, and the missing half fails at a call site
   far from the declaration that forgot it.
 - An interface declares one only as `static abstract`, which every implementing
   type must supply, or `static virtual`, whose body is what one that supplies
-  none falls back on (SL0645). An operator is chosen from the operand types
+  none falls back on (SLC0091). An operator is chosen from the operand types
   where it is written rather than dispatched, so one of the interface's own
   would be reached only by an operand typed as the interface; see
   [§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type).
@@ -795,22 +795,22 @@ here is meant to fit in a sentence.
 
 **What is refused, and why**:
 
-- **Neither side is the declaring type** (SL0615). A conversion between two other types
+- **Neither side is the declaring type** (SLC0074). A conversion between two other types
   would give somebody else's types a meaning from a distance, and a reader
   would have nowhere to look for it. Same rule as an operator's operand
   ([§7.4](#74-operators)).
-- **To or from an interface** (SL0631). A cast to an interface asks the object what it
+- **To or from an interface** (SLC0082). A cast to an interface asks the object what it
   is; a conversion would make a different object instead, and the same
   punctuation would mean two things.
-- **A conversion the language already has** (SL0632). A derived class already converts
+- **A conversion the language already has** (SLC0083). A derived class already converts
   to its base, an array to a slice, an `int` to a `long`. A second answer to a
   question already answered is one a reader would have to know about to predict
   what a cast does.
-- **A type to itself** (SL0630), and the same pair declared twice (SL0211).
+- **A type to itself** (SLC0081), and the same pair declared twice (SLN0006).
 
 Two conversions from different types that both reach the same target are not a
 conflict; two that could both carry *this* value to *that* type are, and the
-call site says so (SL0616) rather than picking one.
+call site says so (SLT0071) rather than picking one.
 
 **A conversion does not cross a library boundary**, on the same terms as an
 operator: neither is in a module's metadata yet, so a consumer sees the type and
@@ -869,7 +869,7 @@ grid[1u, 2u] += 1;
 ```
 
 An array, a slice and a pointer take the one number they are laid out by, so a
-second index on one of those is SL0241. What a pair means is a question only
+second index on one of those is SLT0009. What a pair means is a question only
 the type can answer, which is why answering it is what declaring an indexer is.
 
 An indexer is inherited like any other member, and works on a struct — where
@@ -907,9 +907,9 @@ var small = try Small.Parse(text);
 ```
 
 There is no `this`, so the body cannot read a field or call a method without
-saying which object it means (SL0228, SL0576). A call names the type; naming a
-value instead is refused (SL0646), as is naming the type to reach an instance
-method (SL0576). Each of those says which spelling was meant.
+saying which object it means (SLN0010, SLN0022). A call names the type; naming a
+value instead is refused (SLN0023), as is naming the type to reach an instance
+method (SLN0022). Each of those says which spelling was meant.
 
 Everything else about it is an ordinary method. It overloads by parameters
 alongside the instance methods of the same name — though two members differing
@@ -971,7 +971,7 @@ initializer in another type, a module-level static, another type's static
 constructor — runs after that type's initializers *and* its static
 constructor, so it sees what the block arranged. The units are ordered by the
 same dependency sort the initializers are, and two blocks that each read the
-other's type are a cycle (SL0378). A static's initializer inside a type names
+other's type are a cycle (SLO0016). A static's initializer inside a type names
 the type's other statics, constants and static methods bare, as its methods do.
 
 C# runs one *lazily*, before the type is first used, behind a guard checked on
@@ -991,9 +991,9 @@ public static class Defaults
 }
 ```
 
-`new Defaults()` is refused (SL0583), and so is any member that would need an instance —
+`new Defaults()` is refused (SLC0071), and so is any member that would need an instance —
 a field, a constructor, a destructor, an instance method or an instance property
-(SL0640). A **module** is usually the better answer, and is what the standard
+(SLC0087). A **module** is usually the better answer, and is what the standard
 library uses: a module is a scope, so its members need no prefix inside it. What
 a static class buys is a name that sits *inside* a module and is reached from
 one.
@@ -1002,11 +1002,11 @@ What `static` may not be written on:
 
 | | Refused because | |
 |---|---|---|
-| a module-level function | a module has no instance for a function to belong to | SL0828 |
-| an interface member with no body, unless it is `static abstract` | a requirement says so ([§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type)) | SL0574 |
-| `virtual`, `override`, `abstract`, on a class | dispatch chooses a body from the object a call arrives on | SL0507 |
-| `protected` | the word is about what a derived object reaches through itself | SL0507 |
-| a struct, interface, enum, variant, union or delegate | only a class has instances for the word to deny | SL0828 |
+| a module-level function | a module has no instance for a function to belong to | SLC0123 |
+| an interface member with no body, unless it is `static abstract` | a requirement says so ([§4.3.1](04-generics.md#431-static-abstract--a-promise-about-the-type)) | SLC0070 |
+| `virtual`, `override`, `abstract`, on a class | dispatch chooses a body from the object a call arrives on | SLC0047 |
+| `protected` | the word is about what a derived object reaches through itself | SLC0047 |
+| a struct, interface, enum, variant, union or delegate | only a class has instances for the word to deny | SLC0123 |
 
 ---
 

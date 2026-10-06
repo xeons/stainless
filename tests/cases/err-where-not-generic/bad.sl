@@ -9,8 +9,8 @@ public interface INamed
     String Name();
 }
 
-int NotGeneric(int v) where T : INamed => v;                     // SL0331
+int NotGeneric(int v) where T : INamed => v;                     // SLG0009
 
-public class Holder where T : INamed { }                         // SL0331
+public class Holder where T : INamed { }                         // SLG0009
 
 int Main() => 0;

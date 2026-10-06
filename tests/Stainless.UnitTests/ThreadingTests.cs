@@ -50,7 +50,7 @@ public class ThreadingTests
 
     /// <summary>
     /// Every spelling of a positive constant stride. <c>i++</c> is the one the
-    /// style guide asks for, and it used to be refused (SL0371).
+    /// style guide asks for, and it used to be refused (SLO0010).
     /// </summary>
     [Theory]
     [InlineData("int", "i++")]
@@ -74,7 +74,7 @@ public class ThreadingTests
     [InlineData("j++")]
     [InlineData("i = i * 2")]
     public void AParallelForRefusesAnyOtherStep(string step) =>
-        Assert.Equal(["SL0371"], Body(
+        Assert.Equal(["SLO0010"], Body(
             "var values = new int[10];\nint j = 0;\n" +
             $"for parallel (int i = 0; i < 10; {step})\n    values[0] = 1;"));
 
@@ -115,7 +115,7 @@ public class ThreadingTests
     {
         // The initializer is irrelevant -- the type is refused before it is
         // reached -- so a null one keeps each case to the thing being tested.
-        Assert.Contains("SL0377", Module($"static readonly {type}? Value = null;"));
+        Assert.Contains("SLO0015", Module($"static readonly {type}? Value = null;"));
     }
 
     // --------------------------------------------------------- the surface
@@ -178,7 +178,7 @@ public class ThreadingTests
     [Fact]
     public void AGuardCannotBeDroppedByAssigningNull()
     {
-        Assert.Contains("SL0265", Body("""
+        Assert.Contains("SLT0018", Body("""
             var mutex = new Mutex<long>(0);
             var guard = mutex.Enter();
             guard = null;

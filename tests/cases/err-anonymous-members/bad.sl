@@ -18,9 +18,9 @@ public struct Plain
 int Main()
 {
     Ambiguous a;
-    a.Value = 1;                    // SL0492
+    a.Value = 1;                    // SLN0020
 
     Plain p;
-    p.Missing = 2;                  // SL0247
+    p.Missing = 2;                  // SLN0013
     return 0;
 }

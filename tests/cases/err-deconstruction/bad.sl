@@ -23,16 +23,16 @@ int Main()
     int b = 0;
     var pair = (1, "one");
 
-    (a, b) = (1, 2, 3);                     // SL0609
-    (a, b) = new Plain();                   // SL0608
-    var (x, y, z) = new Two();              // SL0608
-    var n = (int p, int q) = pair;          // SL0771
-    var (u, v) = (null, 1);                 // SL0553
-    var loose = (null, 1);                  // SL0756
+    (a, b) = (1, 2, 3);                     // SLF0031
+    (a, b) = new Plain();                   // SLF0030
+    var (x, y, z) = new Two();              // SLF0030
+    var n = (int p, int q) = pair;          // SLF0040
+    var (u, v) = (null, 1);                 // SLT0061
+    var loose = (null, 1);                  // SLT0076
 
     (int, int)[] pairs = [(1, 2)];
-    foreach ((a, var w) in pairs) { }       // SL0772
+    foreach ((a, var w) in pairs) { }       // SLF0041
 
-    var (same, same) = pair;                // SL0218
+    var (same, same) = pair;                // SLN0008
     return 0;
 }

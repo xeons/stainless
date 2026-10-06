@@ -399,7 +399,7 @@ public sealed record MetadataFunction
     /// Visible to a derived class and to nothing else.
     ///
     /// It has to cross, and it has to be exported, because a dispatched method
-    /// must be public or protected (SL0506) -- so a protected one can be filling
+    /// must be public or protected (SLC0046) -- so a protected one can be filling
     /// a slot that a class derived across a library boundary has to copy or
     /// replace. A consumer that is not deriving cannot call it, and the binder
     /// is what enforces that rather than the linker.

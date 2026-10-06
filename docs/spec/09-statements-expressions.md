@@ -57,11 +57,11 @@ enclosing block, to the function, or to a parameter:
 ```csharp
 int n = 1;
 {
-    int n = 2;      // error[SL0218]: 'n' is already declared in this scope
+    int n = 2;      // error[SLN0008]: 'n' is already declared in this scope
 }
 ```
 
-A local named after a parameter is SL0219.
+A local named after a parameter is SLN0009.
 
 That is C#'s rule rather than C's, and for C#'s reason: where two readings of a
 name are possible, the likelier cause is a mistake rather than an intention,
@@ -78,7 +78,7 @@ offsetof(Msg, LParam)       // 24
 
 `sizeof` and `alignof` take a type; `offsetof` takes a type and one of its
 fields. A bit-field has no byte offset of its own, so `offsetof` refuses one
-(SL0482), as C does. On a **class** the offset counts from the start of the
+(SLI0020), as C does. On a **class** the offset counts from the start of the
 allocation rather than from the first field, because a class reference points
 at the object header ([§2 of abi.md](../abi.md#2-object-header-class-instances)) — so the number is what to add to
 the reference you are holding.
@@ -151,7 +151,7 @@ The tag is a byte, so this is an LLVM `switch` like an enum's.
 
 **Sections do not fall through.** Each one has to end by leaving — `break`,
 `return`, `continue` or a `goto` — and running off the end is an error
-(SL0407) rather than a silent jump into the next section. Values that share a
+(SLF0016) rather than a silent jump into the next section. Values that share a
 body stack their labels:
 
 ```csharp
@@ -175,7 +175,7 @@ switch (step)
 
 The constant converts to the switch's type as a label does, and names a
 section of the innermost switch statement around the jump. There has to be one
-(SL0802), and it has to have a section with that label, or a `default` (SL0803).
+(SLF0045), and it has to have a section with that label, or a `default` (SLF0046).
 A switch of patterns is a place to land too, wherever a section has a plain
 constant label with no `when`. A switch over a variant is not: its sections
 are entered knowing which case the value holds, which is what makes a case's
@@ -201,7 +201,7 @@ for (nuint i = 0; i < values.Length; i++)
 ```
 
 A `default` is optional except over a variant, where leaving a case out without
-one is SL0436. Elsewhere a value that matches nothing falls past the whole
+one is SLF0017. Elsewhere a value that matches nothing falls past the whole
 statement: a statement over an enum need not name every member, as in C#,
 because the value need not be one of them. A statement whose labels cover every
 value it could hold — both bools, every case of a variant — ends a function
@@ -246,30 +246,30 @@ the whole names what matched: `Circle { Radius: > 1.0 } big`.
 **Members** are fields and properties, read by name. `Owner.Name: "a"` is
 `Owner: { Name: "a" }`, which asks that the owner is there before it asks
 anything of it; `{ }` alone asks only that. A member that is a method is
-refused (SL0836) — a pattern reads, and a call belongs in a `when`.
+refused (SLF0048) — a pattern reads, and a call belongs in a `when`.
 
 **Positions** are a tuple's elements, a variant case's payload fields in the
 order they were declared — `Circle(var r)`, `Ok(var value)` — or, for anything
 else, what its `Deconstruct` hands back ([§9.14](#914-assignment)). There are
-as many positions as the value has (SL0609), and a name written on one is
-checked against the element it stands for (SL0776).
+as many positions as the value has (SLF0031), and a name written on one is
+checked against the element it stands for (SLF0044).
 
 **Elements** are matched on an array, a slice, an inline array, or a type with
 a `Count` or `Length` and an integer indexer, `List<T>` among them. The length
 is read once and asked first; each element is then read by its index from
 whichever end it was written against, so `[.., var last]` reads one element.
-There is one `..` at most (SL0775). What `.. var rest` names is a slice of the
+There is one `..` at most (SLF0043). What `.. var rest` names is a slice of the
 same array ([§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array)), which shares its storage
 rather than copying it, or, for a type, what its `Slice(start, length)` answers
 — `a[1..]` asks the same thing ([§9.17](#917--and-)). Naming the run of
-anything with neither is refused (SL0835). A `String` is not matched element
-by element (SL0774): its positions are bytes, and a pattern of characters over
+anything with neither is refused (SLF0047). A `String` is not matched element
+by element (SLF0042): its positions are bytes, and a pattern of characters over
 it would be a pattern of bytes that looked like something else.
 
 **A type is asked only of a reference.** An object is asked what class it is
 and a variant which case it holds; any other value is exactly what it was
 declared to be, so the one type it matches is its own — `(int count, _)` over
-an `(int, String)` names the first element -- and any other is SL0518.
+an `(int, String)` names the first element -- and any other is SLF0020.
 
 **A pattern is a question, and every one of them is asked by a `bool`** — a
 comparison, a tag test, `is`, a member read, a length. There is no matching
@@ -291,7 +291,7 @@ else about the statement is the same with patterns as without — sections that
 may not fall through, `break` that belongs to the switch, `continue` that
 passes through it.
 
-**A name belongs to one label** (SL0619). A section reached by two of them has
+**A name belongs to one label** (SLF0032). A section reached by two of them has
 proved nothing about which, so there would be nothing for the name to be; the
 same rule refuses a name under `or`, and a name under `not` in a label, which
 is assigned only where the label did not match. After `is` a name under `not`
@@ -304,7 +304,7 @@ short-circuits. A guarded label proves nothing about coverage, so a variant
 switch that covers a case only under a `when` still needs the case or a
 `default`.
 
-**A label nothing can reach is a warning** (SL0621): one whose every value an
+**A label nothing can reach is a warning** (SLL0005): one whose every value an
 earlier unguarded label already matches, as `case (true, true):` after
 `case (true, _):`.
 
@@ -337,7 +337,7 @@ The value goes first, the arms are separated by commas, and each one is an
 expression rather than a statement — which is the whole difference between this
 and the statement it is named after.
 
-**It has to be exhaustive** (SL0620). A statement that matches nothing falls
+**It has to be exhaustive** (SLF0033). A statement that matches nothing falls
 past itself; an expression that matched nothing would have no value to be, and
 there are no exceptions here to throw at the hole. So the arms end with `_`, or
 between them they cover every value: both bools, every case of a variant, every
@@ -371,7 +371,7 @@ of its members.
 **The arms agree on a type**, the way a ternary's arms do: the first one decides
 it and the rest convert to it.
 
-**An arm nothing can reach is a warning** (SL0621): an arm after `_`, or one
+**An arm nothing can reach is a warning** (SLL0005): an arm after `_`, or one
 whose every value the arms before it already match.
 
 It is asked the way a statement's labels are, each question once, and written
@@ -413,7 +413,7 @@ block to outlive it.
 
 That is the whole of where `spawn` may be written. It is not a general operator:
 a spawned call has no value until the join, so `total = spawn Work() + 1` and
-`int local = spawn Work();` are both SL0390. The two shapes are `spawn f(x);`
+`int local = spawn Work();` are both SLO0018. The two shapes are `spawn f(x);`
 and `place = spawn f(x);`, and `place` may be any variable, field or element
 that outlives the block.
 
@@ -522,7 +522,7 @@ A mutable string class is refused, since the object is in read-only data. So
 is anything else built at run time, with the alternative:
 
 ```
-error[SL0478]: a 'const' holds a number, a bool, a char, an enum, a 'String', a
+error[SLT0048]: a 'const' holds a number, a bool, a char, an enum, a 'String', a
 C string ('byte*', 'char16*', 'char32*') or an Objective-C string ('NSString',
 'CFStringRef'), and 'Registry' is none of those. Write 'static readonly
 Registry Shared = ...' instead, which has storage rather than being inlined
@@ -533,7 +533,7 @@ error but a zero — one that compiles, runs, and is wrong everywhere the consta
 was used:
 
 ```
-error[SL0479]: 'Mask' is declared 'int', and a floating-point literal is not one
+error[SLT0049]: 'Mask' is declared 'int', and a floating-point literal is not one
 ```
 
 A character literal suits an integer, as it does in C#, so
@@ -555,7 +555,7 @@ be immortal, because replacing what it holds has to release the old value.
 
 **Every static needs an initializer.** It is written by that and nothing else —
 the initializers run before `Main` and there is no later moment at which a first
-value could arrive — so `static int Counter;` is an error (SL0376).
+value could arrive — so `static int Counter;` is an error (SLO0014).
 
 What a static holds is *warned* about rather than refused ([§9.5](#95-what-may-cross-a-thread-boundary)): it outlives
 every thread, so a `List<int>` in one is reachable from all of them and the
@@ -577,7 +577,7 @@ C++ cannot do this and calls the result a fiasco. Swift avoids it by making
 every static lazy and paying a guard check on every access — a check that has to
 become atomic the moment threads exist. Stainless compiles the whole program at
 once, so it simply reads the dependency graph: no guard, no per-access cost, and
-a **compile error** on a cycle rather than a zero at run time (SL0378).
+a **compile error** on a cycle rather than a zero at run time (SLO0016).
 
 **A static read through a call counts.** The graph follows what an initializer
 calls or constructs through every body the program has, so
@@ -666,7 +666,7 @@ receiver, a `for parallel` capture, and a static.
 | a type declared `threadsafe` | the author asserts it synchronizes itself |
 | `T[]` where `T` is plain data | a job borrows it without retaining it |
 
-Everything else **warns** (SL0377). Counting is not what the rule protects:
+Everything else **warns** (SLO0015). Counting is not what the rule protects:
 reference counts are atomic, so sharing an object cannot corrupt its count.
 What nothing synchronizes is the object's *contents*, and two threads writing
 one field is a race no counting scheme could have saved.
@@ -702,7 +702,7 @@ the difference is who asked: a library author stating a requirement in their own
 signature, rather than a compiler guessing at one.
 
 The word goes on a class, a struct or an interface. A variant, a union, an enum
-and a delegate are refused (SL0582): each is a value with no operations of its
+and a delegate are refused (SLO0021): each is a value with no operations of its
 own, so the word on one would promise nothing.
 
 Two gaps remain, and both are about lifetimes rather than types: a `Guard` can
@@ -728,7 +728,7 @@ value is the one from *before* the write, so `i++` and `++i` are different
 expressions rather than two spellings of one. And the place is worked out
 exactly once, so `cells[Next()]++` calls `Next` a single time.
 
-An enum is refused (SL0594): it is a choice rather than a count, and stepping
+An enum is refused (SLT0066): it is a choice rather than a count, and stepping
 one means stepping the integer behind it.
 
 ## 9.7 `?.`, `?[`, `??` and `!`
@@ -753,7 +753,7 @@ ask about one object while reading another.
 |---|---|
 | `node?.Name` | a `String?`, null when there was no node |
 | `node?.Next` | a `Node?`, the same |
-| `node?.Weight` | an `int`, which has no null — SL0605 |
+| `node?.Weight` | an `int`, which has no null — SLO0025 |
 | `node?.Save()` | nothing either way, and a statement |
 
 The third is why `??` and `?.` are bound together rather than separately: where
@@ -762,7 +762,7 @@ is how a value-typed member is reached. Without the fallback there is nowhere
 for "there was no node" to go, and the language says so rather than inventing a
 zero that a caller cannot tell from a real one.
 
-**A receiver that cannot be nothing is refused** (SL0604), for `?.`, `?[`,
+**A receiver that cannot be nothing is refused** (SLO0024), for `?.`, `?[`,
 `??` and `??=` alike. `here?.Name` on a plain `Node` is a question with one
 answer, and writing it suggests a doubt the type does not have.
 
@@ -779,7 +779,7 @@ The true arm of an enclosing conditional that lost its `:` to that guess is
 read again with every `?[` as an element, so `c ? a?[i] : b` means what it
 says.
 
-**Neither is written through** (SL0762), as in C#. `node?.Weight = 4` would be
+**Neither is written through** (SLT0078), as in C#. `node?.Weight = 4` would be
 a write that happens only sometimes, which is an `if`, and reads better as one.
 
 **Each `?.` asks its own question.** `a?.b?.c` is two, and `a?.b.c` is an
@@ -822,7 +822,7 @@ number, `false`, null for an optional reference or a pointer, and every field
 of a struct the same way down. It exists for generic code, which cannot write a
 literal for a type it does not know.
 
-**Only a type that has a zero value has one to give** (SL0810). A `String`, a
+**Only a type that has a zero value has one to give** (SLO0027). A `String`, a
 class and an array are never null, so their zero is not a value of them, and
 neither is a struct's that holds one ([§2.16](02-types.md#216-zero-values)).
 `default(T)` in a template is judged for each `T` it is instantiated with, and
@@ -835,7 +835,7 @@ held to C#'s definite assignment instead: each slot of it that has none is
 written, on every path, before it is read
 ([§2.16.1](02-types.md#2161-locals)).
 
-`default(void)` is the one refusal (SL0309): `void` is the absence of a value,
+`default(void)` is the one refusal (SLT0024): `void` is the absence of a value,
 so there is none of it to zero.
 
 **A bare `default` takes its type from where it is going**, as in C#:
@@ -852,10 +852,10 @@ long wide = (long)default;                  // a cast
 
 It is `default(T)` for the `T` that place names, and costs exactly that. With
 nothing to name one — `var x = default;`, `default.ToString()`,
-`default == default` — it is SL0756. As an argument it fits any parameter, so
+`default == default` — it is SLT0076. As an argument it fits any parameter, so
 two overloads that differ only there are ambiguous, as in C#.
 
-**`case default:` is refused** (SL0758). It is nearly always a `default:` label
+**`case default:` is refused** (SLP0051). It is nearly always a `default:` label
 written wrong, and as a constant it would match whatever the zero is.
 
 ## 9.9 `do`
@@ -882,7 +882,7 @@ done:
 ```
 
 C#'s. **A jump may leave any number of blocks and may not enter one**
-(SL0595): the label it names is in the block the jump is in, or in a block
+(SLF0029): the label it names is in the block the jump is in, or in a block
 around that one. A jump into a block would arrive past whatever the block
 declared ahead of the label. The rule is also what keeps the reference
 counting decidable: what a jump releases is every scope it is in that the
@@ -897,18 +897,18 @@ first run left before it stores. The skipped local is released at the end of
 its block as usual, and is handed a null. The cost is a store per release and
 a release per declaration, and only in a function with a label.
 
-A jump names a label in its own function and nowhere else (SL0589) — a lambda
+A jump names a label in its own function and nowhere else (SLF0028) — a lambda
 and a local function have labels of their own; two labels of a name is an
-error (SL0588), even in blocks that do not nest, where C# allows it, because
+error (SLF0027), even in blocks that do not nest, where C# allows it, because
 a name that means one place in the function reads more plainly; a label nothing jumps to is a
-warning (SL0591); and a jump out of a `parallel` block or a `for parallel`
-body is refused (SL0590), because the work queued there has to finish there.
+warning (SLL0003); and a jump out of a `parallel` block or a `for parallel`
+body is refused (SLO0022), because the work queued there has to finish there.
 A jump from one place to another inside the block is ordinary. `goto case`
 and `goto default` are the switch's own jumps, in [§9.1](#91-switch).
 
 **Reachability is C#'s**, without its constant folding beyond a literal
 `true`. A function has to return on every path that reaches its end
-(SL0217), and a jump, a `while (true)` or `for (;;)` with no `break`, and a
+(SLF0001), and a jump, a `while (true)` or `for (;;)` with no `break`, and a
 `do` whose body always leaves all count as not reaching it. A label is
 reached when a jump that is itself reached names it.
 
@@ -923,7 +923,7 @@ The last name written, as a `String`. What it buys over the literal is that the
 name is bound, so renaming the member breaks the build rather than the run:
 reflection here is reached by name, and `FindType("App.Buton")` has nothing to
 say for itself. It takes a variable, parameter, field, property, method or type
-(SL0592, SL0229), and answers with the last name in it — `nameof(button.Width)`
+(SLT0065, SLN0011), and answers with the last name in it — `nameof(button.Width)`
 is `"Width"`.
 
 ## 9.12 `checked`
@@ -981,7 +981,7 @@ makes `nuint size = Limit;` as plain as `nuint size = 64;`, which is C#'s rule
 too. An enum member does not, since its type is the enum rather than a number. A minus in front of one does not take that away:
 `sbyte low = -100;` fits, `-128` fits an `sbyte` where `-129` does not, and
 `byte b = -1;` is refused because nothing unsigned holds it. One that fits
-nothing is refused too, under a code of its own (SL0266), because no cast makes
+nothing is refused too, under a code of its own (SLT0019), because no cast makes
 300 a `byte` and the value is what is wrong.
 
 **A conditional and a `switch` expression are the values they choose between**,
@@ -1045,7 +1045,7 @@ already known: a constant divisor is checked at compile time instead, and
 `10 / 0` is an error rather than a program that runs.
 
 ```
-error[SL0415]: division by zero
+error[SLT0040]: division by zero
 ```
 
 Overflow of `+`, `-` and `*` is **not** in that table: it wraps, as C# does
@@ -1056,7 +1056,7 @@ C# program that relied on it should keep its answer; LLVM's own `fptosi` is
 poison there, which is a number the optimiser chooses. On ARM64 the
 conversion instruction saturates already; on x86-64 it costs two compares.
 
-**Nesting stops at 500 levels** (SL0108) — expressions inside expressions,
+**Nesting stops at 500 levels** (SLP0016) — expressions inside expressions,
 blocks inside blocks, types inside types, and interpolated strings inside the
 holes of interpolated strings, which count together with whatever encloses
 them. The limit exists because parsing and
@@ -1077,7 +1077,7 @@ alone has to be one that could have had an effect, and the rest are warned
 about:
 
 ```
-warning[SL0222]: this expression has no effect; its result is discarded
+warning[SLL0001]: this expression has no effect; its result is discarded
 ```
 
 **What counts as an effect is a list, not a judgement**: an assignment — plain
@@ -1092,8 +1092,8 @@ count = Next();
 thing?.Method();            // effective: the call is
 count > 0 ? Start() : Stop(); // effective: both arms are calls
 
-count + 1;                  // SL0222 -- computed and thrown away
-count;                      // SL0222
+count + 1;                  // SLL0001 -- computed and thrown away
+count;                      // SLL0001
 ```
 
 **A call is effective whatever it answers.** The warning is not about ignoring
@@ -1105,7 +1105,7 @@ written.
 something else, and a variant's case constructors are where that happens:
 
 ```csharp
-Fail("could not read the file");    // SL0222
+Fail("could not read the file");    // SLL0001
 ```
 
 `Fail` is `Result`'s case constructor ([§2.8](02-types.md#28-resultt-terror--how-a-function-fails)), so that
@@ -1160,11 +1160,11 @@ or a parameter, which only the statement itself could change.
 `b + 10` on a `byte` is an `int`, and `b = b + 10` needs a cast. `b += 10`
 does not: it means `b = (byte)(b + 10)`, which is C#'s rule, and applies when
 `y` itself fits `x` or the operator is a shift. `b += 300` is still refused
-(SL0265), because 300 is not a byte's worth whatever the cast does. The cast
+(SLT0018), because 300 is not a byte's worth whatever the cast does. The cast
 wraps as every integer cast does, and inside `checked` it aborts instead, as
 every numeric cast there does ([§9.12](#912-checked)).
 
-**A field of a temporary struct cannot be written** (SL0399). A struct a call,
+**A field of a temporary struct cannot be written** (SLT0035). A struct a call,
 a property or an indexer answered is a copy that nothing will read again, so
 `list[0].X = 5`, `shape.Origin.X = 7` and `Make().X = 3` would each change the
 copy and throw it away. C# refuses the same three (CS1612 and CS0131). A
@@ -1197,7 +1197,7 @@ a word this language reserved — and `@name` and `name` are one name, so
 **The `@` is not part of the name.** A symbol, its mangled name, what `export`
 writes and what `extern` looks for are all the bare word, so `@default` above
 links against a C function called `default`. An `@` followed by anything but a
-letter or `_` is not a name (SL0001).
+letter or `_` is not a name (SLP0001).
 
 ---
 
@@ -1218,16 +1218,16 @@ allocated and counted, a struct made where it stands. A `C?` makes a `C`. The
 arguments are bound where they were written, before the type is known, so
 nothing about them depends on where the value ends up.
 
-**With nothing to take the type from it is SL0756**: `var p = new();`,
+**With nothing to take the type from it is SLT0076**: `var p = new();`,
 `new().X`, a statement of its own. A type `new` cannot make — an interface, an
-abstract class, a variant — is refused as it would be written out (SL0244,
-SL0514).
+abstract class, a variant — is refused as it would be written out (SLC0007,
+SLC0053).
 
 **In overload resolution it fits any parameter `new` could make**, which is a
 little narrower than C#'s "any type": `Pick(new())` against `Pick(Point)` and
 `Pick(int)` chooses `Point`, where C# calls the pair ambiguous. Two class
 parameters are ambiguous in both. A generic parameter learns nothing from it,
-so `Id(new())` is SL0327 until the type argument is written: `Id<Point>(new())`.
+so `Id(new())` is SLG0005 until the type argument is written: `Id<Point>(new())`.
 
 ---
 
@@ -1259,7 +1259,7 @@ that was written. `a[i..j]` is exactly the slice `a[i:j]` is
 ([§2.12](02-types.md#212-spant-and-readonlyspant--part-of-an-array)): a view that shares the array,
 bounds-checked the same way. Stainless's own `a[i:j]` stays, and takes `^` in
 either place too: `a[1:^1]`. On an inline array a constant `^n` is folded, so
-one outside it is SL0490 at compile time.
+one outside it is SLT0053 at compile time.
 
 **Kept, each is a value**: `^n` is a `Standard.Index` and `a..b` a
 `Standard.Range`, small structs in the module every program already has. An
@@ -1277,10 +1277,10 @@ receiver is evaluated once, and a write through `x[^1]` still reaches the
 setter. An indexer declared to take an `Index` or a `Range` is asked first.
 
 **What is refused.** Counting from the end of something with no length — a
-pointer, a class with no `Count` — is SL0777; an `Index` on a type with a count
-and no integer indexer is SL0241; a range over an inline array, or over a type
-with no `Slice`, is SL0452, because a slice holds a counted array and an inline
-array is not one; and `^` or `..` over anything but an integer is SL0242.
+pointer, a class with no `Count` — is SLT0079; an `Index` on a type with a count
+and no integer indexer is SLT0009; a range over an inline array, or over a type
+with no `Slice`, is SLT0047, because a slice holds a counted array and an inline
+array is not one; and `^` or `..` over anything but an integer is SLT0010.
 
 **A `String` is not indexed**, by `^` or otherwise, because its positions are
 bytes ([§3](03-text.md)). `Substring` is how part of one is taken.

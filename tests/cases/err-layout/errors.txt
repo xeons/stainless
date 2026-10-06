@@ -1,6 +1,6 @@
-SL0465
-SL0466
-SL0463
-SL0728
+SLI0007
+SLI0008
+SLI0006
+SLC0096
 # [Pack] that is no power of two, beside [Packed], or on a class
-SL0421
+SLI0005

@@ -48,7 +48,7 @@ public sealed partial class Binder
         // A bare `Ok(x)` builds a variant rather than calling anything. It has
         // to be decided here, before the name is looked up, because a draft has
         // no type yet and overload resolution has nothing to resolve against.
-        // What keeps that unambiguous is SL0414: a module-level function may not
+        // What keeps that unambiguous is SLN0019: a module-level function may not
         // be named after a case of a variant this file can see. A method still
         // may, and is reached through its receiver.
         if (syntax.Callee is NameSyntax { Name.Parts: [var bare], TypeArguments: null } &&

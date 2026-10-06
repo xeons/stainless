@@ -1634,7 +1634,7 @@ public sealed partial class Binder
     /// <c>value switch { pattern =&gt; result, ... }</c>.
     ///
     /// <para>
-    /// <b>It has to be exhaustive</b> (SL0620), which is the one rule the
+    /// <b>It has to be exhaustive</b> (SLF0033), which is the one rule the
     /// statement does not have. A statement that matches nothing falls past
     /// itself; an expression that matched nothing would have no value to be,
     /// and there are no exceptions here to throw at the hole. An enum counts

@@ -45,7 +45,7 @@ public sealed partial class Binder
             : ResolveType(declaration.ReturnType, scope, allowVoid: true);
 
         // Static is a statement about a member. On a module-level function the
-        // word is refused below (SL0828) and the function is an ordinary one:
+        // word is refused below (SLC0123) and the function is an ordinary one:
         // everything that reads IsStatic goes on to ask which type the method
         // is a member of, and this one is a member of nothing.
         bool isStatic = declaration.Modifiers.HasFlag(Modifiers.Static);
@@ -746,7 +746,7 @@ public sealed partial class Binder
     /// A declaration that agrees with the definition stays. It is how one
     /// module calls what another defines, as a C header would.
     ///
-    /// SL0211 already refuses two such functions in one module whose
+    /// SLN0006 already refuses two such functions in one module whose
     /// parameters match; this is the rest, across modules and across
     /// parameter types.
     /// </summary>

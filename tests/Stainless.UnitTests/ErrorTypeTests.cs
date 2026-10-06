@@ -33,15 +33,15 @@ public class ErrorTypeTests
     /// stops on as a compiler bug.
     /// </summary>
     [Theory]
-    [InlineData("SL0223", """
+    [InlineData("SLF0002", """
 
         module Clashes;
-        Buffer Pick() // SL0273
+        Buffer Pick() // SLN0015
         {
             return ;
         }
         """)]
-    [InlineData("SL0262", """
+    [InlineData("SLT0015", """
 
         module Reaped;
         extern "C" int waitpid(int pid, int status, int options);
@@ -52,14 +52,14 @@ public class ErrorTypeTests
         { left = waitpid(1, &status, NoHang);
         }
         """)]
-    [InlineData("SL0262", """
+    [InlineData("SLT0015", """
 
         module FixedArrays;
         double Total( Matrix matrix)
         {(FromNullTerminatedUtf16(&data[0]));
         }
         """)]
-    [InlineData("SL0262", """
+    [InlineData("SLT0015", """
 
         module ComShell; extern "C"
         {
@@ -74,7 +74,7 @@ public class ErrorTypeTests
             }
         }
         """)]
-    [InlineData("SL0262", """
+    [InlineData("SLT0015", """
 
         module PortableResources;
         import Standard.Resources;
@@ -82,7 +82,7 @@ public class ErrorTypeTests
         { at = Resources.GetPointer(ResourceType.RcData, 301, &borrowed);
         }
         """)]
-    [InlineData("SL0265", """
+    [InlineData("SLT0018", """
 
         module ErrArrow; struct Point
         {
@@ -92,7 +92,7 @@ public class ErrorTypeTests
             int* counted = &X;
         }
         """)]
-    [InlineData("SL0265", """
+    [InlineData("SLT0018", """
 
         module LinuxTerminal; int Main()
         {
@@ -101,12 +101,12 @@ public class ErrorTypeTests
             seen = (ep, &ready, 8, 2000);
         }
         """)]
-    [InlineData("SL0281", """
+    [InlineData("SLD0002", """
 
         module Bad;
         partial Main() => 0;
         """)]
-    [InlineData("SL0289", """
+    [InlineData("SLT0022", """
 
         module Bad; variant Shape
         {
@@ -117,7 +117,7 @@ public class ErrorTypeTests
         }
         Shape TooFew() =>Rect(1.0);
         """)]
-    [InlineData("SL0305", """
+    [InlineData("SLC0013", """
 
         module Shop; interface IPriced
         {
@@ -126,24 +126,24 @@ public class ErrorTypeTests
         {
         }
         """)]
-    [InlineData("SL0305", """
+    [InlineData("SLC0013", """
 
         module Bad; interface IZero<Unit>
         {
             static abstract TSelf Zero { get; }
-        } class Empty<Empty> { } struct Flat                              // SL0302
+        } class Empty<Empty> { } struct Flat                              // SLC0010
         {
         } class Counted : IZero<Counted>
         {
         }
         """)]
-    [InlineData("SL0305", """
+    [InlineData("SLC0013", """
 
         module Bad; interface IShape { doublse Area(); } class Blob : IShape
         {
         }
         """)]
-    [InlineData("SL0307", """
+    [InlineData("SLC0015", """
 
         module Shop; interface IPriced
         {
@@ -152,7 +152,7 @@ public class ErrorTypeTests
         { String Label =>(_title);
         }
         """)]
-    [InlineData("SL0344", """
+    [InlineData("SLC0020", """
 
         module NamedArguments; attribute Column
         {
@@ -169,7 +169,7 @@ public class ErrorTypeTests
             }
         }
         """)]
-    [InlineData("SL0361", """
+    [InlineData("SLT0032", """
 
         module Control; closure void SearchRequested(prompt text); class SearchBox
         { SearchBox(String prompt)
@@ -199,7 +199,7 @@ public class ErrorTypeTests
             });
         }
         """)]
-    [InlineData("SL0361", """
+    [InlineData("SLT0032", """
 
         module ClosureStatics;
         import ClosureLibrary; delegate implicit Plain(int x);
@@ -208,7 +208,7 @@ public class ErrorTypeTests
         { Plain Raw = Tripled;
         }
         """)]
-    [InlineData("SL0377", """
+    [InlineData("SLO0015", """
 
         module StaticsReadInside;
         static i<int> s_maybe = Optional();
@@ -226,7 +226,7 @@ public class ErrorTypeTests
         {
         }
         """)]
-    [InlineData("SL0377", """
+    [InlineData("SLO0015", """
 
         module Bad;
         int Taken(Payload payload)
@@ -244,7 +244,7 @@ public class ErrorTypeTests
             }
         }
         """)]
-    [InlineData("SL0446", """
+    [InlineData("SLT0044", """
 
         module Bad;
         void Reads(in Point p) { }
@@ -254,7 +254,7 @@ public class ErrorTypeTests
             Reads(ref k);               // 'in' is not passed with 'ref'
         }
         """)]
-    [InlineData("SL0447", """
+    [InlineData("SLT0045", """
 
         module Bad;
         void Spoil(ref r<int, String> r) { r =("spoiled"); }
@@ -269,14 +269,14 @@ public class ErrorTypeTests
         {
         }
         """)]
-    [InlineData("SL0471", """
+    [InlineData("SLI0013", """
 
         module Bad; struct PackedBits { void A : 3; int B : 5; }
         int Main()
         {
         }
         """)]
-    [InlineData("SL0502", """
+    [InlineData("SLC0042", """
 
         module CovariantReturns; interface Puppy
         {
@@ -293,13 +293,13 @@ public class ErrorTypeTests
         {
         }
         """)]
-    [InlineData("SL0819", """
+    [InlineData("SLC0118", """
 
         module Bad; closure partial Notify(int value); class Publisher
-        { event Notify Global;            // SL0820: nothing would unsubscribe
+        { event Notify Global;            // SLC0119: nothing would unsubscribe
         }
         """)]
-    [InlineData("SL0565", """
+    [InlineData("SLT0063", """
 
         module ExpressionBodied;
         interface IArea
@@ -314,7 +314,7 @@ public class ErrorTypeTests
         { total = Money.Of(30) + Money.Of(12);
         }
         """)]
-    [InlineData("SL0570", """
+    [InlineData("SLF0022", """
 
         module Bad;
         import Standard.Convert;
@@ -322,7 +322,7 @@ public class ErrorTypeTests
         {(try Convert.ToLong(text));
         }
         """)]
-    [InlineData("SL0446", """
+    [InlineData("SLT0044", """
 
         module NarrowingWritten; class Node { int V = 1; }
         void Fill(out ? n) { n = Node(); }
@@ -336,7 +336,7 @@ public class ErrorTypeTests
             }
         }
         """)]
-    [InlineData("SL0720", """
+    [InlineData("SLI0045", """
 
         module AsmX86;
         int Across(int a, int b, int c)
@@ -346,14 +346,14 @@ public class ErrorTypeTests
             }
         }
         """)]
-    [InlineData("SL0730", """
+    [InlineData("SLD0020", """
 
         module PeSectionName; class Held
         {
             [Embed("logo.bin", Section = ".embedded_logo")] static byte[rsp ] Logo;
         }
         """)]
-    [InlineData("SL0247", """
+    [InlineData("SLN0013", """
 
         module Bad; variant Shape
         {
@@ -365,7 +365,7 @@ public class ErrorTypeTests
             if (shape.Circle);
         }
         """)]
-    [InlineData("SL0295", """
+    [InlineData("SLI0004", """
 
         module Other;
         extern "C" long
@@ -377,7 +377,7 @@ public class ErrorTypeTests
         extern "C" int shared_depth;
         int Main() => 0;
         """)]
-    [InlineData("SL0307", """
+    [InlineData("SLC0015", """
 
         module Nested; interface IWritable
         {
@@ -387,7 +387,7 @@ public class ErrorTypeTests
         }
         int Main() => 0;
         """)]
-    [InlineData("SL0307", """
+    [InlineData("SLC0015", """
 
         module Nested; interface IWritable
         {
@@ -397,7 +397,7 @@ public class ErrorTypeTests
         }
         int Main() => 0;
         """)]
-    [InlineData("SL0502", """
+    [InlineData("SLC0042", """
 
         module Overrides; class Base
         {
@@ -439,6 +439,6 @@ public class ErrorTypeTests
             }
             """], out var diagnostics);
 
-        Assert.Contains(diagnostics.Items, d => d.Code == "SL0276");
+        Assert.Contains(diagnostics.Items, d => d.Code == "SLN0017");
     }
 }

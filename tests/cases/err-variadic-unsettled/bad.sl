@@ -11,9 +11,9 @@ int Twice(int x) => x * 2;
 
 int Main()
 {
-    printf("%p\n", []);                     // SL0805
-    printf("%p\n", Twice);                  // SL0805
-    printf("%p\n", (int x) => x);           // SL0805
-    printf("%d\n", 1, width: 2);            // SL0601
+    printf("%p\n", []);                     // SLI0049
+    printf("%p\n", Twice);                  // SLI0049
+    printf("%p\n", (int x) => x);           // SLI0049
+    printf("%d\n", 1, width: 2);            // SLT0067
     return 0;
 }

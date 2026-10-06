@@ -193,7 +193,7 @@ public class LexerTests
     public void BinaryLiteralRefusesAFloatSuffix(string source)
     {
         Front.Tokens(source, out var diagnostics);
-        Assert.Contains("SL0004", Front.Codes(diagnostics));
+        Assert.Contains("SLP0004", Front.Codes(diagnostics));
     }
 
     /// <summary>
@@ -264,7 +264,7 @@ public class LexerTests
     public void ANonScalarEscapeIsRejected(string source)
     {
         var tokens = Front.Tokens(source, out var diagnostics);
-        Assert.Equal(["SL0526"], Front.Codes(diagnostics));
+        Assert.Equal(["SLP0031"], Front.Codes(diagnostics));
         Assert.Equal(0xFFFD, tokens[0].Value);
     }
 
@@ -332,19 +332,19 @@ public class LexerTests
     /// lexer still ends in an end-of-file token.
     /// </summary>
     [Theory]
-    [InlineData("\"\"\"x\n  \"\"\"", "SL0746")]
-    [InlineData("\"\"\"\n  x\n  y\"\"\"", "SL0747")]
-    [InlineData("\"\"\"\n  \"\"\"", "SL0747")]
-    [InlineData("\"\"\"\n  x\n y\n  \"\"\"", "SL0748")]
-    [InlineData("\"\"\"\n  x\n\ty\n  \"\"\"", "SL0748")]
-    [InlineData("\"\"\"ab\"\"\"\"", "SL0749")]
-    [InlineData("\"\"\"never closed", "SL0006")]
-    [InlineData("\"\"\"\n  x\n", "SL0006")]
-    [InlineData("\"\"\"", "SL0006")]
-    [InlineData("$\"\"\"{{x}}\"\"\"", "SL0750")]
-    [InlineData("$$\"\"\"{{x}\"\"\"", "SL0750")]
-    [InlineData("$$\"\"\"}}\"\"\"", "SL0750")]
-    [InlineData("$$\"\"\"{{x\"\"\"", "SL0006")]
+    [InlineData("\"\"\"x\n  \"\"\"", "SLP0043")]
+    [InlineData("\"\"\"\n  x\n  y\"\"\"", "SLP0044")]
+    [InlineData("\"\"\"\n  \"\"\"", "SLP0044")]
+    [InlineData("\"\"\"\n  x\n y\n  \"\"\"", "SLP0045")]
+    [InlineData("\"\"\"\n  x\n\ty\n  \"\"\"", "SLP0045")]
+    [InlineData("\"\"\"ab\"\"\"\"", "SLP0046")]
+    [InlineData("\"\"\"never closed", "SLP0006")]
+    [InlineData("\"\"\"\n  x\n", "SLP0006")]
+    [InlineData("\"\"\"", "SLP0006")]
+    [InlineData("$\"\"\"{{x}}\"\"\"", "SLP0047")]
+    [InlineData("$$\"\"\"{{x}\"\"\"", "SLP0047")]
+    [InlineData("$$\"\"\"}}\"\"\"", "SLP0047")]
+    [InlineData("$$\"\"\"{{x\"\"\"", "SLP0006")]
     public void AMalformedRawStringIsReported(string source, string code)
     {
         var tokens = Front.Tokens(source, out var diagnostics);
@@ -404,7 +404,7 @@ public class LexerTests
     public void AnUnterminatedFormOfStringIsReported(string source)
     {
         var tokens = Front.Tokens(source, out var diagnostics);
-        Assert.Contains("SL0006", Front.Codes(diagnostics));
+        Assert.Contains("SLP0006", Front.Codes(diagnostics));
         Assert.Equal(TokenKind.EndOfFile, tokens[^1].Kind);
     }
 
@@ -413,7 +413,7 @@ public class LexerTests
     public void ManyDollarsNeedARawString()
     {
         Front.Tokens("$$\"{x}\"", out var diagnostics);
-        Assert.Contains("SL0751", Front.Codes(diagnostics));
+        Assert.Contains("SLP0048", Front.Codes(diagnostics));
     }
 
     /// <summary>
@@ -443,7 +443,7 @@ public class LexerTests
     public void AnInterpolatedStringTakesNoUtf8Suffix()
     {
         Front.Tokens("$\"{x}\"u8", out var diagnostics);
-        Assert.Contains("SL0752", Front.Codes(diagnostics));
+        Assert.Contains("SLP0049", Front.Codes(diagnostics));
     }
 
     // -------------------------------------------------- verbatim identifiers
@@ -476,7 +476,7 @@ public class LexerTests
     public void AnAtWithNoNameIsStillAnError(string source)
     {
         Front.Tokens(source, out var diagnostics);
-        Assert.Contains("SL0001", Front.Codes(diagnostics));
+        Assert.Contains("SLP0001", Front.Codes(diagnostics));
     }
 
     // ------------------------------------------------------------ trivia
@@ -650,7 +650,7 @@ public class LexerTests
         var tokens = Front.Tokens(source, out var diagnostics);
 
         var only = Assert.Single(diagnostics.Items);
-        Assert.Equal("SL0713", only.Code);
+        Assert.Equal("SLP0038", only.Code);
         Assert.Equal(source.IndexOf('{'), only.Span.Start);
 
         Assert.Equal([TokenKind.AsmKeyword, TokenKind.AsmBody, TokenKind.EndOfFile],

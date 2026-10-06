@@ -19,10 +19,10 @@ int Main()
 {
     int a = 1;
     int b = 2;
-    Swap(a, ref b);                         // SL0445
+    Swap(a, ref b);                         // SLT0043
     String word = "";
-    TryFirst(["x"], "none", ref word);      // SL0445
+    TryFirst(["x"], "none", ref word);      // SLT0043
     long wide = 3L;
-    Swap(ref a, ref wide);                  // SL0447
+    Swap(ref a, ref wide);                  // SLT0045
     return 0;
 }

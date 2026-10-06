@@ -38,5 +38,11 @@ public sealed class DiagnosticDescriptor
         Title = title;
     }
 
+    /// <summary>The letter after `SL`, which names the code's category.</summary>
+    public char Letter => Code[2];
+
     public override string ToString() => Code;
 }
+
+/// <summary>What the codes under one letter are about.</summary>
+public sealed record DiagnosticCategory(char Letter, string Name, string Covers);

@@ -92,7 +92,7 @@ sides. LLVM is told `[N x T]`, so the element type is visible to the optimiser
 rather than hidden behind a byte count.
 
 An inline array crosses `extern "C"` only behind a `ref` or `in`, which is
-`T (*)[N]` in C. Passing one by value is refused (SL0491), because C decays an
+`T (*)[N]` in C. Passing one by value is refused (SLT0054), because C decays an
 array parameter to a pointer and Stainless has no decay: the two would disagree
 about the ABI silently.
 
@@ -554,7 +554,7 @@ of that case's own fields. That is what overlapping means here, and it is why
 nothing may read a payload without the tag having been checked (§2.6 of the
 language spec): the bytes are real for exactly one case at a time.
 
-**The tag is one byte, so a variant is capped at 255 cases** (SL0432). A variant
+**The tag is one byte, so a variant is capped at 255 cases** (SLC0034). A variant
 no case of which carries anything is therefore one byte, and reads like an enum.
 
 **A variant can have no tag at all.** When it has exactly two cases, the first
@@ -610,7 +610,7 @@ The payload is an array of the integer the alignment demands rather than of
 bytes with an alignment attribute, because that spelling means the same thing in
 C and in C++ and the two do not share one for alignment. A variant reaches C at
 all only when no case holds a reference; one that does is refused at the
-boundary like any other struct that does (SL0284).
+boundary like any other struct that does (SLI0002).
 
 **Reference counting consults the tag.** For a variant some case of which holds
 a counted reference, the compiler emits two functions — one to retain and one to
@@ -673,7 +673,7 @@ however many times a slice has been cut.
 `sl_slice_bounds_fail(from, to, length)` reports a bad slice, and distinguishes
 one that runs backwards from one that runs off the end.
 
-A slice holds a reference, so it does not cross `extern "C"` (SL0284). What
+A slice holds a reference, so it does not cross `extern "C"` (SLI0002). What
 crosses instead is what C already has: the pointer and the length, passed
 separately.
 
@@ -791,7 +791,7 @@ method declared is slot 0, the call is the same two loads and an indirect call,
 and ARC emits nothing for the reference, because the `AddRef` and `Release` it
 would call are not there: copying one copies a pointer and dropping one releases
 nothing. With no `QueryInterface` in the table there is no `[Guid]`, no `is` and
-no cast either, and a chain is all one kind or the other (SL0622), since
+no cast either, and a chain is all one kind or the other (SLI0036), since
 extending across would put IUnknown three slots into the middle of a table.
 [tests/cases/com-no-unknown](../tests/cases/com-no-unknown) declares such a
 table in C and calls through it.
@@ -1468,7 +1468,7 @@ plain data. Those are the ABI guarantee and they hold across a DLL exactly as
 they hold inside one binary. A managed reference appears in the generated header
 as `void*` — a handle to pass back in, not something to dereference or free —
 and a struct that holds a reference is refused at the boundary outright
-(SL0284), because the other side would copy its bytes and leave the count
+(SLI0002), because the other side would copy its bytes and leave the count
 behind.
 
 **A Stainless consumer** is a different matter, because the compiler can
@@ -1506,16 +1506,16 @@ because the address has to come from the import address table.
   stable across compilations — which the dense directly-indexed table exists to
   avoid — or registering tables when the library loads.
 
-Both are reported where the library is built, as SL0419. A class
+Both are reported where the library is built, as SLD0007. A class
 with a generic virtual method is left out for the second reason in another
-form (SL0419): its instantiations' slots are numbered after the table the
+form (SLD0007): its instantiations' slots are numbered after the table the
 metadata would describe, so a class derived from it elsewhere would put its own
-methods in them. A **com class** stays behind too (SL0419): its vtables and
+methods in them. A **com class** stays behind too (SLD0007): its vtables and
 adjustor thunks are internal symbols a consumer's `new` would have to name, so
 it crosses as a com interface instead. A
-**variant** stays behind as well (SL0419), because the metadata carries layouts
+**variant** stays behind as well (SLD0007), because the metadata carries layouts
 and a variant is its cases; and anything described that reaches an undescribed
-type through a field or a signature is reported too (SL0477). A slice or a tuple
+type through a field or a signature is reported too (SLD0009). A slice or a tuple
 of described types does cross.
 
 ### 6.1 One runtime

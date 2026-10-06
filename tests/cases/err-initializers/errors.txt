@@ -1,8 +1,8 @@
 # An initializer on a struct, one that reads the object it belongs to, one on a
 # computed property, and four brace lists: an unknown member, a property with no
 # setter, named and bare entries mixed, and a type with no 'Add'.
-SL0617
-SL0618
-SL0633
-SL0635
-SL0636
+SLC0075
+SLC0076
+SLC0084
+SLC0085
+SLC0086

@@ -68,7 +68,7 @@ public class ConstraintTests
     [InlineData("Point p; var q = Ref(p);")]
     [InlineData("var n = Ref(1);")]
     public void ClassRefusesAValueType(string body) =>
-        Assert.Contains("SL0328", With("T Ref<T>(T v) where T : class { return v; }", body));
+        Assert.Contains("SLG0006", With("T Ref<T>(T v) where T : class { return v; }", body));
 
     // ------------------------------------------------------------- struct
 
@@ -80,7 +80,7 @@ public class ConstraintTests
 
     [Fact]
     public void StructRefusesAClass() =>
-        Assert.Contains("SL0328",
+        Assert.Contains("SLG0006",
             With("T Val<T>(T v) where T : struct { return v; }", "var d = Val(new Dog());"));
 
     // -------------------------------------------------------------- new()
@@ -97,7 +97,7 @@ public class ConstraintTests
     /// </summary>
     [Fact]
     public void NewRefusesAValueType() =>
-        Assert.Contains("SL0328", With("T Fresh<T>(T v) where T : new() { return new T(); }",
+        Assert.Contains("SLG0006", With("T Fresh<T>(T v) where T : new() { return new T(); }",
             "Point p; var q = Fresh(p);"));
 
     [Theory]
@@ -105,7 +105,7 @@ public class ConstraintTests
     [InlineData("var h = Fresh(Made());")]
     [InlineData("var a = Fresh(Abstract());")]
     public void NewRefusesWhatItCannotMake(string body) =>
-        Assert.Contains("SL0328",
+        Assert.Contains("SLG0006",
             With("T Fresh<T>(T v) where T : new() { return new T(); }\n" +
                  "Hidden Made() { return null; }\n" +
                  "public abstract class Shape { }\n" +
@@ -141,7 +141,7 @@ public class ConstraintTests
 
     [Fact]
     public void ABaseClassRefusesSomethingElse() =>
-        Assert.Contains("SL0328",
+        Assert.Contains("SLG0006",
             With("String Named<T>(T v) where T : Animal { return \"\"; }", "Point p; var s = Named(p);"));
 
     /// <summary>
@@ -150,7 +150,7 @@ public class ConstraintTests
     /// </summary>
     [Fact]
     public void AValueTypeCannotConstrain() =>
-        Assert.Contains("SL0329",
+        Assert.Contains("SLG0007",
             With("T By<T>(T v) where T : Point { return v; }", "Point p; var q = By(p);"));
 
     // ------------------------------------------------------ one by another
@@ -163,7 +163,7 @@ public class ConstraintTests
 
     [Fact]
     public void AndIsCheckedBothWays() =>
-        Assert.Contains("SL0328", With(
+        Assert.Contains("SLG0006", With(
             "String Two<T, U>(T a, U b) where T : U where U : INamed { return b.Name(); }",
             "Point p; var s = Two(p, new Animal());"));
 
@@ -181,7 +181,7 @@ public class ConstraintTests
     /// library author asked for it in their own signature.
     /// </summary>
     [Fact]
-    public void ThreadsafeRefusesWhatDoesNot() => Assert.Contains("SL0328", Front.ModuleCodes("""
+    public void ThreadsafeRefusesWhatDoesNot() => Assert.Contains("SLG0006", Front.ModuleCodes("""
         public class Plain { public Plain() { } }
         long Held<T>(T v) where T : threadsafe { return 1; }
         int Main() { return (int)Held(new Plain()); }
@@ -194,21 +194,21 @@ public class ConstraintTests
     [InlineData("where T : INamed, struct")]
     [InlineData("where T : new(), INamed")]
     public void TheKindComesFirstAndNewComesLast(string clause) =>
-        Assert.Contains("SL0580", Front.ModuleCodes(
+        Assert.Contains("SLG0013", Front.ModuleCodes(
             Types + "T F<T>(T v) " + clause + " { return v; }\nint Main() { return 0; }"));
 
     [Theory]
     [InlineData("where T : class, struct")]
     [InlineData("where T : struct, new()")]
     public void ContradictoryKindsAreRefused(string clause) =>
-        Assert.Contains("SL0581", Front.ModuleCodes(
+        Assert.Contains("SLG0014", Front.ModuleCodes(
             "T F<T>(T v) " + clause + " { return v; }\nint Main() { return 0; }"));
 
     [Theory]
     [InlineData("where T : INamed, unmanaged")]
     [InlineData("where T : INamed, notnull")]
     public void TheNewKindsComeFirstToo(string clause) =>
-        Assert.Contains("SL0580", Front.ModuleCodes(
+        Assert.Contains("SLG0013", Front.ModuleCodes(
             Types + "T F<T>(T v) " + clause + " { return v; }\nint Main() { return 0; }"));
 
     [Theory]
@@ -217,7 +217,7 @@ public class ConstraintTests
     [InlineData("where T : unmanaged, struct")]
     [InlineData("where T : struct, Animal")]
     public void TheNewKindsContradictToo(string clause) =>
-        Assert.Contains("SL0581", Front.ModuleCodes(
+        Assert.Contains("SLG0014", Front.ModuleCodes(
             Types + "T F<T>(T v) " + clause + " { return v; }\nint Main() { return 0; }"));
 
     /// <summary>
@@ -226,7 +226,7 @@ public class ConstraintTests
     /// </summary>
     [Fact]
     public void NewTakesNoParameters() =>
-        Assert.Contains("SL0579", Front.ModuleCodes(
+        Assert.Contains("SLG0012", Front.ModuleCodes(
             "T F<T>(T v) where T : new(int) { return v; }\nint Main() { return 0; }"));
 
     // ---------------------------------------------------------- unmanaged
@@ -245,7 +245,7 @@ public class ConstraintTests
     [InlineData("Holder h; h.Text = \"\"; var n = Size(h);")]
     [InlineData("var n = Size((1, \"text\"));")]
     public void UnmanagedRefusesAnythingCounted(string body) =>
-        Assert.Contains("SL0328", With(
+        Assert.Contains("SLG0006", With(
             "nuint Size<T>(T v) where T : unmanaged { return 0; }\n" +
             "public struct Holder { public String Text; }", body));
 
@@ -259,65 +259,65 @@ public class ConstraintTests
 
     [Fact]
     public void NotNullRefusesAnOptional() =>
-        Assert.Contains("SL0328", With("T Keep<T>(T v) where T : notnull { return v; }",
+        Assert.Contains("SLG0006", With("T Keep<T>(T v) where T : notnull { return v; }",
             "Dog? d = null; var k = Keep(d);"));
 
     // ------------------------------------------------ where they are written
 
     [Fact]
     public void AnUnknownParameterIsReportedUnused() =>
-        Assert.Equal(["SL0330"], Front.ModuleCodes("T F<T>(T v) where U : class { return v; }"));
+        Assert.Equal(["SLG0008"], Front.ModuleCodes("T F<T>(T v) where U : class { return v; }"));
 
     [Fact]
     public void AnUnknownParameterIsReportedOnce() =>
-        Assert.Equal(["SL0330"], Front.ModuleCodes(
+        Assert.Equal(["SLG0008"], Front.ModuleCodes(
             "T F<T>(T v) where U : class { return v; }\nint Main() { F(1); return 0; }"));
 
     [Fact]
     public void AParameterHasOneClause() =>
-        Assert.Equal(["SL0788"], Front.ModuleCodes(Types +
+        Assert.Equal(["SLG0015"], Front.ModuleCodes(Types +
             "T F<T>(T v) where T : class where T : INamed { return v; }"));
 
     [Fact]
     public void AConstraintIsWrittenOnce() =>
-        Assert.Equal(["SL0789"], Front.ModuleCodes(Types +
+        Assert.Equal(["SLG0016"], Front.ModuleCodes(Types +
             "T F<T>(T v) where T : INamed, INamed { return v; }"));
 
     [Fact]
     public void AParameterHasOneBaseClass() =>
-        Assert.Equal(["SL0790"], Front.ModuleCodes(Types +
+        Assert.Equal(["SLG0017"], Front.ModuleCodes(Types +
             "T F<T>(T v) where T : Animal, Dog { return v; }"));
 
     [Theory]
     [InlineData("where T : U where U : T")]
     [InlineData("where T : U where U : V where V : T")]
     public void ParametersMayNotConstrainEachOtherInACircle(string clauses) =>
-        Assert.Equal(["SL0791"], Front.ModuleCodes(
+        Assert.Equal(["SLG0018"], Front.ModuleCodes(
             "T F<T, U, V>(T a, U b, V c) " + clauses + " { return a; }"));
 
     [Fact]
     public void ASealedClassCannotConstrain() =>
-        Assert.Equal(["SL0329"], Front.ModuleCodes(
+        Assert.Equal(["SLG0007"], Front.ModuleCodes(
             "public sealed class Leaf { }\nT F<T>(T v) where T : Leaf { return v; }"));
 
     [Fact]
     public void AStructCannotConstrainEvenUnused() =>
-        Assert.Equal(["SL0329"], Front.ModuleCodes(Types +
+        Assert.Equal(["SLG0007"], Front.ModuleCodes(Types +
             "T F<T>(T v) where T : Point { return v; }"));
 
     [Fact]
     public void AGenericStructCannotConstrain() =>
-        Assert.Equal(["SL0329"], Front.ModuleCodes(
+        Assert.Equal(["SLG0007"], Front.ModuleCodes(
             "public struct Cell<T> { public T Value; }\n" +
             "T F<T>(T v) where T : Cell<T> { return v; }"));
 
     [Fact]
     public void AMethodOfAGenericTypeIsCheckedToo() =>
-        Assert.Equal(["SL0788"], Front.ModuleCodes(Types +
+        Assert.Equal(["SLG0015"], Front.ModuleCodes(Types +
             "public class Box<T> { public U Get<U>(U v) where U : class where U : INamed " +
             "{ return v; } }"));
 
     [Fact]
     public void DefaultIsOnlyForAnOverride() =>
-        Assert.Equal(["SL0792"], Front.ModuleCodes("T F<T>(T v) where T : default { return v; }"));
+        Assert.Equal(["SLG0019"], Front.ModuleCodes("T F<T>(T v) where T : default { return v; }"));
 }

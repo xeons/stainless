@@ -323,6 +323,10 @@ rule that is already there gets its existing code rather than a new one, and
 --markdown`. Unit tests refuse a code spelled at a call site, a declared code
 nothing reports, two codes with one title, and a stale page.
 
+A code is `SL`, a category letter, and a number within the category:
+`SLN0017` is about names, `SLI0042` about interop. The ten categories are
+`Codes.Categories`, and a new code takes the next number in its own.
+
 ## The error type
 
 A type that could not be resolved becomes the error type, and that failure

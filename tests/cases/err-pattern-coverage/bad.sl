@@ -16,27 +16,27 @@ public variant Shape
     Empty;
 }
 
-// SL0620: a member of the enum is left out.
+// SLF0033: a member of the enum is left out.
 String Paint(Color color) => color switch
 {
     Color.Red => "red",
     Color.Green => "green",
 };
 
-// SL0620: a [Flags] enum's members are not all its values.
+// SLF0033: a [Flags] enum's members are not all its values.
 String Allowed(Access access) => access switch
 {
     Access.Read => "read",
     Access.Write => "write",
 };
 
-// SL0620: false is left out.
+// SLF0033: false is left out.
 String Yes(bool flag) => flag switch
 {
     true => "yes",
 };
 
-// SL0620: only the big circles are covered.
+// SLF0033: only the big circles are covered.
 String Size(Shape shape) => shape switch
 {
     Circle(> 1.0) => "big",
@@ -44,14 +44,14 @@ String Size(Shape shape) => shape switch
     Empty => "empty",
 };
 
-// SL0620: inside a tuple, (false, false) is left out.
+// SLF0033: inside a tuple, (false, false) is left out.
 String Pair(bool a, bool b) => (a, b) switch
 {
     (true, _) => "first",
     (_, true) => "second",
 };
 
-// SL0621: every case is already covered.
+// SLL0005: every case is already covered.
 String Covered(Shape shape) => shape switch
 {
     Circle => "circle",
@@ -60,7 +60,7 @@ String Covered(Shape shape) => shape switch
     _ => "other",
 };
 
-// SL0621: (true, true) is part of (true, _).
+// SLL0005: (true, true) is part of (true, _).
 String Subsumed((bool, bool) pair) => pair switch
 {
     (true, _) => "first",
@@ -68,7 +68,7 @@ String Subsumed((bool, bool) pair) => pair switch
     _ => "neither",
 };
 
-// SL0436: a statement over a variant that leaves part of a case out.
+// SLF0017: a statement over a variant that leaves part of a case out.
 String Statement(Shape shape)
 {
     switch (shape)

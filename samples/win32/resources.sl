@@ -13,7 +13,7 @@
 //
 // **This is a Windows idea.** A PE has a resource directory indexed by type and
 // name that the loader itself reads; ELF has nothing equivalent, and a build
-// for a non-Windows target leaves the script out and says so (SL0700). See
+// for a non-Windows target leaves the script out and says so (SLD0010). See
 // `bindings/win32/Resources.sl` for where the line falls and why.
 module ResourceSample;
 

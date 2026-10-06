@@ -478,7 +478,7 @@ public sealed partial class Binder
                 ContainingType = template.ContainingType,
                 IsPublic = template.IsPublic,
                 // Only a member is static; the word on a module function was
-                // refused where the template was declared (SL0828).
+                // refused where the template was declared (SLC0123).
                 IsStatic = declaration.Modifiers.HasFlag(Modifiers.Static) &&
                            template.ContainingType is not null,
                 Body = declaration.Body,
@@ -889,7 +889,7 @@ public sealed partial class Binder
     ///
     /// C# admits a struct here, because there <c>new T()</c> on a value type is
     /// default-initialization. It is not that here: a struct declares no
-    /// constructor taking no arguments (SL0738), because <c>T value;</c> runs
+    /// constructor taking no arguments (SLC0100), because <c>T value;</c> runs
     /// nothing -- so a struct would satisfy a constraint whose whole purpose it
     /// then failed.
     ///
@@ -898,7 +898,7 @@ public sealed partial class Binder
     /// look only at the declared list, and so refused a class <c>new</c> would
     /// have made. A base with no constructor of that shape was reported where
     /// the class was declared, so it is not asked about again here. An abstract
-    /// class is refused, because <c>new</c> refuses it (SL0514).
+    /// class is refused, because <c>new</c> refuses it (SLC0053).
     /// </summary>
     private static bool IsDefaultConstructible(TypeSymbol type) =>
         type is ClassTypeSymbol { IsAbstract: false } declared &&

@@ -14,31 +14,31 @@ public interface ISink<in T>
 public interface ISource<out T>
 {
     T Next();
-    void Push(T item);                           // SL0801
+    void Push(T item);                           // SLG0023
 }
 
 // An `in` parameter handed out.
 public interface IConsumer<in T>
 {
-    T Last();                                    // SL0801
+    T Last();                                    // SLG0023
 }
 
 // Through an `in` parameter of another interface the position turns round.
 public interface IFactory<out T>
 {
-    ISink<T> Sink();                             // SL0801
+    ISink<T> Sink();                             // SLG0023
 }
 
 // An array is written through as well as read.
 public interface IBatch<out T>
 {
-    T[] All();                                   // SL0801
+    T[] All();                                   // SLG0023
 }
 
 // A property with a setter is both.
 public interface IHolder<out T>
 {
-    T Value { get; set; }                        // SL0801
+    T Value { get; set; }                        // SLG0023
 }
 
 public interface IList2<T>
@@ -64,9 +64,9 @@ public class IntBox : IBox<int>
 int Main()
 {
     // An invariant interface does not convert, whatever its argument does.
-    IList2<Animal> animals = new Dogs();         // SL0265
+    IList2<Animal> animals = new Dogs();         // SLT0018
 
     // Variance is for references: an int is not a long by the same pointer.
-    IBox<long> longs = new IntBox();             // SL0265
+    IBox<long> longs = new IntBox();             // SLT0018
     return 0;
 }

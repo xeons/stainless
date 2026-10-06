@@ -95,7 +95,7 @@ So a device context handed to something that wants a window is caught, rather
 than being one `void*` passed to another:
 
 ```
-error[SL0262]: argument 1 of 'ShowWindow' expects 'HWND__*', but 'HDC__*' was given
+error[SLT0015]: argument 1 of 'ShowWindow' expects 'HWND__*', but 'HDC__*' was given
 ```
 
 **It costs nothing.** None of those types is laid out, emitted, or present at

@@ -2,7 +2,7 @@
 module Bad;
 
 // A `char` is one UTF-8 code unit and a `char16` one UTF-16 unit. A unit is not
-// a character -- which is the distinction SL0527 exists to keep everywhere else
+// a character -- which is the distinction SLT0056 exists to keep everywhere else
 // -- so an interpolation will not quietly cross it either.
 int Main()
 {

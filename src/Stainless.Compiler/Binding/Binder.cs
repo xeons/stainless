@@ -193,7 +193,7 @@ public sealed partial class Binder(
     ///
     /// Every pass after the second finds a declaration's symbol here and never
     /// by its name. The name belongs to whichever declaration won it, so a
-    /// lookup by name hands a declaration that lost -- SL0201, SL0550 -- a
+    /// lookup by name hands a declaration that lost -- SLN0001, SLC0062 -- a
     /// symbol of some other kind, or none at all. A declaration absent from
     /// this map is either a generic one, which is a template and has no type
     /// until something instantiates it, or one pass 2 reported and which has

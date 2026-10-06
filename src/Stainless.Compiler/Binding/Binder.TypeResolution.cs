@@ -759,7 +759,7 @@ public sealed partial class Binder
 
         // A lambda whose parameters were known and whose body still would not
         // bind is the reason nothing could be inferred, and its own errors say
-        // why far better than SL0327 would.
+        // why far better than SLG0005 would.
         if (failedAtLambda is not null)
         {
             var failedLambdas = new List<(LambdaSyntax, IReadOnlyList<TypeSymbol>)>();
@@ -882,7 +882,7 @@ public sealed partial class Binder
     ///
     /// It loops, because one lambda's result may settle another's parameter,
     /// and stops as soon as a pass learns nothing -- so a call that genuinely
-    /// cannot be inferred reaches SL0327 rather than spinning.
+    /// cannot be inferred reaches SLG0005 rather than spinning.
     ///
     /// A function passed by name takes the same route, with its declaration
     /// read in place of a body: see <see cref="NamedFunctionResult"/>.
@@ -992,7 +992,7 @@ public sealed partial class Binder
     /// <c>Upper</c> that takes one. Where those are not known yet, a name with
     /// exactly one function of the right arity is that function, and its
     /// parameters are what settles them. Anything less certain says nothing,
-    /// and the call reaches SL0327 as it would have.
+    /// and the call reaches SLG0005 as it would have.
     /// </summary>
     private TypeSymbol? NamedFunctionResult(
         BoundFunctionGroup group,
@@ -1201,7 +1201,7 @@ public sealed partial class Binder
             // Only as far as both lists go. When no template has the arity of
             // the call, the first is tried anyway so that the call can report
             // against something, and an argument past its last parameter is
-            // the arity's problem, which the call itself reports as SL0260.
+            // the arity's problem, which the call itself reports as SLT0014.
             for (int i = 0; i < arguments.Count; i++)
             {
                 if (WrittenParameterType(template.Declaration.Parameters, arguments, i)
@@ -1262,7 +1262,7 @@ public sealed partial class Binder
         return BuildCall(syntax, function, self, arguments, nonVirtual: member.Target is BaseSyntax);
     }
 
-    /// <summary>True once SL0831 has been said; it is about the target, not each use.</summary>
+    /// <summary>True once SLT0084 has been said; it is about the target, not each use.</summary>
     private bool _reportedNarrowInt128;
 
     private static bool IsStandardLibrary(ModuleSymbol module) =>

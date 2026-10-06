@@ -3,7 +3,7 @@
 // The string table travels: it is bytes with a number on it, and
 // `Standard.Resources` reads it identically on every target. The manifest does
 // not, in the sense that matters -- it is carried and readable, and nothing
-// outside Windows turns one into a side-by-side assembly binding. SL0700 names
+// outside Windows turns one into a side-by-side assembly binding. SLD0010 names
 // the second and says nothing about the first.
 STRINGTABLE
 BEGIN

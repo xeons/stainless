@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: 0BSD
 //
 // What a container cannot make is a compile error at the registration: an
-// abstract class (SL0917), two widest constructors (SL0918), a parameter no
-// provider can be asked for (SL0919), and a default implementation that names
-// no generic class (SL0920).
+// abstract class (SLC0126), two widest constructors (SLC0127), a parameter no
+// provider can be asked for (SLC0128), and a default implementation that names
+// no generic class (SLC0129).
 module ErrDiConstruct;
 
 import Standard.DependencyInjection;

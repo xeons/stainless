@@ -21,7 +21,7 @@ public class Shape
 }
 
 // Not fine: the first declaration already said what it derives from.
-public class Shape : ISized // SL0551
+public class Shape : ISized // SLC0063
 {
     public int Size() => Sides;
 }
@@ -34,22 +34,22 @@ public struct Point
 // Not fine: a struct's layout belongs to the declaration that has the fields.
 public struct Point
 {
-    public int Y;                               // SL0551
+    public int Y;                               // SLC0063
 }
 
 // Not fine: nor does a struct take a base list from a later declaration.
-public struct Point : IDrawable // SL0551
+public struct Point : IDrawable // SLC0063
 {
     public void Draw() { }
 }
 
 // Not fine: every declaration has to agree about what it is.
-public struct Shape // SL0550
+public struct Shape // SLC0062
 {
     public int Wrong() => 0;
 }
 
 // Not fine: a type with a body already is not made opaque by one without.
-public struct Point; // SL0644
+public struct Point; // SLC0090
 
 int Main() => 0;

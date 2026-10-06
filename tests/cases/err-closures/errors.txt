@@ -1,5 +1,5 @@
 # A shape that does not match, a bound method given to a delegate, and a method
 # group that nothing settles.
-SL0361
-SL0381
-SL0553
+SLT0032
+SLT0034
+SLT0061

@@ -2,7 +2,7 @@
 //
 // The capture is a field of the closure, so the write lands there and the
 // variable around the lambda keeps its value. A copy the lambda never reads
-// again makes the write invisible, and SL0829 says so. A copy it does read
+// again makes the write invisible, and SLL0014 says so. A copy it does read
 // again is state the closure keeps for itself, and is not reported.
 module CapturedWrite;
 
@@ -23,7 +23,7 @@ public class Clicks
     public int Count => _count;
 
     // A bare member is copied, so this changes the copy and not the field.
-    public Act Lost() => () => _count++;                // SL0829
+    public Act Lost() => () => _count++;                // SLL0014
 
     // Through `this` the object is captured, and the field is written.
     public Act Kept() => () => this._count++;
@@ -34,7 +34,7 @@ public struct Point
     public int X;
 
     // A struct's `this` is the value, so the lambda writes a copy of it.
-    public Act Move() => () => this.X = 5;              // SL0829
+    public Act Move() => () => this.X = 5;              // SLL0014
 }
 
 bool ParseDigit(String text, out int value)
@@ -46,18 +46,18 @@ bool ParseDigit(String text, out int value)
 public void Main()
 {
     int count = 0;
-    Act add = () => count++;                            // SL0829
+    Act add = () => count++;                            // SLL0014
     add();
     add();
     Console.WriteLine($"count {count}");
 
     int total = 0;
-    Act sum = () => { total += 2; };                    // SL0829
+    Act sum = () => { total += 2; };                    // SLL0014
     sum();
     Console.WriteLine($"total {total}");
 
     int parsed = 0;
-    Act parse = () => { ParseDigit("7", out parsed); }; // SL0829
+    Act parse = () => { ParseDigit("7", out parsed); }; // SLL0014
     parse();
     Console.WriteLine($"parsed {parsed}");
 

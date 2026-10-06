@@ -291,7 +291,7 @@ public class ParserTests
                 return 0;
             }
             """);
-        Assert.Contains("SL0758", diagnostics);
+        Assert.Contains("SLP0051", diagnostics);
     }
 
     [Fact]
@@ -372,7 +372,7 @@ public class ParserTests
     public void AWholeSliceOpeningAStatementIsAnExpression(string statement)
     {
         Front.Parse($"module A;\nvoid F(int[] a, int[] b) {{ {statement} }}", out var diagnostics);
-        Assert.DoesNotContain(diagnostics.Items, d => d.Code == "SL0807");
+        Assert.DoesNotContain(diagnostics.Items, d => d.Code == "SLP0052");
     }
 
     /// <summary>And a slice's type written that way is still told how it is spelled.</summary>
@@ -380,7 +380,7 @@ public class ParserTests
     public void ASliceTypeWrittenWithBracketsIsStillRefused()
     {
         Front.Parse("module A;\nvoid F(int[] a) { int[:] c = a[:]; }", out var diagnostics);
-        Assert.Contains(diagnostics.Items, d => d.Code == "SL0807");
+        Assert.Contains(diagnostics.Items, d => d.Code == "SLP0052");
     }
 
     // ------------------------------------------------- indexes and ranges
@@ -699,7 +699,7 @@ public class ParserTests
     public void AModifierIsWrittenOnce(string member)
     {
         Front.Parse("module A;\nclass C { " + member + " }", out var diagnostics);
-        Assert.Equal(["SL0109"], Front.Codes(diagnostics));
+        Assert.Equal(["SLC0001"], Front.Codes(diagnostics));
     }
 
     /// <summary>Two visibilities contradict each other, as any two modifiers can.</summary>
@@ -712,7 +712,7 @@ public class ParserTests
     public void AVisibilityIsWrittenOnce(string member)
     {
         Front.Parse("module A;\nclass C { " + member + " }", out var diagnostics);
-        Assert.Equal(["SL0507"], Front.Codes(diagnostics));
+        Assert.Equal(["SLC0047"], Front.Codes(diagnostics));
     }
 
     [Fact]
@@ -957,7 +957,7 @@ public class ParserTests
 
     /// <summary>
     /// A type declared inside a type is a level of nesting, and past the limit
-    /// it is SL0108 like a block inside a block. It was not counted, so the
+    /// it is SLP0016 like a block inside a block. It was not counted, so the
     /// fuzzer's three thousand `public interface`s each opened a level nothing
     /// bounded -- and hoisting copies every inner type once per level above it,
     /// which made that half a minute of parsing.
@@ -974,7 +974,7 @@ public class ParserTests
         }));
 
         Assert.True(parse.Wait(TimeSpan.FromSeconds(30)), "the parse did not finish");
-        Assert.Contains("SL0108", Front.Codes(parse.Result));
+        Assert.Contains("SLP0016", Front.Codes(parse.Result));
     }
 
     // ------------------------------------------------------------------ asm
@@ -1065,7 +1065,7 @@ public class ParserTests
     public void AStaticLocalVariableIsRefused()
     {
         FirstStatement("static int count = 0;", out var diagnostics);
-        Assert.Contains("SL0828", Front.Codes(diagnostics));
+        Assert.Contains("SLC0123", Front.Codes(diagnostics));
     }
 
     [Fact]
@@ -1107,7 +1107,7 @@ public class ParserTests
     public void AnAsmOperandValueIsNotAnAssignment()
     {
         FirstStatement("asm (in rax = a = b) { nop }", out var diagnostics);
-        Assert.Contains("SL0100", Front.Codes(diagnostics));
+        Assert.Contains("SLP0012", Front.Codes(diagnostics));
     }
 
     /// <summary>
@@ -1127,7 +1127,7 @@ public class ParserTests
     {
         var statement = FirstStatement("asm (rax = total) { nop }", out var diagnostics);
 
-        Assert.Equal(["SL0715"], Front.Codes(diagnostics));
+        Assert.Equal(["SLP0040"], Front.Codes(diagnostics));
         var operand = Assert.Single(Assert.IsType<AsmSyntax>(statement).Operands);
         Assert.Equal("rax", operand.Register);
     }
@@ -1138,7 +1138,7 @@ public class ParserTests
     public void AsmWithNoBodyIsReported(string body)
     {
         FirstStatement(body, out var diagnostics);
-        Assert.Contains("SL0714", Front.Codes(diagnostics));
+        Assert.Contains("SLP0039", Front.Codes(diagnostics));
     }
 
     /// <summary>
@@ -1152,7 +1152,7 @@ public class ParserTests
         Front.Parse("module Test;\nclass C\n{\n    void F()\n    {\n        asm { {k1 {k2 {k3 }\n    }\n}",
                     out var diagnostics);
 
-        Assert.Equal(["SL0713"], Front.Codes(diagnostics));
+        Assert.Equal(["SLP0038"], Front.Codes(diagnostics));
     }
 
     // ------------------------------------------------------------ constraints
@@ -1220,7 +1220,7 @@ public class ParserTests
     public void AFieldCannotBeNamedForAnInterface()
     {
         Front.Parse("module Test;\nclass C\n{\n    int IShape.Corners;\n}", out var diagnostics);
-        Assert.Equal(["SL0793"], Front.Codes(diagnostics));
+        Assert.Equal(["SLC0110"], Front.Codes(diagnostics));
     }
 
     // ------------------------------------------------------------- variance
@@ -1261,7 +1261,7 @@ public class ParserTests
     public void OnlyAnInterfaceOrADelegateHasVariance(string declaration)
     {
         Front.Parse("module Test;\n" + declaration, out var diagnostics);
-        Assert.Equal(["SL0800"], Front.Codes(diagnostics));
+        Assert.Equal(["SLG0022"], Front.Codes(diagnostics));
     }
 
     [Fact]
@@ -1283,7 +1283,7 @@ public class ParserTests
         Front.Parse("module Test;\npublic variant Shape\n{\n    Dot,\n    Circle(double Radius);\n}",
                     out var diagnostics);
         var error = Assert.Single(diagnostics.Items);
-        Assert.Equal("SL0100", error.Code);
+        Assert.Equal("SLP0012", error.Code);
         Assert.Contains("ends with ';'", error.Message);
     }
 }

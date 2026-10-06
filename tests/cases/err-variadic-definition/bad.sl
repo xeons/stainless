@@ -17,7 +17,7 @@ public class Bag
 {
     public int Count;
 
-    public int Total(int first, ...)                // SL0493: a method
+    public int Total(int first, ...)                // SLI0021: a method
     {
         return first;
     }

@@ -308,7 +308,7 @@ line that would have to learn about it.
 
 `if (x != null)` narrows a local or a parameter and not `node.Next`, because a
 field or a call result may be a different value by the time it is read — the
-rule variants follow, stated once for both (SL0248, SL0285). A local is the
+rule variants follow, stated once for both (SLO0001, SLF0006). A local is the
 fix and usually what the code meant.
 
 What would make it sound for a field is knowing that nothing between the check

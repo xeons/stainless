@@ -383,7 +383,7 @@ public sealed partial class LlvmEmitter
 
     /// <summary>
     /// A value with nothing inside it to count. An inline array is held by
-    /// address, like a struct, and cannot hold a reference (SL0486), so the
+    /// address, like a struct, and cannot hold a reference (SLO0020), so the
     /// whole of it is copied as bytes.
     /// </summary>
     private void StoreUncounted(string slot, Val value, TypeSymbol targetType)

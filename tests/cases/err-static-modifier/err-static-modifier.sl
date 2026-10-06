@@ -6,7 +6,7 @@
 // every refusal the binder would have made.
 module ErrStaticModifier;
 
-// SL0828: only a class has instances for the word to be denying. A module is
+// SLC0123: only a class has instances for the word to be denying. A module is
 // what this language has instead of a static class anyway, and it is better --
 // a module is a scope, so its members need no prefix inside it.
 public static struct Holder { public int x; }
@@ -14,6 +14,6 @@ public static interface IHolder { int Read(); }
 public static enum Level { Low, High }
 public static delegate void Notify(int value);
 
-// A static with no value is refused too (SL0376), but by the binder rather
+// A static with no value is refused too (SLO0014), but by the binder rather
 // than here: whether it needs one depends on whether an attribute says where
 // its bytes come from, which is a question about names. err-embed pins it.

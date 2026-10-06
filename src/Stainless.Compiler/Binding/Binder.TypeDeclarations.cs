@@ -360,7 +360,7 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// Whether a type name is still free in its module, reporting SL0201 when
+    /// Whether a type name is still free in its module, reporting SLN0001 when
     /// it is not.
     ///
     /// One question asked of all four tables, by every kind of declaration.
@@ -503,7 +503,7 @@ public sealed partial class Binder
         }
 
         // An implements list needs no word here: a struct cannot implement an
-        // interface at all (SL0302), body or no body, and that message says why.
+        // interface at all (SLC0010), body or no body, and that message says why.
         structType.IsOpaque = true;
 
         // Nothing will ever lay it out, and everything downstream asks whether a

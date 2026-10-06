@@ -762,7 +762,7 @@ public String SerializeProjectFile(ProjectFile project)
 {
     // The object is built and then wrapped, rather than made and reached
     // into: a variant's payload is not readable until something has
-    // established which case it is (SL0285), and `CreateJsonObject` answers a
+    // established which case it is (SLF0006), and `CreateJsonObject` answers a
     // `JsonValue` that this would have to narrow first. Building the
     // `JsonObject` itself skips the question.
     var members = new JsonObject();

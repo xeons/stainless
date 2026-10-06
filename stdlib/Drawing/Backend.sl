@@ -444,7 +444,7 @@ threadsafe sealed class Backend
     /// than adding to it (`ConversionKind.ComAdopt`, §8.5), and the release
     /// happens when the reference goes. A `com interface IStream` with no
     /// members is `IUnknown` under another name and the compiler says so
-    /// (SL0534); declaring the eleven slots this module never calls would be
+    /// (SLI0028); declaring the eleven slots this module never calls would be
     /// inventing a binding to document a shape.
     ///
     /// The `1` is `fDeleteOnRelease`: the memory goes when the stream does,
@@ -486,7 +486,7 @@ threadsafe sealed class Backend
     /// The encoded bytes, or an empty array for a failure.
     ///
     /// **Empty rather than null**, because an array is a value in this
-    /// language and never null (SL0271). A zero-length encode is not a thing
+    /// language and never null (SLT0021). A zero-length encode is not a thing
     /// either backend produces, so the two cannot be confused.
     public byte[] EncodeImage(void* image, ImageFormat format, int quality)
     {

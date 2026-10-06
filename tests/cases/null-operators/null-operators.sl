@@ -11,7 +11,7 @@
 // **Nothing has to be expressible.** A class has null and a value type does
 // not (§2.5), so `node?.Name` is a `String?` and answers null, while
 // `node?.Weight` has nowhere to put "there was no node" -- and is only
-// reachable with a `??` saying what it is instead. That is SL0605, and it is
+// reachable with a `??` saying what it is instead. That is SLO0025, and it is
 // why `??` and `?.` are bound together rather than separately: when they meet,
 // they fold into one question with two answers.
 module NullOperators;

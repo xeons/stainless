@@ -20,24 +20,24 @@ int Main()
     HKEY key     = LocalMachine();
 
     // A device context is not a window.
-    ShowWindow(device, 1);                          // SL0262
+    ShowWindow(device, 1);                          // SLT0015
 
     // Nor is a window a device context.
-    LineTo(window, 10, 10);                         // SL0262
+    LineTo(window, 10, 10);                         // SLT0015
 
     // A kernel handle is not a window, however much both are pointers.
-    SetWindowTextW(file, null);                     // SL0262
+    SetWindowTextW(file, null);                     // SLT0015
 
     // A registry key is not a file.
-    CloseHandle(key);                               // SL0262
+    CloseHandle(key);                               // SLT0015
 
     // And a window is not a registry key.
-    RegCloseKey(window);                            // SL0262
+    RegCloseKey(window);                            // SLT0015
 
     // An untyped pointer is not a handle either: the direction that matters is
     // the one that would let anything through.
     void* anything = null;
-    DestroyWindow(anything);                        // SL0262
+    DestroyWindow(anything);                        // SLT0015
 
     // `DeleteObject(window)` is *not* here, and compiles. `HGDIOBJ` takes any
     // pointer, because Windows spells it `void*` so that every pen, brush, font

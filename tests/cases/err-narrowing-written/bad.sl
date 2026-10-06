@@ -18,7 +18,7 @@ void ByReference()
     if (r.Ok)
     {
         Spoil(ref r);
-        Console.WriteLine(Text.FromInteger(r.Value));   // SL0285
+        Console.WriteLine(Text.FromInteger(r.Value));   // SLF0006
     }
 }
 
@@ -26,7 +26,7 @@ void InALaterOperand()
 {
     Node? n = new Node();
     if (n != null && (n = null) == null)
-        Console.WriteLine(Text.FromInteger(n.V));       // SL0248
+        Console.WriteLine(Text.FromInteger(n.V));       // SLO0001
 }
 
 void OptionalByReference()
@@ -35,7 +35,7 @@ void OptionalByReference()
     if (m != null)
     {
         Clear(ref m);
-        Console.WriteLine(Text.FromInteger(m.V));       // SL0248
+        Console.WriteLine(Text.FromInteger(m.V));       // SLO0001
     }
 }
 

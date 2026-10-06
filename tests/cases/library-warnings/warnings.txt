@@ -1,10 +1,10 @@
-SL0419
-SL0419
-SL0419
+SLD0007
+SLD0007
+SLD0007
 # an interface, which was silently left out before COM made it three cases
-SL0419
+SLD0007
 # a com interface, and a com class
-SL0419
-SL0419
+SLD0007
+SLD0007
 # a class with a generic virtual method
-SL0419
+SLD0007

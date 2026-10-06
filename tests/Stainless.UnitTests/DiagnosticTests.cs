@@ -30,7 +30,7 @@ namespace Stainless.UnitTests;
 /// </summary>
 public partial class DiagnosticTests
 {
-    [GeneratedRegex(@"SL\d{4}")]
+    [GeneratedRegex(@"^SL[A-Z]\d{4}$")]
     private static partial Regex CodePattern { get; }
 
     /// <summary>The repository, found by walking up from the test assembly.</summary>
@@ -89,7 +89,7 @@ public partial class DiagnosticTests
         Files("docs", "*.md")
             .Where(p => Path.GetFileName(p) != "diagnostics.md")
             .Append(Path.Combine(Root, "README.md")),
-        @"\b(SL\d{4})\b");
+        @"\b(SL[A-Z]\d{4})\b");
 
     /// <summary>Every code an end-to-end case pins.</summary>
     private static readonly SortedSet<string> Pinned = CodesIn(
@@ -97,7 +97,7 @@ public partial class DiagnosticTests
                                  SearchOption.AllDirectories)
             .Concat(Directory.EnumerateFiles(Path.Combine(Root, "tests", "cases"), "warnings.txt",
                                              SearchOption.AllDirectories)),
-        @"\b(SL\d{4})\b");
+        @"\b(SL[A-Z]\d{4})\b");
 
     // -------------------------------------------------------------- the set
 
@@ -126,7 +126,7 @@ public partial class DiagnosticTests
             }
             """);
 
-        Assert.Single(codes, code => code == "SL0222");
+        Assert.Single(codes, code => code == "SLL0001");
     }
 
     /// <summary>
@@ -157,22 +157,14 @@ public partial class DiagnosticTests
     public void EveryPinnedCodeExists() =>
         Assert.Empty(Pinned.Except(Emitted));
 
-    /// <summary>
-    /// A retired code stays retired. There is a debug assertion for this at the
-    /// point of reporting, which fires only if the code is actually reached;
-    /// this catches it at the point of writing.
-    /// </summary>
-    [Fact]
-    public void NoRetiredCodeIsEmittedAgain() =>
-        Assert.Empty(Emitted.Intersect(RetiredDiagnostics.Codes));
-
-    [Fact]
-    public void NoRetiredCodeIsStillDocumentedAsLive() =>
-        Assert.Empty(Documented.Intersect(RetiredDiagnostics.Codes));
-
     [Fact]
     public void EveryCodeIsWellFormed() =>
         Assert.All(Emitted, code => Assert.Matches(CodePattern, code));
+
+    /// <summary>The letter after `SL` names a category the inventory lists.</summary>
+    [Fact]
+    public void EveryCodeIsInACategory() =>
+        Assert.All(Codes.All, d => Assert.Contains(Codes.Categories, c => c.Letter == d.Letter));
 
     // ------------------------------------------------------------ the registry
 
@@ -195,7 +187,7 @@ public partial class DiagnosticTests
     [Fact]
     public void NoPlaceSpellsACode() =>
         Assert.Empty(CompilerSource
-            .SelectMany(f => Regex.Matches(f.Value, "\"SL\\d{4}\"")
+            .SelectMany(f => Regex.Matches(f.Value, "\"SL[A-Z]?\\d{4}\"")
                                   .Select(m => $"{Path.GetFileName(f.Key)}: {m.Value}")));
 
     /// <summary>Every declared diagnostic is reported somewhere.</summary>
@@ -297,7 +289,7 @@ public partial class DiagnosticTests
             "}",
             out var diagnostics);
 
-        Assert.Equal(["SL0202", "SL0276", "SL0276"], Front.Codes(diagnostics));
+        Assert.Equal(["SLN0002", "SLN0017", "SLN0017"], Front.Codes(diagnostics));
         Assert.DoesNotContain(diagnostics.Items,
             d => d.Message.Contains(DiagnosticBag.ErrorTypeName, StringComparison.Ordinal));
     }
@@ -389,7 +381,7 @@ public partial class DiagnosticTests
     {
         var file = Front.Text("int x = value;");
         var diagnostic = new Diagnostic(
-            Severity.Error, "SL0001", "no such thing", new SourceSpan(file, 8, 13));
+            Severity.Error, "SLP0001", "no such thing", new SourceSpan(file, 8, 13));
 
         string[] lines = diagnostic.Render(color: false).Split('\n');
         string source = lines.First(l => l.Contains("int x"));
@@ -405,7 +397,7 @@ public partial class DiagnosticTests
     {
         var file = Front.Text("one\ntwo\nthree");
         var diagnostic = new Diagnostic(
-            Severity.Error, "SL0001", "message", new SourceSpan(file, 8, 13));
+            Severity.Error, "SLP0001", "message", new SourceSpan(file, 8, 13));
 
         Assert.Contains($"{Front.TestFile}:3:1", diagnostic.Render(color: false));
     }
@@ -413,7 +405,7 @@ public partial class DiagnosticTests
     [Fact]
     public void RenderingSurvivesADiagnosticWithNoFile()
     {
-        var diagnostic = new Diagnostic(Severity.Error, "SL0001", "message", default);
+        var diagnostic = new Diagnostic(Severity.Error, "SLP0001", "message", default);
         Assert.Contains("message", diagnostic.Render(color: false));
     }
 
@@ -427,14 +419,14 @@ public partial class DiagnosticTests
     {
         var file = Front.Text("abc\ndefghij");
         var diagnostic = new Diagnostic(
-            Severity.Error, "SL0001", "message", new SourceSpan(file, 0, 9));
+            Severity.Error, "SLP0001", "message", new SourceSpan(file, 0, 9));
 
         string carets = diagnostic.Render(color: false).Split('\n').First(l => l.Contains('^'));
         Assert.Equal(3, carets.Count(c => c == '^'));
     }
 
     /// <summary>
-    /// SL0292 says what to do with the operand that is not a String: a number
+    /// SLT0023 says what to do with the operand that is not a String: a number
     /// is converted, and an optional String is checked against null, which no
     /// conversion of a number helps with.
     /// </summary>
@@ -448,7 +440,7 @@ public partial class DiagnosticTests
         Front.BindBody(declaration + "\n    String text = \"x\";\n    bool same = text == other;",
             out var diagnostics);
 
-        var reported = diagnostics.Items.Single(d => d.Code == "SL0292");
+        var reported = diagnostics.Items.Single(d => d.Code == "SLT0023");
         Assert.Contains(said, reported.Message);
         Assert.DoesNotContain(notSaid, reported.Message);
     }

@@ -53,7 +53,7 @@ public sealed partial class Binder
 
     /// <summary>
     /// What a block takes and gives back crosses to Objective-C as a message's
-    /// arguments do (SL0907); an <c>out</c> or <c>ref</c> has nothing to be
+    /// arguments do (SLI0056); an <c>out</c> or <c>ref</c> has nothing to be
     /// written back through, so it is a pointer or nothing.
     /// </summary>
     private void CheckBlockSignature(ObjCBlockTypeSymbol block, DelegateDeclSyntax declaration)

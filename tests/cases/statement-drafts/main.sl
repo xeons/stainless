@@ -2,7 +2,7 @@
 //
 // A value with no type of its own, written as a statement, is never made:
 // what it was built from runs, for its effects, and the rest is dropped with
-// SL0222.
+// SLL0001.
 module StatementDrafts;
 
 import Standard.Console;

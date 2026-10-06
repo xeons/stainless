@@ -166,7 +166,7 @@ public sealed partial class Binder
             return EnumText(value, enumType, span);
 
         // A code unit is not a character, and the cast that says which is
-        // meant is the same one SL0527 asks for everywhere else.
+        // meant is the same one SLT0056 asks for everywhere else.
         if (value.Type is PrimitiveTypeSymbol
             { Kind: PrimitiveKind.Char or PrimitiveKind.Char16 } unit)
         {
@@ -420,7 +420,7 @@ public sealed partial class Binder
 
         // Only char32 is a character. `char` is one UTF-8 code unit and
         // `char16` one UTF-16 unit, and a unit is not a character -- which is
-        // the distinction SL0527 exists to keep, so this does not quietly
+        // the distinction SLT0056 exists to keep, so this does not quietly
         // cross it either. See AsText for what those two are told.
         PrimitiveTypeSymbol { Kind: PrimitiveKind.Char32 } => _builtins.TextFromChar,
 

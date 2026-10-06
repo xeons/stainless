@@ -113,7 +113,7 @@ public sealed partial class LlvmEmitter
     /// <summary>
     /// Gives every event in a freshly allocated object an empty subscriber list.
     ///
-    /// An array is a value and never null (SL0271), so the zeroed storage
+    /// An array is a value and never null (SLT0021), so the zeroed storage
     /// <c>sl_alloc</c> hands back is not yet one -- and an event is read before
     /// anything has subscribed, by the first <c>+=</c> as much as by a raise.
     /// The empty array is what makes "no subscribers" an ordinary case with no

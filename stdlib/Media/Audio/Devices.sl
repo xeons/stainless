@@ -24,7 +24,7 @@ module Standard.Media.Audio;
 /// The backend, held.
 ///
 /// A class rather than module-level storage, because a module has no static of
-/// its own to keep one in (SL0204) and the loading has to happen exactly once.
+/// its own to keep one in (SLN0004) and the loading has to happen exactly once.
 /// The functions below are the surface; this is where the handle lives.
 static class Devices
 {

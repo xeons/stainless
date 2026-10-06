@@ -10,16 +10,16 @@ public delegate void Plain(int value);
 
 public interface IHasOne
 {
-    event Notify Wanted;                          // SL0300: an interface has no state
+    event Notify Wanted;                          // SLC0009: an interface has no state
 }
 
 public class Publisher
 {
     public event Notify Fired;
 
-    public event Asked Question;                  // SL0819: handlers cannot return a value
-    public event Plain Direct;                    // SL0818: a delegate has no object
-    public static event Notify Global;            // SL0820: nothing would unsubscribe
+    public event Asked Question;                  // SLC0118: handlers cannot return a value
+    public event Plain Direct;                    // SLC0117: a delegate has no object
+    public static event Notify Global;            // SLC0119: nothing would unsubscribe
 
     public void RaiseIt() => Fired(1); // fine: its own event, by name
 }
@@ -37,10 +37,10 @@ int Main()
     p.Fired += s.On;                              // fine
     p.Fired -= s.On;                              // fine
 
-    p.Fired(1);                                   // SL0823: only Publisher may raise it
-    Notify held = p.Fired;                        // SL0824: an event has no value to read
-    p.Fired = s.On;                               // SL0825: '=' would replace the whole list
-    p.Fired.Clear();                              // SL0824: only Publisher may clear it
+    p.Fired(1);                                   // SLC0120: only Publisher may raise it
+    Notify held = p.Fired;                        // SLC0121: an event has no value to read
+    p.Fired = s.On;                               // SLC0122: '=' would replace the whole list
+    p.Fired.Clear();                              // SLC0121: only Publisher may clear it
 
     return 0;
 }

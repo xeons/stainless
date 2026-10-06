@@ -183,7 +183,7 @@ public sealed partial class LlvmEmitter
 
         // Registered before the fields are walked, so a struct that somehow
         // reaches itself stops rather than recurring for ever. A value type
-        // containing itself is SL0216 and never gets this far.
+        // containing itself is SLC0006 and never gets this far.
         _spellings[type] = new Spelling("{ i8 }", 1, 1, null);
 
         var spelling = Spell(type);
@@ -693,7 +693,7 @@ public sealed partial class LlvmEmitter
     private void ExternalDeclarations(BoundProgram program)
     {
         // A C name this program defines is called through its definition. The
-        // binder has made sure every declaration of it agrees (SL0295), and a
+        // binder has made sure every declaration of it agrees (SLI0004), and a
         // declare beside the define is a redefinition to LLVM.
         var defined = program.Functions
             .Where(f => f.Symbol.Linkage == LinkageKind.ExportC)

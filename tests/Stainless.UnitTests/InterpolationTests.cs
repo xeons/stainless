@@ -56,21 +56,21 @@ public class InterpolationTests
 
     /// <summary>
     /// A code unit is not a character, and the language keeps that distinction
-    /// everywhere else (SL0527). Writing one as a character would cross it
+    /// everywhere else (SLT0056). Writing one as a character would cross it
     /// quietly, so the cast that says which is meant is required here too.
     /// </summary>
     [Theory]
     [InlineData("""char c = 'x'; String s = $"{c}";""")]
     [InlineData("""char16 c = 'x'; String s = $"{c}";""")]
     public void ACodeUnitNeedsToSayWhichItMeans(string body) =>
-        Assert.Contains("SL0557", Body(body));
+        Assert.Contains("SLT0062", Body(body));
 
     /// <summary>An enum writes its member's name, and takes no format.</summary>
     [Theory]
     [InlineData("""String s = $"{Level.High}";""", new string[0])]
     [InlineData("""String s = Level.High.ToText();""", new string[0])]
-    [InlineData("""String s = $"{Level.High:X}";""", new[] { "SL0753" })]
-    [InlineData("""String s = Level.High.ToText("G");""", new[] { "SL0260" })]
+    [InlineData("""String s = $"{Level.High:X}";""", new[] { "SLT0074" })]
+    [InlineData("""String s = Level.High.ToText("G");""", new[] { "SLT0014" })]
     public void AnEnumWritesItsName(string body, string[] codes) =>
         Assert.Equal(codes, Front.ModuleCodes(
             "public enum Level { Low, High }\nint Main() { " + body + " return 0; }"));
@@ -85,16 +85,16 @@ public class InterpolationTests
     [InlineData("""int Main() { int[] a = [1]; String s = $"{a}"; return 0; }""")]
     [InlineData("""void V() { } int Main() { String s = $"{V()}"; return 0; }""")]
     public void SomethingWithNoTextIsRefused(string source) =>
-        Assert.Contains("SL0557", Front.ModuleCodes(source));
+        Assert.Contains("SLT0062", Front.ModuleCodes(source));
 
     /// <summary>An empty hole names no value.</summary>
     [Fact]
-    public void AnEmptyHoleIsRefused() => Assert.Contains("SL0555", Body("""String s = $"{}";"""));
+    public void AnEmptyHoleIsRefused() => Assert.Contains("SLP0033", Body("""String s = $"{}";"""));
 
     /// <summary>A lone closing brace closes nothing; `}}` is the literal.</summary>
     [Fact]
     public void ALoneClosingBraceIsRefused() =>
-        Assert.Contains("SL0554", Body("""String s = $"a } b";"""));
+        Assert.Contains("SLP0032", Body("""String s = $"a } b";"""));
 
     /// <summary>
     /// A hole holds one expression. Two would mean the second was silently
@@ -102,12 +102,12 @@ public class InterpolationTests
     /// </summary>
     [Fact]
     public void TwoExpressionsInOneHoleAreRefused() =>
-        Assert.Contains("SL0556", Body("""int a = 1; int b = 2; String s = $"{a b}";"""));
+        Assert.Contains("SLP0034", Body("""int a = 1; int b = 2; String s = $"{a b}";"""));
 
     /// <summary>An unterminated one is the same error a plain literal gets.</summary>
     [Fact]
     public void AnUnterminatedInterpolationIsRefused() =>
-        Assert.Contains("SL0006", Body("""String s = $"unfinished;"""));
+        Assert.Contains("SLP0006", Body("""String s = $"unfinished;"""));
 
     // ------------------------------------------------- alignment and format
 
@@ -138,14 +138,14 @@ public class InterpolationTests
     [InlineData("""String w = "x"; String s = $"{w:X}";""")]
     [InlineData("""bool b = true; String s = $"{b:D}";""")]
     public void AFormatTheTypeDoesNotTakeIsRefused(string body) =>
-        Assert.Contains("SL0753", Body(body));
+        Assert.Contains("SLT0074", Body(body));
 
     [Theory]
     [InlineData("""int n = 1; int w = 4; String s = $"{n,w}";""")]
     [InlineData("""int n = 1; String s = $"{n,1.5}";""")]
     [InlineData("""int n = 1; String s = $"{n,"x"}";""")]
     public void AnAlignmentMustBeAConstantInteger(string body) =>
-        Assert.Contains("SL0754", Body(body));
+        Assert.Contains("SLT0075", Body(body));
 
     /// <summary>
     /// A <c>:</c> at the top of a hole starts its format, so a conditional's
@@ -157,7 +157,7 @@ public class InterpolationTests
     public void AConditionalInAHoleNeedsParentheses(string body)
     {
         var codes = Body(body);
-        Assert.Contains("SL0755", codes);
+        Assert.Contains("SLP0050", codes);
         Assert.Single(codes);
     }
 
@@ -197,7 +197,7 @@ public class InterpolationTests
 
     [Fact]
     public void AClassThatIsNotFormattableTakesNoFormat() =>
-        Assert.Contains("SL0557", Front.ModuleCodes("""
+        Assert.Contains("SLT0062", Front.ModuleCodes("""
             public class C { }
             int Main() { var c = new C(); String s = $"{c:X}"; return 0; }
             """));
@@ -258,7 +258,7 @@ public class InterpolationTests
     public void ADollarAloneIsStillAnError()
     {
         Front.Tokens("module Test;\nint Main() { int $ = 1; return 0; }", out var diagnostics);
-        Assert.Contains("SL0001", Front.Codes(diagnostics));
+        Assert.Contains("SLP0001", Front.Codes(diagnostics));
     }
 
     /// <summary>A hole's tokens carry their real positions in the file.</summary>
@@ -326,7 +326,7 @@ public class InterpolationTests
     /// </summary>
     [Fact]
     public void AnInterpolationNestedTooDeeplyIsRefusedByTheLexer() =>
-        Assert.Equal(["SL0108"], ParseCodes(Nested("$\"{", "1", "}\"", 100_000)));
+        Assert.Equal(["SLP0016"], ParseCodes(Nested("$\"{", "1", "}\"", 100_000)));
 
     /// <summary>
     /// The parser over a hole counts from its parent's depth. Each started from
@@ -336,7 +336,7 @@ public class InterpolationTests
     /// </summary>
     [Fact]
     public void AHoleCountsTheDepthItIsNestedAt() =>
-        Assert.Equal(["SL0108"],
+        Assert.Equal(["SLP0016"],
             ParseCodes(Nested("$\"{", Nested("(", "1", ")", 200), "}\"", 200)));
 
     /// <summary>

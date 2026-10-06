@@ -20,59 +20,6 @@ namespace Stainless.Source;
 
 public enum Severity { Error, Warning, Note }
 
-/// <summary>
-/// Codes that were used once and are not to be used again.
-///
-/// A code is a handle for a rule, so a rule has exactly one and a code means
-/// exactly one thing. These were second handles for a rule that already had
-/// one: each produced a message a reader could not tell from the surviving
-/// code's, which makes it a duplicate rather than a distinction. They are
-/// listed rather than reused, because a number that meant something else in an
-/// older build should not quietly come to mean this.
-///
-///   SL0214, SL0321  -> SL0201   'X' is already declared in module 'Y'
-///   SL0386          -> SL0205   'X' already declares a member named 'Y'
-///   SL0251          -> SL0247   'X' has no member named 'Y'
-///   SL0237          -> SL0232   operator 'X' cannot be applied to these
-///   SL0256          -> SL0247   'X' has no method named 'Y'
-///   SL0259          -> SL0229   no function named 'X' is in scope
-///   SL0261          -> SL0260   'X' takes N arguments, but M were given
-///   SL0311, SL0485  -> SL0309   there is no array of 'void'
-///
-/// The numbering has always had gaps -- the ranges are banded by pass -- so
-/// these leave no hole worth closing.
-/// </summary>
-public static class RetiredDiagnostics
-{
-    public static readonly IReadOnlySet<string> Codes = new HashSet<string>(StringComparer.Ordinal)
-    {
-        "SL0214", "SL0237", "SL0251", "SL0256", "SL0259",
-        "SL0261", "SL0311", "SL0321", "SL0386", "SL0485",
-
-        // Storage in a type: what a `static` field is.
-        "SL0577",
-
-        // A plain function as a closure, refused until a shared thunk and a
-        // null receiver made it a closure like any other.
-        "SL0599",
-
-        // A compound assignment to a property whose receiver was not a plain
-        // load, refused until the receiver was held and evaluated once.
-        "SL0397",
-
-        // A static automatic property, refused until its storage became a
-        // static that starts at its type's zero.
-        "SL0584",
-
-        // An overloaded interface method, refused until each overload took a
-        // slot of its own.
-        "SL0416",
-
-        // A body on an interface method, refused until one became its default.
-        "SL0301",
-    };
-}
-
 public sealed record Diagnostic(Severity Severity, string Code, string Message, SourceSpan Span)
 {
     /// <summary>Renders a diagnostic with a source excerpt and a caret run under the span.</summary>
@@ -327,7 +274,6 @@ public sealed class DiagnosticBag
         DiagnosticDescriptor what, SourceSpan span, string message,
         params ReadOnlySpan<IDiagnosticSubject?> about)
     {
-        Fresh(what.Code);
         if (IsConsequence(about)) return;
         NotAboutTheErrorType(what.Code, message);
         if (_muted > 0) return;
@@ -384,17 +330,6 @@ public sealed class DiagnosticBag
             throw new InternalCompilerError($"{code} names the error type: {message}");
     }
 
-    /// <summary>
-    /// Catches a retired code being brought back. It is a debug assertion
-    /// because a released compiler should not pay for it, and the whole test
-    /// suite runs against a debug build -- so anything that reintroduces one
-    /// fails there rather than shipping.
-    /// </summary>
-    [System.Diagnostics.Conditional("DEBUG")]
-    private static void Fresh(string code) =>
-        System.Diagnostics.Debug.Assert(
-            !RetiredDiagnostics.Codes.Contains(code),
-            $"{code} was retired; see RetiredDiagnostics for what replaced it");
 
     public void AddRange(DiagnosticBag other)
     {

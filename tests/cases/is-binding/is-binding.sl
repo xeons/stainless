@@ -135,7 +135,7 @@ class Link
     }
 }
 
-// A nullable field, which no check can be about (SL0248). Through `is` it can:
+// A nullable field, which no check can be about (SLO0001). Through `is` it can:
 // the test asks about the null and the class at once, and the field is read
 // exactly once.
 int SecondOr(Link link, int fallback)

@@ -10,7 +10,7 @@ public class Shape
     public virtual int Sides() => 0;
 }
 
-// SL0937: the object is reached before 'base(...)' has built it.
+// SLO0032: the object is reached before 'base(...)' has built it.
 public class Reaching : Shape
 {
     List<int> _items;
@@ -23,7 +23,7 @@ public class Reaching : Shape
     }
 }
 
-// SL0938: a field with no zero value is given its value after the base.
+// SLO0033: a field with no zero value is given its value after the base.
 public class Late : Shape
 {
     String _name;
@@ -35,7 +35,7 @@ public class Late : Shape
     }
 }
 
-// SL0811: a field read before it has a value.
+// SLO0028: a field read before it has a value.
 public class Early
 {
     String _first;

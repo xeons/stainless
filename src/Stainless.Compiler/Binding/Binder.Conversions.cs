@@ -446,8 +446,7 @@ public sealed partial class Binder
     /// and passing them straight on.
     ///
     /// <para>
-    /// This used to be refused (SL0599), with "wrap it in a lambda" as the way
-    /// out -- which is exactly what this writes, except that a lambda is a new
+    /// A lambda wrapping the function would do as much, at the cost of a new
     /// class and a new object at every mention. A thunk shared by every mention
     /// and a null receiver instead cost no allocation, and they keep what
     /// closure equality promises: two mentions of <c>Upper</c> are equal, so
@@ -632,7 +631,7 @@ public sealed partial class Binder
         };
 
         // A code unit is held as a scalar rather than as a width, and the three
-        // encodings are kept apart by SL0527 rather than by whether a number
+        // encodings are kept apart by SLT0056 rather than by whether a number
         // fits. Reading one here would answer that question first and with the
         // wrong code.
         return type is PrimitiveTypeSymbol { IsInteger: true } written && value is ulong bits

@@ -143,7 +143,7 @@ Homebrew's GTK libraries draws with GTK instead.
 
 **A test case is a directory**, holding the `.sl` files of one program plus
 exactly one expectation: `expected.txt` (it must compile, run, and print this)
-or `errors.txt` (it must fail, and every `SL####` the file names must be
+or `errors.txt` (it must fail, and every code (`SLT0042`) the file names must be
 reported). Optional beside them: `args.txt`, `stdin.txt`, `warnings.txt`,
 `defines.txt`, `abi.txt`, `target.txt`, `platform.txt`, `sources.txt`,
 `libraries.txt`, `sdk.txt`, and `expected.linux.txt` or `expected.macos.txt` for a case
@@ -165,7 +165,7 @@ These are rules held by the unit tests, and each has caught a real commit:
 - **A new sample must be listed in `SampleTests`**, or `EverySampleOnDiskIsListed`
   fails. A `UnixOnly` sample is skipped on Windows, so this can pass locally and
   fail on Linux.
-- **A documented `SL####` needs an `errors.txt` case pinning it**, or
+- **A documented code needs an `errors.txt` case pinning it**, or
   `DiagnosticTests.EveryDocumentedCodeIsPinnedByACase` fails.
 - **A new diagnostic is declared in `Source/Codes.cs`**, reported by name, and
   `docs/diagnostics.md` regenerated with `stainless explain --markdown`, or
@@ -236,7 +236,7 @@ them (`Take`, `Skip`, `Select`, `Where`, `Find`, `Any`, `All`, `ForEach`, …):
   fixes it; so does not using the name.
 - `Fail(...)` and `Ok(...)` are `Result`'s case constructors and are in scope
   everywhere. A method named `Fail` will silently never be called — the only
-  sign is SL0222, "this expression has no effect".
+  sign is SLL0001, "this expression has no effect".
 
 **A commit subject is imperative and names the change** — *Read a file to its
 end rather than to its length* — and is under 72 characters. The body carries

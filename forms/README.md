@@ -810,7 +810,7 @@ What the exercise cost, and it is worth knowing before the next backend:
   user's has to name its receiver -- `this.busy`, or a method that reads it.
   Written bare it compiles, runs, and guards nothing: a checked menu item set
   from its own handler recursed until the stack ran out. The compiler warns
-  about it (SL0610), and the comment on `GtkMenuItemPeer.Echoing` is the long
+  about it (SLL0004), and the comment on `GtkMenuItemPeer.Echoing` is the long
   version.
 - **A signal's arity has to match the connector's.** `switch-page` carries a
   page *and* a page number, so a handler connected as if it carried one reads
@@ -931,7 +931,7 @@ here at all. Where one is a backend's rather than the library's, it says so.
   call, which cannot leak and is slower than it needs to be.
 - **`BorderSpacing` and `ChildSizing` are absent.** The LCL's finer layout
   controls; only `Dock` and `Anchors` are here.
-- **`Application` and `WidgetSet` hold static state and warn (SL0377).** A GUI
+- **`Application` and `WidgetSet` hold static state and warn (SLO0015).** A GUI
   toolkit is *thread-affine* — one thread owns the widgets — which is true of
   WinForms, WPF, GTK and Cocoa alike. Stainless can say `threadsafe`, which
   would be a lie here, and cannot yet say "one thread only". The warning is

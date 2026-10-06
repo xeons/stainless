@@ -10,7 +10,7 @@ public struct Point : IShape
     public double Area() => X;
 }
 
-public struct Hollow : IShape { }                       // SL0305
+public struct Hollow : IShape { }                       // SLC0013
 
 double Measure(IShape shape) => shape.Area();
 
@@ -20,6 +20,6 @@ int Main()
     p.X = 1.0;
 
     // It still cannot become a reference to the interface.
-    IShape held = p;                                    // SL0302
-    return (int)Measure(p);                             // SL0302
+    IShape held = p;                                    // SLC0010
+    return (int)Measure(p);                             // SLC0010
 }

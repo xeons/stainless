@@ -1976,7 +1976,7 @@ public sealed partial class Binder
     /// <c>asm (in rcx = n, out rax = r) { ... }</c>.
     ///
     /// The text is not looked at: it is the target assembler's, and that
-    /// assembler is where a mistake in it is found (SL0723, from the driver).
+    /// assembler is where a mistake in it is found (SLI0048, from the driver).
     /// What is checked here is everything the assembler cannot see — which
     /// registers exist on this target, what a value may be to travel in one,
     /// and whether an output has somewhere to go.

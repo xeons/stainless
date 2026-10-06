@@ -213,7 +213,7 @@ two mistakes are easy and neither is loud:
   settle it, or pick a different name.
 - **`Fail` and `Ok` are `Result`'s case constructors** and are in scope
   everywhere. A method named `Fail` is never called, and the only sign is
-  SL0222, *this expression has no effect*.
+  SLL0001, *this expression has no effect*.
 
 **Do not name a member after a case constructor or a collection verb.** The
 compiler will not warn, and the failure looks like a logic bug.
@@ -261,7 +261,7 @@ do stays a method. They can coexist.
   accessors reached through an instance and a module has none, so
   `Env.ArgumentCount()`, `Threading.ProcessorCount()` and `Env.CurrentDirectory()` keep
   their parentheses however much they read like facts. Writing one as a
-  property is SL0400.
+  property is SLC0031.
 - **`IsEmpty` is a property**, including on `String` and `StringBuilder`. It
   was the one exception here for a while, because those two get theirs from
   `Builtins.cs` and a builtin could only be a `FunctionSymbol`. Builtins can
@@ -434,7 +434,7 @@ forms had been sitting at the bottom of forty comparisons.
 **The compiler can see the set.** An `if` chain over constants is opaque; a
 `switch` is a shape the binder knows, which is what makes exhaustiveness
 checking possible at all -- see the variant switches in
-[§2 of the spec](spec/02-types.md), where leaving a case out is SL0436.
+[§2 of the spec](spec/02-types.md), where leaving a case out is SLF0017.
 
 The exception is a chain whose tests are not all the same question: ranges,
 different operands, or conditions with side conditions attached. A `switch` that
@@ -636,7 +636,7 @@ whole of it.
 **A tag is checked.** A `@param` naming no parameter, a `@failure` naming a
 case the error type does not have, a `cref` that resolves to nothing: each is a
 warning where it was written. **Document all of a declaration's parameters or
-none** — half of them is SL0741, for the same reason C# reports CS1573.
+none** — half of them is SLL0008, for the same reason C# reports CS1573.
 
 ### 4.5 Layout
 
@@ -757,4 +757,4 @@ exactly what a script cannot do. Both want reading, one module at a time.
 
 **Both suites run before each commit.** They ask different questions, and the
 unit tests hold rules the end-to-end suite cannot see — a new sample has to be
-listed in `SampleTests`, and a documented `SL####` has to be pinned by a case.
+listed in `SampleTests`, and a documented diagnostic code has to be pinned by a case.

@@ -87,7 +87,7 @@ with a function that makes one, and `Com.GetClassObject` answers from it with an
 no registration call to remember and no factory to hand-write.
 
 Activation supplies no arguments, so an activatable class needs a constructor
-taking none; a class that has constructors and no empty one is refused (SL0611)
+taking none; a class that has constructors and no empty one is refused (SLI0035)
 where it is declared rather than where it fails to be made.
 
 ## The registry, and why this does not use it

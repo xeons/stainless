@@ -409,50 +409,50 @@ public class BoundTreeTests
 
     [Fact]
     public void BreakingOutOfADoLeavesOutUnwritten() =>
-        Assert.Contains("SL0600", OutCodes(
+        Assert.Contains("SLO0023", OutCodes(
             "void F(bool stop, out int x)\n{\n    do\n    {\n        if (stop)\n            break;\n" +
             "        x = 1;\n    }\n    while (false);\n}"));
 
     [Fact]
     public void BreakingOutOfASwitchSectionLeavesOutUnwritten() =>
-        Assert.Contains("SL0600", OutCodes(
+        Assert.Contains("SLO0023", OutCodes(
             "void F(int n, out int x)\n{\n    switch (n)\n    {\n        case 0:\n" +
             "            if (n > 0)\n                break;\n            x = 1;\n            break;\n" +
             "        default:\n            x = 2;\n            break;\n    }\n}"));
 
     [Fact]
     public void ADeconstructionWritesOut() =>
-        Assert.DoesNotContain("SL0600", OutCodes(
+        Assert.DoesNotContain("SLO0023", OutCodes(
             "void F(out int x)\n{\n    int y = 0;\n    (x, y) = (1, 2);\n}"));
 
     [Fact]
     public void TheRightOfAndIsNotCertain() =>
-        Assert.Contains("SL0600", OutCodes(
+        Assert.Contains("SLO0023", OutCodes(
             "bool F(bool first, out int x)\n{\n    bool both = first && Give(out x);\n    return both;\n}"));
 
     [Fact]
     public void ATryBeforeTheWriteCanReturnWithoutIt() =>
-        Assert.Contains("SL0600", OutCodes(
+        Assert.Contains("SLO0023", OutCodes(
             "Result<int, Failure> F(out int x)\n{\n    int n = try Next();\n    x = n;\n    return Ok(n);\n}"));
 
     [Fact]
     public void ATryAfterTheWriteIsFine() =>
-        Assert.DoesNotContain("SL0600", OutCodes(
+        Assert.DoesNotContain("SLO0023", OutCodes(
             "Result<int, Failure> F(out int x)\n{\n    x = 0;\n    int n = try Next();\n    return Ok(n);\n}"));
 
     [Fact]
     public void ALoopConditionAlwaysRuns() =>
-        Assert.DoesNotContain("SL0600", OutCodes(
+        Assert.DoesNotContain("SLO0023", OutCodes(
             "void F(out int x)\n{\n    while (Give(out x))\n        return;\n}"));
 
     [Fact]
     public void ASwitchedValueAlwaysRuns() =>
-        Assert.DoesNotContain("SL0600", OutCodes(
+        Assert.DoesNotContain("SLO0023", OutCodes(
             "void F(out int x)\n{\n    switch (Give(out x) ? 1 : 0)\n    {\n        case 1:\n            break;\n    }\n}"));
 
     [Fact]
     public void ADoConditionRunsWhenTheBodyEnds() =>
-        Assert.DoesNotContain("SL0600", OutCodes(
+        Assert.DoesNotContain("SLO0023", OutCodes(
             "void F(out int x)\n{\n    int i = 0;\n    do\n    {\n        i++;\n    }\n    while (!Give(out x));\n}"));
 
     // ------------------------------------------------------------ captured members
@@ -467,7 +467,7 @@ public class BoundTreeTests
     [InlineData("String Mode => $\"{_level}\";")]
     [InlineData("int[] Mode => [_level];")]
     public void AGetterReadsItsFieldsWhereverTheyAre(string property) =>
-        Assert.Contains("SL0610", Front.ModuleCodes($$"""
+        Assert.Contains("SLL0004", Front.ModuleCodes($$"""
             public closure void Act();
             public class Panel
             {

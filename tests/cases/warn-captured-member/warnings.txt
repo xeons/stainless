@@ -2,4 +2,4 @@
 # elsewhere -- so the lambda reads what they said when it was made. `Fixed` and
 # `Correct` are here to show what does not warn: a member only a constructor
 # writes, and a member reached through a method call.
-SL0610
+SLL0004

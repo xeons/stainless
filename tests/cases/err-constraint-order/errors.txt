@@ -1,7 +1,7 @@
 # One per clause that is written wrongly, in source order.
-SL0580
-SL0580
-SL0581
-SL0580
-SL0581
-SL0579
+SLG0013
+SLG0013
+SLG0014
+SLG0013
+SLG0014
+SLG0012

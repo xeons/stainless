@@ -86,7 +86,7 @@ public class BinderTests
     [InlineData("int F(out params int[] a) { a = []; return 1; }")]
     [InlineData("public delegate int D(params int[] a);")]
     public void AMisplacedParamsIsRefused(string module) =>
-        Assert.Contains("SL0763", Front.ModuleCodes(module));
+        Assert.Contains("SLC0101", Front.ModuleCodes(module));
 
     /// <summary>
     /// Storage that may not be written may not be lent by 'ref' or 'out'
@@ -98,7 +98,7 @@ public class BinderTests
     [InlineData("static readonly P s_p = new P(1.0);\nvoid Bump(ref double d) { }\nvoid F() => Bump(ref s_p.X);")]
     [InlineData("void Bump(ref double d) { }\nvoid F(ReadOnlySpan<P> ps) => Bump(ref ps[0].X);")]
     public void AReadOnlyPlaceIsNotLentThroughAField(string module) =>
-        Assert.Equal(["SL0444"], Front.ModuleCodes(
+        Assert.Equal(["SLT0042"], Front.ModuleCodes(
             "public struct P { public double X; public P(double x) { X = x; } }\n" + module));
 
     /// <summary>
@@ -108,7 +108,7 @@ public class BinderTests
     [Theory]
     [InlineData("int Pick<T>(Span<T> s) => 1;\nint Pick<T>(ReadOnlySpan<T> s) => 2;\nint F(Span<int> s) => Pick(s);", new string[0])]
     [InlineData("int Pick<T>(Span<T> s) => 1;\nint Pick<T>(ReadOnlySpan<T> s) => 2;\nint F(int[] a) => Pick(a);", new string[0])]
-    [InlineData("int Pick<T>(T a, int b) => 1;\nint Pick<T>(int a, T b) => 2;\nint F() => Pick(1, 2);", new[] { "SL0453" })]
+    [InlineData("int Pick<T>(T a, int b) => 1;\nint Pick<T>(int a, T b) => 2;\nint F() => Pick(1, 2);", new[] { "SLG0011" })]
     public void GenericOverloadsAreRanked(string module, string[] expected) =>
         Assert.Equal(expected, Front.ModuleCodes(module));
 
@@ -119,9 +119,9 @@ public class BinderTests
     [Theory]
     [InlineData("public closure R Maker<R>();\npublic closure R Maker<T, R>(T value);\nint F(Maker<int> a, Maker<int, int> b) => a() + b(1);", new string[0])]
     [InlineData("public struct Box<T> { public T A; }\npublic struct Box<T, U> { public T A; public U B; }\nint F(Box<int> a, Box<int, long> b) => a.A;", new string[0])]
-    [InlineData("public struct Box<T> { public T A; }\npublic struct Box<U> { public U A; }", new[] { "SL0201" })]
+    [InlineData("public struct Box<T> { public T A; }\npublic struct Box<U> { public U A; }", new[] { "SLN0001" })]
     [InlineData("public struct Pair { public int A; }\npublic struct Pair<T> { public T A; }\nint F(Pair a, Pair<int> b) => a.A + b.A;", new string[0])]
-    [InlineData("public struct Box<T> { public T A; }\nint F(Box<int, int> b) => 0;", new[] { "SL0323" })]
+    [InlineData("public struct Box<T> { public T A; }\nint F(Box<int, int> b) => 0;", new[] { "SLG0003" })]
     public void AGenericNameIsDeclaredOncePerArity(string module, string[] expected) =>
         Assert.Equal(expected, Front.ModuleCodes(module));
 
@@ -132,7 +132,7 @@ public class BinderTests
     [Theory]
     [InlineData("int Pick<T>(T x, Func<T, int> f) => 1;\nint Pick<T>(T x, Func<T, double> f) => 2;\nint G() => Pick(1, (n) => n + 1);", new string[0])]
     [InlineData("int Pick<T>(T x, Func<T, int> f) => 1;\nint Pick<T>(T x, Func<T, double> f) => 2;\nint G() => Pick(1, (n) => 0.5);", new string[0])]
-    [InlineData("int Pick(Func<int, int> f) => 1;\nint G() => Pick((n) => 0.5);", new[] { "SL0262" })]
+    [InlineData("int Pick(Func<int, int> f) => 1;\nint G() => Pick((n) => 0.5);", new[] { "SLT0015" })]
     public void ALambdaIsRankedByWhatItReturns(string module, string[] expected) =>
         Assert.Equal(expected, Front.ModuleCodes(module));
 
@@ -155,16 +155,16 @@ public class BinderTests
     /// </summary>
     [Theory]
     [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; public double Area() => S * S; }\ndouble M<T>(T shape) where T : IArea => shape.Area();\ndouble G(Sq s) => M(s);", new string[0])]
-    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; public double Area() => S * S; }\nIArea G(Sq s) => s;", new[] { "SL0302" })]
-    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; }", new[] { "SL0305" })]
-    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; double Area() => S; }", new[] { "SL0306" })]
+    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; public double Area() => S * S; }\nIArea G(Sq s) => s;", new[] { "SLC0010" })]
+    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; }", new[] { "SLC0013" })]
+    [InlineData("public interface IArea { double Area(); }\npublic struct Sq : IArea { public double S; double Area() => S; }", new[] { "SLC0014" })]
     public void AStructImplementsAnInterfaceWithoutBecomingOne(string module, string[] expected) =>
         Assert.Equal(expected, Front.ModuleCodes(module));
 
     [Theory]
     [InlineData("bool F(int[] a, int[] b) => a == b;", new string[0])]
     [InlineData("bool F(int[] a, int[] b) => a != b;", new string[0])]
-    [InlineData("bool F(int[] a, long[] b) => a == b;", new[] { "SL0232" })]
+    [InlineData("bool F(int[] a, long[] b) => a == b;", new[] { "SLT0006" })]
     public void ArraysCompareByIdentity(string module, string[] expected) =>
         Assert.Equal(expected, Front.ModuleCodes(module));
 
@@ -177,7 +177,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void AMismatchUnderlinesTheValue() =>
-        Assert.Equal(("SL0265", "\"s\""), One("int x = \"s\";"));
+        Assert.Equal(("SLT0018", "\"s\""), One("int x = \"s\";"));
 
     /// <summary>
     /// A literal outside its type's range is that rather than a conversion
@@ -190,7 +190,7 @@ public class BinderTests
     [InlineData("int i = 5000000000;", "5000000000")]
     [InlineData("long l = 9223372036854775808;", "9223372036854775808")]
     public void ALiteralTooLargeForItsTypeUnderlinesTheLiteral(string body, string underlined) =>
-        Assert.Equal(("SL0266", underlined), One(body));
+        Assert.Equal(("SLT0019", underlined), One(body));
 
     /// <summary>
     /// A literal is the narrowest of int, uint, long and ulong that holds it,
@@ -225,7 +225,7 @@ public class BinderTests
     [InlineData("long l = 1; int i = l;", "l")]
     [InlineData("float f = 1; int i = f;", "f")]
     public void ANarrowingConversionUnderlinesTheSource(string body, string underlined) =>
-        Assert.Equal(("SL0265", underlined), One(body));
+        Assert.Equal(("SLT0018", underlined), One(body));
 
     /// <summary>
     /// An argument that did not bind is reported once. It matches every
@@ -236,7 +236,7 @@ public class BinderTests
     [Fact]
     public void AnArgumentThatDidNotBindDoesNotAlsoReportAmbiguity() =>
         Assert.Equal(
-            ["SL0247"],
+            ["SLN0013"],
             Front.ModuleCodes("""
                 String Pick(long n) { return "l"; }
                 String Pick(nuint n) { return "n"; }
@@ -245,15 +245,15 @@ public class BinderTests
 
     [Fact]
     public void AnUnknownFunctionUnderlinesItsName() =>
-        Assert.Equal(("SL0229", "nope"), One("nope();"));
+        Assert.Equal(("SLN0011", "nope"), One("nope();"));
 
     [Fact]
     public void AnUnknownNameUnderlinesItself() =>
-        Assert.Equal(("SL0229", "nope"), One("int x = nope;"));
+        Assert.Equal(("SLN0011", "nope"), One("int x = nope;"));
 
     [Fact]
     public void WritingAConstUnderlinesTheTarget() =>
-        Assert.Equal(("SL0240", "y"), One("const int y = 0; y = 1;"));
+        Assert.Equal(("SLT0008", "y"), One("const int y = 0; y = 1;"));
 
     /// <summary>
     /// A redeclaration underlines the second one, since the first was fine
@@ -261,7 +261,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void ARedeclarationUnderlinesTheSecond() =>
-        Assert.Equal(("SL0218", "int x = 2;"), One("int x = 1; int x = 2;"));
+        Assert.Equal(("SLN0008", "int x = 2;"), One("int x = 1; int x = 2;"));
 
     /// <summary>
     /// Two constructors of one signature are one symbol, and were both emitted
@@ -271,7 +271,7 @@ public class BinderTests
     [InlineData("public class C { public C() { } public C() { } }")]
     [InlineData("public struct S { public S(int a) { } public S(int b) { } }")]
     public void TwoConstructorsOfOneSignatureAreRefused(string declarations) =>
-        Assert.Equal(["SL0211"], Front.ModuleCodes(declarations));
+        Assert.Equal(["SLN0006"], Front.ModuleCodes(declarations));
 
     [Fact]
     public void AConstructorOverloadedByItsParametersIsFine() =>
@@ -279,15 +279,15 @@ public class BinderTests
 
     [Fact]
     public void ANonBooleanConditionUnderlinesTheCondition() =>
-        Assert.Equal(("SL0227", "1"), One("if (1) { }"));
+        Assert.Equal(("SLT0003", "1"), One("if (1) { }"));
 
     [Fact]
     public void DivisionByAConstantZeroUnderlinesTheWholeExpression() =>
-        Assert.Equal(("SL0415", "1 / 0"), One("int i = 1 / 0;"));
+        Assert.Equal(("SLT0040", "1 / 0"), One("int i = 1 / 0;"));
 
     [Fact]
     public void UsingAVoidCallAsAValueUnderlinesTheCall() =>
-        Assert.Equal(("SL0265", "F()"),
+        Assert.Equal(("SLT0018", "F()"),
                      OneInModule("public void F() { }\npublic int G() { return F(); }"));
 
     // ----------------------------------------------------------- code units
@@ -298,7 +298,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void OneEncodingDoesNotBecomeAnother() =>
-        Assert.Equal(("SL0527", "a"), One("char16 a = 'a'; char b = a;"));
+        Assert.Equal(("SLT0056", "a"), One("char16 a = 'a'; char b = a;"));
 
     /// <summary>
     /// A literal takes the narrowest of the three that holds it whole, so a
@@ -306,7 +306,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void ALiteralThatDoesNotFitIsRejected() =>
-        Assert.Equal("SL0527", One("char c = '\U0001F600';").Code);
+        Assert.Equal("SLT0056", One("char c = '\U0001F600';").Code);
 
     [Theory]
     [InlineData("char c = 'a';")]
@@ -321,7 +321,7 @@ public class BinderTests
 
     [Fact]
     public void AnArrayLiteralOfTheWrongLengthUnderlinesTheLiteral() =>
-        Assert.Equal(("SL0547", "[1, 2, 3]"), One("int[2] a = [1, 2, 3];"));
+        Assert.Equal(("SLT0058", "[1, 2, 3]"), One("int[2] a = [1, 2, 3];"));
 
     /// <summary>
     /// An empty literal with nothing to settle against has no element type to
@@ -329,7 +329,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void AnEmptyArrayLiteralWithNoTargetIsRejected() =>
-        Assert.Equal(("SL0548", "[]"), One("var a = [];"));
+        Assert.Equal(("SLT0059", "[]"), One("var a = [];"));
 
     /// <summary>
     /// When the elements decide, they have to agree; the odd one out is what
@@ -337,7 +337,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void ElementsThatDisagreeUnderlineTheOddOneOut() =>
-        Assert.Equal(("SL0549", "\"two\""), One("var a = [1, \"two\"];"));
+        Assert.Equal(("SLT0060", "\"two\""), One("var a = [1, \"two\"];"));
 
     // ---------------------------------------------------------- narrowing
 
@@ -348,7 +348,7 @@ public class BinderTests
 
     [Fact]
     public void AnOptionalCannotBeReachedThroughUnchecked() =>
-        Assert.Equal(["SL0248"], Narrowing("C? c = null; int n = c.V;"));
+        Assert.Equal(["SLO0001"], Narrowing("C? c = null; int n = c.V;"));
 
     [Theory]
     [InlineData("C? c = null; if (c != null) { int n = c.V; }")]
@@ -365,7 +365,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void AnAssignmentForgetsTheFact() =>
-        Assert.Equal(["SL0248"],
+        Assert.Equal(["SLO0001"],
                      Narrowing("C? c = null; if (c != null) { c = null; int n = c.V; }"));
 
     /// <summary>
@@ -374,7 +374,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void AWeakReferenceIsNeverNarrowed() =>
-        Assert.Equal(["SL0638"],
+        Assert.Equal(["SLO0026"],
                      Narrowing("weak C? c = null; if (c != null) { int n = c.V; }"));
 
     // ------------------------------------------------------- declarations
@@ -386,7 +386,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void ADuplicateNameUnderlinesTheSecond() =>
-        Assert.Equal(("SL0201", "public const int X = 2;"),
+        Assert.Equal(("SLN0001", "public const int X = 2;"),
                      OneInModule("public const int X = 1;\npublic const int X = 2;"));
 
     /// <summary>
@@ -395,7 +395,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void AnUnimplementedInterfaceUnderlinesTheInterface() =>
-        Assert.Equal(("SL0305", "I"),
+        Assert.Equal(("SLC0013", "I"),
                      OneInModule("interface I { int F(); }\nclass C : I { }"));
 
     /// <summary>
@@ -405,7 +405,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void ABareComInterfaceIsRejectedTwice() =>
-        Assert.Equal(["SL0534", "SL0537"], Front.ModuleCodes("com interface IThing { }"));
+        Assert.Equal(["SLI0028", "SLI0031"], Front.ModuleCodes("com interface IThing { }"));
 
     /// <summary>
     /// A CLSID on a com class is accepted: it is what lets something ask for
@@ -424,7 +424,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void AnActivatableClassNeedsAnEmptyConstructor() =>
-        Assert.Contains("SL0611", Front.ModuleCodes(
+        Assert.Contains("SLI0035", Front.ModuleCodes(
             "[Guid(\"9d2f5f7a-1c64-4a3b-8f0e-7d5a2c9b4e10\")] com interface I { int F(); }\n" +
             "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] com class C : I {\n" +
             "  int n;\n  public C(int start) { n = start; }\n" +
@@ -447,7 +447,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void APlainClassStillRefusesAGuid() =>
-        Assert.Contains("SL0728", Front.ModuleCodes(
+        Assert.Contains("SLC0096", Front.ModuleCodes(
             "[Guid(\"5a1c8e30-2b47-4d16-a9f3-c04e7b81d629\")] class C { }"));
 
     /// <summary>
@@ -457,13 +457,13 @@ public class BinderTests
     /// nothing defined, and the build ended in "this is a compiler bug".
     /// </summary>
     [Theory]
-    [InlineData("bool r = a is IB;", "SL0518")]
-    [InlineData("bool r = c is IA;", "SL0518")]
-    [InlineData("bool r = a is IC;", "SL0518")]
-    [InlineData("int r = a switch { IB => 1, _ => 0 };", "SL0518")]
-    [InlineData("int r = c switch { IA => 1, _ => 0 };", "SL0518")]
-    [InlineData("var r = (IB)a;", "SL0243")]
-    [InlineData("var r = a as IB;", "SL0612")]
+    [InlineData("bool r = a is IB;", "SLF0020")]
+    [InlineData("bool r = c is IA;", "SLF0020")]
+    [InlineData("bool r = a is IC;", "SLF0020")]
+    [InlineData("int r = a switch { IB => 1, _ => 0 };", "SLF0020")]
+    [InlineData("int r = c switch { IA => 1, _ => 0 };", "SLF0020")]
+    [InlineData("var r = (IB)a;", "SLT0011")]
+    [InlineData("var r = a as IB;", "SLT0070")]
     public void ANoUnknownInterfaceCannotBeAskedWhatItIs(string statement, string code) =>
         Assert.Equal([code], Front.ModuleCodes(
             "[NoUnknown] com interface IA { void A(); }\n" +
@@ -535,7 +535,7 @@ public class BinderTests
     /// <summary>A struct does not: its layout is C's.</summary>
     [Fact]
     public void ASecondDeclarationOfAStructMayNotAddAField() =>
-        Assert.Equal(["SL0551"], Front.ModuleCodes(
+        Assert.Equal(["SLC0063"], Front.ModuleCodes(
             "public struct S { public int A; }" +
             "\npublic struct S { public int B; }"));
 
@@ -553,7 +553,7 @@ public class BinderTests
     /// <summary>But from one of them: two would be two answers to one question.</summary>
     [Fact]
     public void TwoDeclarationsMayNotBothNameABase() =>
-        Assert.Equal(["SL0551"], Front.ModuleCodes(
+        Assert.Equal(["SLC0063"], Front.ModuleCodes(
             """
             public interface I { void F(); }
             public interface J { void G(); }
@@ -564,7 +564,7 @@ public class BinderTests
     /// <summary>And every declaration must agree about what it is.</summary>
     [Fact]
     public void EveryDeclarationMustAgreeAboutTheKind() =>
-        Assert.Equal(["SL0550"], Front.ModuleCodes(
+        Assert.Equal(["SLC0062"], Front.ModuleCodes(
             "public class C { }\npublic struct C { }"));
 
     /// <summary>
@@ -626,7 +626,7 @@ public class BinderTests
         bool addsToTheFirst = first == second && parts.Contains(first);
         bool anotherArity = first.StartsWith("generic") != second.StartsWith("generic");
 
-        string[] reported = ["SL0201", "SL0550", "SL0551", "SL0644"];
+        string[] reported = ["SLN0001", "SLC0062", "SLC0063", "SLC0090"];
 
         foreach (var codes in new[]
                  {
@@ -647,7 +647,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void TwoGenericTemplatesAreStillADuplicate() =>
-        Assert.Equal(["SL0201"], Front.ModuleCodes(
+        Assert.Equal(["SLN0001"], Front.ModuleCodes(
             "public class Box<T> { T v; }" +
             "\npublic class Box<T> { T w; }"));
 
@@ -767,8 +767,8 @@ public class BinderTests
             }
             """);
 
-        Assert.Contains("SL0276", codes);
-        Assert.Contains("SL0499", codes);
+        Assert.Contains("SLN0017", codes);
+        Assert.Contains("SLC0039", codes);
     }
 
     /// <summary>
@@ -777,8 +777,8 @@ public class BinderTests
     /// blamed for overriding something that is still a dispatched method.
     /// </summary>
     [Theory]
-    [InlineData("public String Speak() => \"?\";", "SL0500")]
-    [InlineData("public virtual int Speak() => 0;", "SL0502")]
+    [InlineData("public String Speak() => \"?\";", "SLC0040")]
+    [InlineData("public virtual int Speak() => 0;", "SLC0042")]
     public void AnOverrideThatFailsLeavesADispatchedMethod(string inBase, string code)
     {
         var codes = Front.ModuleCodes(
@@ -811,7 +811,7 @@ public class BinderTests
     public void AGenericCallWithTooManyArgumentsIsAnArityError(string body)
     {
         Front.Bind("module Test;\n" + body, out var diagnostics);
-        Assert.Contains("SL0260", Front.Codes(diagnostics));
+        Assert.Contains("SLT0014", Front.Codes(diagnostics));
     }
 
     /// <summary>
@@ -829,15 +829,15 @@ public class BinderTests
     {
         var codes = Front.ModuleCodes("class Box { }\n" + body);
 
-        Assert.Contains("SL0828", codes);
-        Assert.Contains("SL0229", codes);
+        Assert.Contains("SLC0123", codes);
+        Assert.Contains("SLN0011", codes);
     }
 
     /// <summary>
     /// A struct that contains itself, by every route to it, with something
     /// that walks its fields after layout.
     ///
-    /// SL0216 was reported and the cycle left in place, so the first of those
+    /// SLC0006 was reported and the cycle left in place, so the first of those
     /// walks recursed until the process died of a stack overflow. The cut in
     /// layout answers most of it; the walks carry their own guard for the rest,
     /// because a cycle layout did not see is still a cycle to them.
@@ -852,7 +852,7 @@ public class BinderTests
     [InlineData("struct S { (S, int) pair; }")]
     [InlineData("struct S { (int, (S, byte)) nested; }")]
     public void AStructThatContainsItselfIsReportedAndSurvived(string declaration) =>
-        Assert.Contains("SL0216", Front.ModuleCodes(WalkedEveryWay(declaration)));
+        Assert.Contains("SLC0006", Front.ModuleCodes(WalkedEveryWay(declaration)));
 
     /// <summary>
     /// A tuple of ordinary structs is laid out by the C rules like any other
@@ -980,7 +980,7 @@ public class BinderTests
             Front.BindBody($"long r = 0; asm (out {register} = r) {{ nop }}", out var diagnostics);
             var diagnostic = Front.Only(diagnostics);
 
-            Assert.Equal("SL0716", diagnostic.Code);
+            Assert.Equal("SLI0041", diagnostic.Code);
             Assert.Contains($"on {architecture}", diagnostic.Message);
         });
     }
@@ -1004,7 +1004,7 @@ public class BinderTests
         var platform = (TargetPlatform)typeof(TargetPlatform).GetField(target)!.GetValue(null)!;
 
         Under(platform, () =>
-            Assert.Equal(["SL0717"],
+            Assert.Equal(["SLI0042"],
                          Front.BodyCodes($"long r = 0; asm (in {register} = r) {{ nop }}")));
     }
 
@@ -1023,7 +1023,7 @@ public class BinderTests
         Under(TargetPlatform.X64Linux, () =>
         {
             Front.BindBody($"byte a = 0; byte b = 0; asm ({operands}) {{ nop }}", out var diagnostics);
-            Assert.Equal("SL0718", Front.Only(diagnostics).Code);
+            Assert.Equal("SLI0043", Front.Only(diagnostics).Code);
         });
 
     /// <summary>
@@ -1050,7 +1050,7 @@ public class BinderTests
             Front.BindModule("public struct Pair { public int A; public int B; }\n" +
                              "public class Holder { }\n" +
                              "void F()\n{\n" + body + "\n}", out var diagnostics);
-            Assert.Equal(["SL0719"], Front.Codes(diagnostics));
+            Assert.Equal(["SLI0044"], Front.Codes(diagnostics));
         });
 
     [Theory]
@@ -1059,14 +1059,14 @@ public class BinderTests
     [InlineData("asm (in al = 256) { nop }")]
     [InlineData("int* p = null; asm (in ecx = p) { nop }")]
     public void AValueWiderThanItsRegisterIsReported(string body) =>
-        Under(TargetPlatform.X64Windows, () => Assert.Equal(["SL0720"], Front.BodyCodes(body)));
+        Under(TargetPlatform.X64Windows, () => Assert.Equal(["SLI0045"], Front.BodyCodes(body)));
 
     [Theory]
     [InlineData("double d = 0.0; asm (in s0 = d) { nop }")]
     [InlineData("asm (in s0 = 1.5) { nop }")]
     [InlineData("long v = 0; asm (in w0 = v) { nop }")]
     public void AValueWiderThanAnArm64RegisterIsReported(string body) =>
-        Under(TargetPlatform.Arm64Linux, () => Assert.Equal(["SL0720"], Front.BodyCodes(body)));
+        Under(TargetPlatform.Arm64Linux, () => Assert.Equal(["SLI0045"], Front.BodyCodes(body)));
 
     [Theory]
     [InlineData("double d = 0.0; asm (in rax = d) { nop }")]
@@ -1074,16 +1074,16 @@ public class BinderTests
     [InlineData("long v = 0; asm (in xmm0 = v) { nop }")]
     [InlineData("bool b = false; asm (out xmm3 = b) { nop }")]
     public void AValueInTheWrongKindOfRegisterIsReported(string body) =>
-        Under(TargetPlatform.X64Windows, () => Assert.Equal(["SL0721"], Front.BodyCodes(body)));
+        Under(TargetPlatform.X64Windows, () => Assert.Equal(["SLI0046"], Front.BodyCodes(body)));
 
     /// <summary>
     /// An output needs a place with an address: the checks an assignment makes,
     /// and a bit-field refused because it has none.
     /// </summary>
     [Theory]
-    [InlineData("asm (out rax = 5) { nop }", "SL0240")]
-    [InlineData("const long c = 1; asm (inout rax = c) { nop }", "SL0240")]
-    [InlineData("Bits b; asm (out eax = b.Flag) { nop }", "SL0722")]
+    [InlineData("asm (out rax = 5) { nop }", "SLT0008")]
+    [InlineData("const long c = 1; asm (inout rax = c) { nop }", "SLT0008")]
+    [InlineData("Bits b; asm (out eax = b.Flag) { nop }", "SLI0047")]
     public void AnAsmOutputNeedsAPlaceWithAnAddress(string body, string code) =>
         Under(TargetPlatform.X64Windows, () =>
         {
@@ -1095,7 +1095,7 @@ public class BinderTests
     [Fact]
     public void AnInParameterIsNotAnAsmOutput() =>
         Under(TargetPlatform.X64Windows, () =>
-            Assert.Equal(["SL0448"], Front.ModuleCodes(
+            Assert.Equal(["SLT0046"], Front.ModuleCodes(
                 "void F(in long v)\n{\n    asm (out rax = v) { nop }\n}")));
 
     /// <summary>
@@ -1116,7 +1116,7 @@ public class BinderTests
     [Fact]
     public void ARefusedAsmOutputIsNotAlsoAnUnwrittenOut() =>
         Under(TargetPlatform.X64Windows, () =>
-            Assert.Equal(["SL0716"], Front.ModuleCodes(
+            Assert.Equal(["SLI0041"], Front.ModuleCodes(
                 "void F(out long low)\n{\n    asm (out x0 = low) { nop }\n}")));
 
     /// <summary>
@@ -1126,7 +1126,7 @@ public class BinderTests
     [Fact]
     public void AnAsmOutputOutsideAParallelLoopIsARace() =>
         Under(TargetPlatform.X64Windows, () =>
-            Assert.Equal(["SL0373"], Front.BodyCodes(
+            Assert.Equal(["SLO0012"], Front.BodyCodes(
                 "long total = 0;\nfor parallel (int i = 0; i < 4; i++)\n" +
                 "{\n    asm (inout rax = total) { add rax, 1 }\n}")));
 
@@ -1178,7 +1178,7 @@ public class BinderTests
     [InlineData("int F(int n) { for (;;) { break; } }")]
     [InlineData("int F(int n) { if (n > 0) goto done; return 1; done: n++; }")]
     public void AnEndSomethingReachesNeedsAReturn(string module) =>
-        Assert.Equal(["SL0217"], Front.ModuleCodes(module));
+        Assert.Equal(["SLF0001"], Front.ModuleCodes(module));
 
     /// <summary>A section that ends in a jump does not fall through.</summary>
     [Theory]
@@ -1198,15 +1198,15 @@ public class BinderTests
     [InlineData("void F() { { goto other; } { other: return; } }")]
     [InlineData("void F(int n) { goto inside; switch (n) { case 1: inside: break; } }")]
     public void AJumpIntoABlockIsRefusedAsOne(string module) =>
-        Assert.Equal(["SL0595"], Front.ModuleCodes(module));
+        Assert.Equal(["SLF0029"], Front.ModuleCodes(module));
 
     [Theory]
-    [InlineData("void F() { goto case 1; }", "SL0802")]
-    [InlineData("void F() { goto default; }", "SL0802")]
-    [InlineData("void F(int n) { switch (n) { case 1: goto case 2; } }", "SL0803")]
-    [InlineData("void F(int n) { switch (n) { case 1: goto default; } }", "SL0803")]
-    [InlineData("void F(int n) { switch (n) { case 1: goto case n; } }", "SL0840")]
-    [InlineData("void F(int n) { switch (n) { case 1: Func<int, int> f = x => { goto case 1; }; break; } }", "SL0802")]
+    [InlineData("void F() { goto case 1; }", "SLF0045")]
+    [InlineData("void F() { goto default; }", "SLF0045")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto case 2; } }", "SLF0046")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto default; } }", "SLF0046")]
+    [InlineData("void F(int n) { switch (n) { case 1: goto case n; } }", "SLF0049")]
+    [InlineData("void F(int n) { switch (n) { case 1: Func<int, int> f = x => { goto case 1; }; break; } }", "SLF0045")]
     public void GotoCaseNamesASectionOfTheSwitchItIsIn(string module, string code) =>
         Assert.Equal([code], Front.ModuleCodes(module));
 
@@ -1238,7 +1238,7 @@ public class BinderTests
             "public class Source { public event Handler Changed; }\n" +
             "void On(int x) { }\n" +
             "void F(Source s) { s" + chain + " += On; }"));
-        Assert.Contains("SL0108", codes);
+        Assert.Contains("SLP0016", codes);
     }
 
     /// <summary>
@@ -1254,7 +1254,7 @@ public class BinderTests
     public void AnUnsettledValueAsAStatementIsDropped(string statement)
     {
         var program = Front.BindBody(statement, out var diagnostics);
-        Assert.Equal(["SL0222"], Front.Codes(diagnostics));
+        Assert.Equal(["SLL0001"], Front.Codes(diagnostics));
         Front.Verified(new Stainless.Emit.LlvmEmitter(forSharedLibrary: true).Emit(Stainless.Lowering.Lowerer.Lower(program)));
     }
 
@@ -1264,7 +1264,7 @@ public class BinderTests
     /// </summary>
     [Fact]
     public void ATryAsAStatementHasAnEffect() =>
-        Assert.DoesNotContain("SL0222", Front.ModuleCodes(
+        Assert.DoesNotContain("SLL0001", Front.ModuleCodes(
             "Result<int, int> Step() => Ok(1);\n" +
             "Result<bool, int> Run() { try Step(); return Ok(true); }"));
 

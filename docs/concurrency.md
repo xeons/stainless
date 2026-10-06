@@ -56,7 +56,7 @@ another thread. That bright line already exists and cost nothing to draw.
 > struct's fields rather than its kind: one of primitives and Strings crosses,
 > one holding a `List<T>` does not. What a struct still cannot do is cross
 > `extern "C"` while holding a reference, which is
-> [SL0284](../tests/cases/err-struct-crosses-c/).
+> [SLI0002](../tests/cases/err-struct-crosses-c/).
 >
 > And "non-atomic, as today" in the second row is the premise corrected at the
 > top of this file: every count is atomic. The row is left as written because
@@ -185,7 +185,7 @@ declared before the block in order to outlive it.
 
 That is also the whole of where the word may be written. A spawned call has no
 value until the join, so `total = spawn Work() + 1` and `int local = spawn
-Work();` are both SL0390; the two shapes are `spawn f(x);` and
+Work();` are both SLO0018; the two shapes are `spawn f(x);` and
 `place = spawn f(x);`. Making it a prefix operator rather than a statement
 keyword is what turns those from a parse failure into a sentence about why
 there is no value there yet.
@@ -550,7 +550,7 @@ section 5 and the library of [stdlib/Threading/](../stdlib/Threading/).
 `static` gives it storage at module level or in a type, initialized in dependency
 order before `Main`, and section 1.3's sendability rule is checked wherever a value can reach
 a second thread. An unsynchronized class crossing a thread boundary is warned
-about (SL0377) rather than refused, for the reason §1.3 gives.
+about (SLO0015) rather than refused, for the reason §1.3 gives.
 
 All eight steps are done. Three things were left open, and the first of them is
 closed.

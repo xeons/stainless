@@ -195,7 +195,7 @@ public class LinkDiagnosisTests
         AssemblerDiagnosis.Report(output, blocks, Binding.TargetPlatform.X64Windows, diagnostics);
 
         var diagnostic = Assert.Single(diagnostics.Items);
-        Assert.Equal("SL0723", diagnostic.Code);
+        Assert.Equal("SLI0048", diagnostic.Code);
         Assert.Equal("bogus rax", Front.Underlined(source, diagnostic));
         Assert.Contains("invalid instruction mnemonic 'bogus'", diagnostic.Message);
     }
@@ -233,7 +233,7 @@ public class LinkDiagnosisTests
             output, [Block(file, source.IndexOf('{'))], Binding.TargetPlatform.X64Linux, diagnostics);
 
         var diagnostic = Assert.Single(diagnostics.Items);
-        Assert.Equal("SL0723", diagnostic.Code);
+        Assert.Equal("SLI0048", diagnostic.Code);
         Assert.Contains("can not be undefined", diagnostic.Message);
     }
 }

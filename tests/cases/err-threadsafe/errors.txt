@@ -1,5 +1,5 @@
 # The three types with no operations to synchronize, then the constraint.
-SL0582
-SL0582
-SL0582
-SL0328
+SLO0021
+SLO0021
+SLO0021
+SLG0006

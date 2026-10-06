@@ -14,13 +14,13 @@ int Main()
     // A bit-field has no byte offset of its own — it shares a storage unit with
     // its neighbours, and the number a caller would want is the unit's. C
     // refuses this too.
-    nuint a = offsetof(Flags, A);                   // SL0482
+    nuint a = offsetof(Flags, A);                   // SLI0020
 
     // An interface reference is a pointer to an object; there is no layout here
     // to take an offset into.
-    nuint b = offsetof(IThing, Go);                 // SL0480
+    nuint b = offsetof(IThing, Go);                 // SLI0018
 
     // A field that is not there.
-    nuint c = offsetof(Flags, Missing);             // SL0481
+    nuint c = offsetof(Flags, Missing);             // SLI0019
     return 0;
 }

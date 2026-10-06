@@ -81,7 +81,7 @@ public class InferenceTests
     /// </summary>
     [Fact]
     public void TheResultTypeIsNotGuessed() =>
-        Assert.Contains("SL0265", Body("String wrong = Transform(numbers, n => n * 2);"));
+        Assert.Contains("SLT0018", Body("String wrong = Transform(numbers, n => n * 2);"));
 
     /// <summary>A lambda body that reaches outside itself still binds.</summary>
     [Fact]
@@ -114,33 +114,33 @@ public class InferenceTests
         Assert.NotEmpty(Body("int result = Transform(numbers, n => n.NoSuchMethod());"));
 
     /// <summary>
-    /// And what is reported is the body's own error, not SL0327: every
+    /// And what is reported is the body's own error, not SLG0005: every
     /// parameter was known, so the body is the reason, and a failed inference
     /// would send the reader to the call instead.
     /// </summary>
     [Theory]
-    [InlineData("int result = Transform(numbers, n => n.NoSuchMethod());", "SL0247")]
-    [InlineData("int result = Transform(words, (String w) => w.NoSuchField);", "SL0247")]
-    [InlineData("int result = Transform(numbers, n => NoSuchFunction(n));", "SL0229")]
+    [InlineData("int result = Transform(numbers, n => n.NoSuchMethod());", "SLN0013")]
+    [InlineData("int result = Transform(words, (String w) => w.NoSuchField);", "SLN0013")]
+    [InlineData("int result = Transform(numbers, n => NoSuchFunction(n));", "SLN0011")]
     public void ABodyThatCannotBindReportsItsOwnError(string body, string code)
     {
         var codes = Body(body);
         Assert.Contains(code, codes);
-        Assert.DoesNotContain("SL0327", codes);
+        Assert.DoesNotContain("SLG0005", codes);
     }
 
     /// <summary>
     /// The same for a lambda given to <c>var</c>: its parameters are written,
-    /// so its body is why it has no type, and SL0553 would hide what is wrong.
+    /// so its body is why it has no type, and SLT0061 would hide what is wrong.
     /// A call through the refused local says nothing more.
     /// </summary>
     [Fact]
     public void AVarLambdaReportsItsBodysError()
     {
         var codes = Body("var f = (int n) => n.NoSuchField;\n    int k = f(2);");
-        Assert.Contains("SL0247", codes);
-        Assert.DoesNotContain("SL0553", codes);
-        Assert.DoesNotContain("SL0229", codes);
+        Assert.Contains("SLN0013", codes);
+        Assert.DoesNotContain("SLT0061", codes);
+        Assert.DoesNotContain("SLN0011", codes);
     }
 
     /// <summary>
@@ -153,10 +153,10 @@ public class InferenceTests
     [InlineData("String result = Transform(numbers, n => { return \"x\"; });")]
     public void ABlockBodyIsReadOffItsReturns(string body) => Assert.Empty(Body(body));
 
-    /// <summary>Returns that agree on nothing say nothing, and the call is SL0327.</summary>
+    /// <summary>Returns that agree on nothing say nothing, and the call is SLG0005.</summary>
     [Fact]
     public void ReturnsThatDisagreeAreNotAnAnswer() =>
-        Assert.Contains("SL0327",
+        Assert.Contains("SLG0005",
             Body("var result = Transform(numbers, n => { if (n > 1) { return 1; } return \"x\"; });"));
 
     /// <summary>
@@ -168,7 +168,7 @@ public class InferenceTests
     /// </summary>
     [Fact]
     public void ALambdaWithNoTargetIsRefused() =>
-        Assert.Contains("SL0553", Body("var f = x => x;"));
+        Assert.Contains("SLT0061", Body("var f = x => x;"));
 
     // ------------------------------------------- a function passed by name
 
@@ -201,7 +201,7 @@ public class InferenceTests
 
     /// <summary>
     /// The result is read off the declaration, as it would be off a lambda's
-    /// body. This was SL0327 -- only a lambda was read -- and before that the
+    /// body. This was SLG0005 -- only a lambda was read -- and before that the
     /// function could not become a closure at all.
     /// </summary>
     [Theory]
@@ -222,7 +222,7 @@ public class InferenceTests
     {
         var codes = NamedBody(body);
         Assert.NotEmpty(codes);
-        Assert.DoesNotContain("SL0327", codes);
+        Assert.DoesNotContain("SLG0005", codes);
     }
 
     /// <summary>
@@ -235,7 +235,7 @@ public class InferenceTests
 
     [Fact]
     public void AnOverloadNothingNarrowsIsNotGuessed() =>
-        Assert.Equal(["SL0327"], NamedBody("nuint result = Shapes(Pick);"));
+        Assert.Equal(["SLG0005"], NamedBody("nuint result = Shapes(Pick);"));
 
     // ------------------------------------------------------ nothing leaks
 
@@ -315,7 +315,7 @@ public class InferenceTests
     /// </summary>
     [Fact]
     public void AKeptGuessReportsWhatItsInstantiationBroke() =>
-        Assert.Contains("SL0328", Front.ModuleCodes("""
+        Assert.Contains("SLG0006", Front.ModuleCodes("""
             public interface IShape { int Sides(); }
 
             int Count<T>(T value) where T : IShape => 0;

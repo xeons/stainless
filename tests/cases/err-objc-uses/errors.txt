@@ -1,12 +1,12 @@
 # a message held in a closure without being sent
-SL0250
+SLT0012
 # 'new' on an 'extern objc class'
-SL0914
+SLI0061
 # an Objective-C object returned from 'extern "C++"'
-SL0284
+SLI0002
 # ownership said of a C function returning no object
-SL0728
+SLC0096
 # a store to an Objective-C object C holds
-SL0926
+SLI0066
 # a protocol's class member sent to the protocol
-SL0928
+SLI0068

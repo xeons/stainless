@@ -134,7 +134,7 @@ public struct DateTimeOffset
     /// `2026-09-05T14:30:00Z` back to an instant.
     ///
     /// A `Result` rather than a nullable, because a `DateTimeOffset` is a
-    /// struct and a struct is never null (SL0271) -- and because "that is not
+    /// struct and a struct is never null (SLT0021) -- and because "that is not
     /// a date" and "that is not a real date" are worth telling apart.
     ///
     /// Deliberately strict: exactly the shape `FormatIso` writes, so a round

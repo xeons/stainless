@@ -57,7 +57,7 @@ public com interface ICounter
 /// the class, which is what a caller holding nothing asks for.
 ///
 /// The constructor takes nothing because activation has nothing to pass
-/// (SL0611). Everything else is an ordinary com class.
+/// (SLI0035). Everything else is an ordinary com class.
 [Guid("5a1c8e30-2b47-4d16-a9f3-c04e7b81d629")]
 public com class Greeter : IGreeter, ICounter
 {

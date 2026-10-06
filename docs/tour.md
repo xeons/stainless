@@ -88,7 +88,7 @@ A switch that covers every case needs no `default`, and is a way out of the
 function — `Area` above needs no `return` after it. Leaving one out says which:
 
 ```
-error[SL0436]: this switch over 'Shape' does not cover 'Rect' and 'Empty'; a
+error[SLF0017]: this switch over 'Shape' does not cover 'Rect' and 'Empty'; a
 variant is the choice between its cases, so a switch that leaves one out has no
 answer for it. Add the case, or a 'default'
 ```
@@ -99,7 +99,7 @@ machinery:
 
 ```csharp
 if (shape.Circle) { return shape.Radius; }   // fine
-return shape.Radius;                         // error[SL0285]
+return shape.Radius;                         // error[SLF0006]
 ```
 
 A field or a call result carries no proof — either could be a different value
@@ -140,7 +140,7 @@ takes its type from what it is assigned to. Reading `Value` before checking `Ok`
 is a compile error rather than a wrong answer:
 
 ```
-error[SL0285]: 'read.Value' is not readable here, because nothing has
+error[SLF0006]: 'read.Value' is not readable here, because nothing has
 established that 'read' is 'Ok'; check 'if (read.Ok)' first, or switch over
 'read'
 ```
@@ -279,7 +279,7 @@ purpose it then failed.
 A violated constraint is caught where the generic is instantiated:
 
 ```
-error[SL0328]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
+error[SLG0006]: 'Half' cannot be used as 'T' in 'Ranked' because it does not
 implement 'IDescribable'; it implements 'IComparable<Half>'
 ```
 
@@ -715,7 +715,7 @@ type, so `HWND__*` and `HDC__*` are different types because they point at
 different things:
 
 ```
-error[SL0262]: argument 1 of 'Width' expects 'HWND__*', but 'HDC__*' was given
+error[SLT0015]: argument 1 of 'Width' expects 'HWND__*', but 'HDC__*' was given
 ```
 
 It costs nothing at all — neither type is laid out, emitted, or present at run

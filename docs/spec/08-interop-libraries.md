@@ -24,7 +24,7 @@ export "C" int stainless_add(int a, int b) => a + b;
 the runtime's `sl_fail`. Nothing after a call to one is reached, so a function
 whose last statement is that call needs no `return` after it, and definite
 assignment asks nothing of what follows. It is taken on the other language's
-word, so it goes on an `extern` and nowhere else (SL0728):
+word, so it goes on an `extern` and nowhere else (SLC0096):
 
 ```csharp
 extern "C"
@@ -81,7 +81,7 @@ as several C files may, provided they agree on its type; one of them may define
 it with `export "C"`, and the program has one global under that name.
 
 ```
-error[SL0295]: the C name 'Twin' is defined by 'Clash.Twin', and this defines
+error[SLI0004]: the C name 'Twin' is defined by 'Clash.Twin', and this defines
 it a second time; C has one function per name, so give this one a name of its
 own
 ```
@@ -109,11 +109,11 @@ int Format(byte* buffer, nuint size, byte* format, ...)
 ```
 
 `VaList.Start()` begins at the first argument after the function's own, and
-only a variadic function may call it (SL0935). `Next<T>()` reads one, on a
+only a variadic function may call it (SLI0070). `Next<T>()` reads one, on a
 local or a parameter that is a `VaList`, and only as what C actually passes
 there -- an `int` or wider integer, a `double`, a pointer, a function pointer:
 a `float` arrives as a `double` and a `byte` as an `int`, so asking for either
-is refused rather than read wrongly (SL0947). Reading as the wrong one of
+is refused rather than read wrongly (SLI0073). Reading as the wrong one of
 those, or past the last, is what it is in C, which says nothing about it. A
 list needs no ending: `va_end` does nothing on any target here.
 
@@ -124,21 +124,21 @@ pointer to a copy, on other ARM64. Every read is lowered as clang lowers it
 rather than with LLVM's `va_arg`, which reads the wrong slots on Win64 and on
 AArch64 Linux.
 
-A method, a constructor and a generic may not be variadic (SL0493): none is
+A method, a constructor and a generic may not be variadic (SLI0021): none is
 one C function. An Objective-C message an existing class answers may be
 (section 8.6).
 
 **What a `...` takes has a type of its own.** A lambda, a function's name, an
 array literal and a case constructor each take their type from the parameter
-they are given to, and `...` declares none, so passing one is refused (SL0805)
+they are given to, and `...` declares none, so passing one is refused (SLI0049)
 rather than guessed at. The extra arguments are positional, as C's are, and
-naming one after them is SL0601.
+naming one after them is SLT0067.
 
 **`"C"` and `"C++"` are the conventions there are.** The string is checked, and
 anything else is rejected:
 
 ```
-error[SL0102]: unsupported linkage convention "Rust"; "C" and "C++" are supported
+error[SLP0013]: unsupported linkage convention "Rust"; "C" and "C++" are supported
 ```
 
 C++ linkage is [§8.1](#81-c-linkage).
@@ -149,7 +149,7 @@ in either direction, because C would copy its bytes and leave the count behind
 ([§2.2](02-types.md#22-struct--value-type-c-layout)):
 
 ```
-error[SL0284]: 'Holder' holds a reference, so parameter 'h' cannot cross
+error[SLI0002]: 'Holder' holds a reference, so parameter 'h' cannot cross
 extern "C"; C would copy its bytes and leave the count behind. Pass a struct of
 plain data, or a raw pointer
 ```
@@ -173,15 +173,15 @@ the other reads. An imported one has no initializer, because the storage is not
 this program's to define:
 
 ```
-error[SL0702]: 'already_there' is declared 'extern "C"', so it is defined
+error[SLI0040]: 'already_there' is declared 'extern "C"', so it is defined
 elsewhere and cannot be given a value here
 ```
 
 Beside a `static` ([section 9.3](09-statements-expressions.md#93-const-and-static)),
 this is the only variable allowed at module scope. One that is neither is
-refused (SL0204), because a mutable global with no boundary to justify it is
+refused (SLN0004), because a mutable global with no boundary to justify it is
 state every thread reaches and nothing declares -- what `static` is for, with
-the thread-safety question SL0377 asks of it.
+the thread-safety question SLO0015 asks of it.
 
 **Two things to get right, and the compiler can check neither**, because it
 never sees the C declaration:
@@ -213,7 +213,7 @@ alternative would have been reading a plausible wrong number.
 mangles a function, and none of that is written:
 
 ```
-error[SL0701]: 'cpp_global' is a variable, and a C++ variable's name is mangled
+error[SLI0039]: 'cpp_global' is a variable, and a C++ variable's name is mangled
 by rules this compiler does not implement; declare it 'extern "C"', or reach it
 through a C++ function that returns its address
 ```
@@ -432,13 +432,13 @@ missing:
 
 | | |
 |---|---|
-| a generic (SL0419) | a template emits nothing until it is instantiated, so a consumer with only the binary has nothing to instantiate. A generic crosses as source |
-| a class implementing an interface (SL0419) | a dispatch table is indexed by an interface id assigned across a whole program, and a library and its consumer are two different programs |
-| a variant (SL0419) | its cases are what a consumer would switch on, and the metadata carries layouts rather than cases |
+| a generic (SLD0007) | a template emits nothing until it is instantiated, so a consumer with only the binary has nothing to instantiate. A generic crosses as source |
+| a class implementing an interface (SLD0007) | a dispatch table is indexed by an interface id assigned across a whole program, and a library and its consumer are two different programs |
+| a variant (SLD0007) | its cases are what a consumer would switch on, and the metadata carries layouts rather than cases |
 | a slice, `Span<T>` | it is a type the compiler builds on demand rather than one the source declared, so there is no name for a consumer to resolve |
 
 **And anything reaching one of those through a field or a signature** is reported
-the same way (SL0477). A public struct with a variant field would otherwise be
+the same way (SLD0009). A public struct with a variant field would otherwise be
 described happily, and the consumer would be the one to find that the field's
 type is a name nothing can resolve — which is precisely the failure these
 warnings exist to move to this side of the boundary.
@@ -502,12 +502,12 @@ it is nothing.
 
 **Every com interface extends `IUnknown`**, written or not, so a declaration's
 own first method is slot 3. Extension is **single**: a COM vtable is one array
-and a reference is one pointer to it, so there is room for one chain (SL0510).
+and a reference is one pointer to it, so there is room for one chain (SLC0050).
 A derived interface's table is its base's with its own methods appended, which
 is what makes an upcast free — the same property that makes a class upcast free
 ([§2.4.3](02-types.md#243-inheritance)), arrived at from the table side rather than the object side.
 
-`[Guid("...")]` is required (SL0537) and is understood by the compiler rather
+`[Guid("...")]` is required (SLI0031) and is understood by the compiler rather
 than stored as metadata: an IID is the interface's identity, not something a
 library reads back. `iidof(IShellItem)` is its address as a `Guid*`, which is
 what activation and `QueryInterface` take.
@@ -582,13 +582,13 @@ Two things follow, and both are consequences rather than choices:
   say.
 
 What the attribute costs is everything `IUnknown` was for. There is no `[Guid]`
-(SL0624) — an IID names an interface *to QueryInterface*, and there is none to
+(SLI0037) — an IID names an interface *to QueryInterface*, and there is none to
 ask. For the same reason nothing can ask what such a reference really is: there
-is no cast to or from another com interface (SL0243), no `is` and no
-type pattern (SL0518), whichever side the `[NoUnknown]` is on. And a chain is
-all one kind or the other (SL0622): extending across would put `IUnknown` three
+is no cast to or from another com interface (SLT0011), no `is` and no
+type pattern (SLF0020), whichever side the `[NoUnknown]` is on. And a chain is
+all one kind or the other (SLI0036): extending across would put `IUnknown` three
 slots into the middle of one table. It may be written only on a
-`com interface` (SL0728).
+`com interface` (SLC0096).
 
 A cast from `byte*` still adopts the pointer, and adopting costs nothing here
 because there was no `+1` to take over:
@@ -692,7 +692,7 @@ class needs a constructor taking none, and nothing `required` left for the
 maker to set. A class with no constructor at all is fine -- [section 2.16](02-types.md#216-zero-values) has already
 held its fields to initializers — but one that has constructors and no empty
 one, or a `required` member its empty one is not `[SetsRequiredMembers]` for,
-is refused where it is declared (SL0611) rather than activated with a null
+is refused where it is declared (SLI0035) rather than activated with a null
 where its type says there is none.
 
 `DllGetClassObject` is the whole of what an in-process server must export, and
@@ -724,7 +724,7 @@ between the host's `Release()` and its next line.
   is what the sample does. A program wanting `CoCreateInstance` declares it
   `extern "C"` like any other Windows API, as [bindings/win32](../../bindings/win32)
   does for the shell's half.
-- **A com class cannot derive from a class** (SL0536): the tear-offs sit after
+- **A com class cannot derive from a class** (SLI0030): the tear-offs sit after
   the fields, and a derived class adds fields after those.
 - **On 32-bit x86 an export is `__cdecl` unless it says otherwise.** Windows'
   loader calls `DllGetClassObject` as `__stdcall`, so a server writes
@@ -772,11 +772,11 @@ already exists, `objc class` a class this program defines, and `objc
 closure` a block. A reference to either is an Objective-C object pointer, and
 ARC counts it with `objc_retain` and `objc_release` exactly as it counts a
 Stainless object with `sl_retain`. Objective-C is Apple's, so a program that
-sends a message is built for `arm64-macos` or `x64-macos` (SL0915); the
+sends a message is built for `arm64-macos` or `x64-macos` (SLI0062); the
 declarations bind anywhere, so a binding compiles on every host.
 
 `objc` is a modifier, like `com`, and goes before `interface` or `class`
-(SL0900); `extern` goes before `objc class` and nowhere else (SL0901). Neither
+(SLI0050); `extern` goes before `objc class` and nowhere else (SLI0051). Neither
 may be generic.
 
 **Apple's frameworks are declared already.** [bindings/macos](../../bindings/macos/README.md)
@@ -803,10 +803,10 @@ public NSWindow? Window { get; }
 ```
 
 A selector carries one argument after each colon, so the colons and the
-parameters MUST agree (SL0905), and one that is not a selector at all is
-refused (SL0904). On a protocol or an `extern objc class` a member without a
-selector has nothing to send (SL0902). A member of an `extern objc class`
-with a body is a Stainless helper instead: it takes no selector (SL0903), it
+parameters MUST agree (SLI0055), and one that is not a selector at all is
+refused (SLI0054). On a protocol or an `extern objc class` a member without a
+selector has nothing to send (SLI0052). A member of an `extern objc class`
+with a body is a Stainless helper instead: it takes no selector (SLI0053), it
 is called directly, and `this` inside it is the object. A protocol member has
 no body, because Objective-C has no default implementations.
 
@@ -814,7 +814,7 @@ no body, because Objective-C has no default implementations.
 `NSString.Alloc()` sends `alloc` to NSString, though NSObject declares it. A
 protocol's class member is `static abstract`, a requirement each adopting
 class answers, and is sent to such a class: `NSString.SupportsSecureCoding`.
-Sent to the protocol itself it has no class to go to (SL0928).
+Sent to the protocol itself it has no class to go to (SLI0068).
 
 **A message MAY be variadic**, as `stringWithFormat:` is: `...` after its
 parameters, on a member of a protocol or an `extern objc class` with no body.
@@ -854,13 +854,13 @@ stainless: '+[SLNothing nothing]' answered nil, and a Demo.SLNothing is never ni
 one asks `respondsToSelector:` first and stops the program, naming the
 message, if the answer is no -- rather than let Objective-C raise its
 unrecognized-selector exception. It means nothing on a class's member
-(SL0728).
+(SLC0096).
 
 ### What crosses a message
 
 What C can spell crosses as it would to C, and so do Objective-C objects,
 `Selector` and `Class`. A `String`, a Stainless object, a struct holding a
-reference and a pointer to an Objective-C reference do not (SL0907); an
+reference and a pointer to an Objective-C reference do not (SLI0056); an
 `NSString` is the string Objective-C takes.
 
 **`bool` is `BOOL`**, which is `signed char` on Intel and `bool` on Apple
@@ -893,20 +893,20 @@ cast too, and owns nothing.
 ### Classes and their roots
 
 `[ObjCRoot]` marks a class with no superclass, such as `NSObject`, and every
-`extern objc class` MUST reach one through its superclasses (SL0911): a class
+`extern objc class` MUST reach one through its superclasses (SLI0060): a class
 object's metaclass points at its root's, so a chain that stops short would
 name the wrong one. A class's superclass is the first name in its list and
-the rest are protocols; an objc type derives from objc types only (SL0910).
+the rest are protocols; an objc type derives from objc types only (SLI0059).
 
 `[ObjCName]` is the name the Objective-C runtime knows, where it differs
 from the declaration's -- Objective-C's `NSObject` is a class and a protocol
 both, and Stainless needs two names. Either attribute on anything but an
-objc type is refused (SL0728).
+objc type is refused (SLC0096).
 
 An `extern objc class` describes a class that is laid out, made and taken
 apart by code compiled somewhere else, so it declares no field, no static
-storage, no constructor, no destructor and no event (SL0909), and `new`
-cannot make one (SL0914): send it the messages its headers make one with.
+storage, no constructor, no destructor and no event (SLI0058), and `new`
+cannot make one (SLI0061): send it the messages its headers make one with.
 
 A member is looked for on the class, then its superclasses, then the
 protocols any of them adopts: an object answers its protocols' messages,
@@ -934,8 +934,8 @@ class is seen. The declaration that is the class itself names a superclass,
 or is `[ObjCRoot]`; any other is a category, and adds to the class its own
 module or a module its file imports declares. Each may adopt protocols. A
 second declaration naming a superclass, in a file that imports the class's
-module, is refused (SL0551); so is a category whose file sees no such class,
-or two of them, and cannot say which it adds to (SL0643).
+module, is refused (SLC0063); so is a category whose file sees no such class,
+or two of them, and cannot say which it adds to (SLI0038).
 
 ### Core Foundation
 
@@ -958,13 +958,13 @@ extern "C" CFStringRef CFStringCreateWithCString(
 ```
 
 A Core Foundation type derives from Core Foundation types alone, ending at
-one with no base; it adopts no protocol and answers no message (SL0952), and
-is no Objective-C class's superclass (SL0942). A cast down to one asks the
+one with no base; it adopts no protocol and answers no message (SLI0078), and
+is no Objective-C class's superclass (SLI0071). A cast down to one asks the
 object's `CFTypeID` against the function the attribute names, and nil
 answers no. Any object is a `CFTypeRef`, as Core Foundation's own functions
 take it, so a cast to the root asks nothing. A mutable type has no
 `CFTypeID` of its own -- it shares its base's -- so an object cannot be asked
-whether it is one (SL0518). A weak reference to one is refused: the runtime
+whether it is one (SLF0020). A weak reference to one is refused: the runtime
 keeps weak references to objects of its own classes.
 
 ### Objects across `extern "C"`
@@ -973,17 +973,17 @@ A C function MAY take and return an Objective-C object. What it returns
 arrives at +0, which is ARC's rule for a C function, and is claimed at once;
 `[ReturnsRetained]` says it is handed over instead -- Core Foundation's
 Create rule -- and `[ReturnsNotRetained]` says the rule again. Either on a
-function returning no object is refused (SL0728). One declared `T` that
+function returning no object is refused (SLC0096). One declared `T` that
 returns nil stops the program, naming the function.
 
 A C variable holding an object is read at +0 and retained, and is never
-written (SL0926): a store would release what the library owns.
+written (SLI0066): a store would release what the library owns.
 
 ```csharp
 extern "C" NSString NSDefaultRunLoopMode;
 ```
 
-A C++ function returning an object is refused (SL0284): C++ has no rule for
+A C++ function returning an object is refused (SLI0002): C++ has no rule for
 who owns it.
 
 ### A class defined here
@@ -1009,7 +1009,7 @@ public objc class Canvas : NSView, NSAccessibility
 ```
 
 It derives from an `extern objc class` or from another class defined here,
-and so reaches a root (SL0911). Its runtime name is its module's and its own,
+and so reaches a root (SLI0060). Its runtime name is its module's and its own,
 `Example.Canvas`, unless `[ObjCName]` gives another; a class it derives from
 or a protocol it adopts keeps the name its headers give it.
 
@@ -1019,11 +1019,11 @@ name and parameters, and takes the ownership that member declared; it writes
 no selector of its own. A member with the name and parameters of a member of
 a protocol the class adopts answers that protocol's selector. A member that
 answers none is a Stainless helper, called directly. Every message is
-overridable already, so `virtual` and `abstract` mean nothing here (SL0921);
-an `override` of nothing (SL0499), a selector the superclass answers without
-`override` (SL0503), and a selector answered twice (SL0949) are refused. Every required member of
+overridable already, so `virtual` and `abstract` mean nothing here (SLI0063);
+an `override` of nothing (SLC0039), a selector the superclass answers without
+`override` (SLC0043), and a selector answered twice (SLI0075) are refused. Every required member of
 a protocol the class adopts MUST be answered, by the class or by a class it
-derives from (SL0305).
+derives from (SLC0013).
 
 A message to an object of the class goes through `objc_msgSend`, whoever
 sends it, so a subclass written in Objective-C overrides it; a helper is
@@ -1034,13 +1034,13 @@ the call names. `base.Member` sends to the superclass.
 object through an init that runs none of the constructors -- a nib, or a
 superclass's designated initializer -- so the field initializers run as the
 runtime allocates the object, whatever init follows, and a field with no zero
-value MUST have one (SL0813). An event's list is made there too. Every field
+value MUST have one (SLO0030). An event's list is made there too. Every field
 is released as the object is freed, after `~Canvas()`, which is the class's
 `dealloc` and runs before its superclass's.
 
 **A constructor is an init.** `new Canvas(frame)` allocates the object and
 runs the constructor over it. A constructor marked `[Selector]` -- which MUST
-be in the init family (SL0924) -- or one that takes nothing, which answers
+be in the init family (SLI0065) -- or one that takes nothing, which answers
 `init`, is also an init Objective-C can send. It begins with `base(...)`,
 which runs a constructor of a class defined here or sends an init message the
 class it is built on declares, chosen by overload; without one it is the init
@@ -1066,8 +1066,8 @@ after that could be trusted. Any other exception -- a C++ one from a framework
 
 What a defined class cannot be is what the runtime has no way to give it: it
 is not a record, not `static`, takes no primary constructor, has no
-bit-fields, and answers no generic message (SL0923); `typeof` does not
-describe it (SL0950). It implements no Stainless interface (SL0910).
+bit-fields, and answers no generic message (SLI0064); `typeof` does not
+describe it (SLI0076). It implements no Stainless interface (SLI0059).
 
 ### Blocks
 
@@ -1087,10 +1087,10 @@ to keep, and called later from either side. One Objective-C made is called
 as a closure is, `transform(2)`.
 
 What a block takes and gives back crosses as a message's arguments do, and
-an `out` or `ref` has nothing to be written back through (SL0907). An object
+an `out` or `ref` has nothing to be written back through (SLI0056). An object
 a block hands back arrives at +0, as a message's does, and is claimed; one
 declared non-optional that is nil stops the program. A block is not asked
-what it is (SL0518): the runtime knows only that it is one.
+what it is (SLF0020): the runtime knows only that it is one.
 
 **Objective-C may build a block on its stack** and hand it over. A block a
 method of a class defined here is given is copied before the method sees it,
@@ -1162,7 +1162,7 @@ class its unwinder header carries, and is deleted unread: only C++ can read the
 object, and nothing here links the C++ runtime, so its name and reason are
 empty.
 
-`[Throws]` is refused (SL0728) on a function Stainless defines, on one declared
+`[Throws]` is refused (SLC0096) on a function Stainless defines, on one declared
 answering anything else, on one whose result is returned in memory -- a call
 that threw would leave it unwritten -- and on one that returns `Self`, takes
 `...` or takes a parameter by reference. Windows raises a C++ exception through
@@ -1185,7 +1185,7 @@ A case or a program may also include `.m` files, compiled with
 ### What is not there yet
 
 - **A message held without being sent**, in a closure or a delegate
-  (SL0250). A message has no function to point at; write a lambda that sends
+  (SLT0012). A message has no function to point at; write a lambda that sends
   it.
 - **An Objective-C exception** is caught only where a binding said a call
   throws (`[Throws]`, above). One that reaches a method a defined class answers
@@ -1276,14 +1276,14 @@ so.
 
 It goes on a module-level `static` or on a `static` field of a class or struct
 — the two are the same storage named by different scopes — and nowhere else
-(SL0728). The static must be declared `byte[]` (SL0730) and must have no
-initializer (SL0731): the linker makes the object, so there is nothing for an
+(SLC0096). The static must be declared `byte[]` (SLD0020) and must have no
+initializer (SLD0021): the linker makes the object, so there is nothing for an
 initializer to run, and a declaration with both would be two answers to the
 same question.
 
 **Every field is a string literal.** The path, the section and the access each
 decide something about the binary, so none of them can be a value the program
-computes (SL0704) — not a `static readonly String`, and not two literals joined
+computes (SLD0012) — not a `static readonly String`, and not two literals joined
 with `+`. A file whose name is known only at run time is a file to read, and
 `Standard.File` reads it.
 
@@ -1292,7 +1292,7 @@ is the first positional argument and the other two may be written positionally
 or by name ([§6.1](06-attributes-reflection.md#61-attributes)). Naming them is
 the usual form, because `Section` and `Access` are rare enough that a reader
 meeting a bare `".stub"` would have to go and look. The path is the one field
-with no sensible default, so leaving it out is an error (SL0703).
+with no sensible default, so leaving it out is an error (SLD0011).
 
 ### The path
 
@@ -1307,10 +1307,10 @@ as written.
 The file is checked where the attribute is bound, so a mistake is an error on
 the literal that made it rather than an assembler failure later. A file that is
 not there, a directory, a file that cannot be opened, and one larger than an
-array on the target can describe are all SL0706:
+array on the target can describe are all SLD0014:
 
 ```
-error[SL0706]: there is no file at 'C:\src\game\assets\logo.png' to embed
+error[SLD0014]: there is no file at 'C:\src\game\assets\logo.png' to embed
 ```
 
 A relative path also needs a file to be relative to. Source compiled from a
@@ -1328,7 +1328,7 @@ section makes another object, because those are different memory.
 ### Access
 
 `Access` is some of the letters `r`, `w` and `x`, each at most once, in any
-order, and always including `r` (SL0707). The default is `"r"`.
+order, and always including `r` (SLD0015). The default is `"r"`.
 
 | Access | Default section, PE | Default section, ELF | Default section, Mach-O | What it is for |
 |---|---|---|---|---|
@@ -1350,7 +1350,7 @@ the page is mapped read-only, and the store is an access violation or a
 that the fault is what happens rather than the store being deleted as
 something that cannot occur. Ask for `"rw"` where the program writes.
 
-**`"rwx"` has no default** (SL0708). Every target has a section for read-only
+**`"rwx"` has no default** (SLD0016). Every target has a section for read-only
 data, for writable data and for code, and none has one for memory that is both
 writable and executable — the combination security hardening exists to remove.
 Quietly making one would put it in a binary nobody asked for it in by name, so
@@ -1382,10 +1382,10 @@ Console.WriteLine($"{answer()}");          // 42
 `Section` names where the object goes; without it the object goes where the
 table above says. A name has to survive being written into an assembler
 directive and named again by a linker script, so it may not be empty or hold a
-quote, a backslash, a comma, whitespace or a control character (SL0709).
+quote, a backslash, a comma, whitespace or a control character (SLD0017).
 
 **A section already has its permissions, and an embed cannot give it others**
-(SL0711). An assembler does not take flags for a section it knows: `.text`
+(SLD0019). An assembler does not take flags for a section it knows: `.text`
 asked for as read-only data is still executable, silently, on both object
 formats — so an embed asking `.text` for `"r"` would get code. The same holds
 for a name extending one of those (`.text.stub` on ELF, `.text$stub` on PE,
@@ -1395,7 +1395,7 @@ one decides its access, and a second asking for different access is refused
 rather than left for the assembler to reject or, on PE, to ignore.
 
 ```
-error[SL0711]: '.text' is always "rx" on x86_64-pc-linux-gnu, and the assembler
+error[SLD0019]: '.text' is always "rx" on x86_64-pc-linux-gnu, and the assembler
 would keep that whatever an embed asked for, so "r" cannot be placed there; name
 a section of its own
 ```
@@ -1406,21 +1406,21 @@ exactly one comma, and each name from one to sixteen bytes of letters, digits,
 string table. The directive states no permissions there: a section has its
 segment's. So the segment has to be one whose permissions an object file can
 count on: `__TEXT` for `"rx"`, `__DATA` for `"rw"` and `__DATA_CONST` for
-`"r"`. Anything else is refused (SL0709), as is a name without a segment.
+`"r"`. Anything else is refused (SLD0017), as is a name without a segment.
 A segment of another name gets whatever the linker gives it. The access rule
 above applies to the segment: `__TEXT,__const` asked for as `"r"` would still be
 executable, and `__DATA,__bss` holds no bytes. The comma is Mach-O's alone; on
-the other formats it is refused with the rest (SL0709).
+the other formats it is refused with the rest (SLD0017).
 
 ```
-error[SL0709]: '.rodata' cannot name a section on arm64-apple-macosx15.0: a
+error[SLD0017]: '.rodata' cannot name a section on arm64-apple-macosx15.0: a
 Mach-O section is named 'segment,section', with exactly one comma
 ```
 
 **A PE image keeps eight bytes of a section name.** An object file can hold a
 longer one, and lld-link then cuts it short in the executable without a word —
 `.embedded_logo` becomes `.embedde`. The bytes arrive either way, so this is a
-warning rather than an error, and only for a Windows target (SL0710): what
+warning rather than an error, and only for a Windows target (SLD0018): what
 breaks is a tool looking for the section by the name the source gave it.
 
 ### What is in the section
@@ -1574,7 +1574,7 @@ asm (in rcx = count, in rsi = &buffer[0], inout rax = total, out rdx = carry)
 
 `in` is the keyword it already was; `out` and `inout` are words, as `out` is at
 a call ([§7.2.1](07-functions-members.md#721-out)), and stay names everywhere
-else. An operand with no direction is SL0715, and is read on as though it
+else. An operand with no direction is SLP0040, and is read on as though it
 said `in`. The value after `=` is read as an expression without assignment,
 because the `=` is the operand's.
 
@@ -1584,23 +1584,23 @@ the same order after it.** Taking the address first is what makes `inout rax =
 counts[Next()]` call `Next` once rather than once to read and again to write. A
 place is anything an assignment could write that has an address: a local, a
 parameter, a field, an element, a dereference or a static. The checks an
-assignment makes are made (SL0240, SL0448, SL0379), and a bit-field is refused
-because it is the one place with no address (SL0722).
+assignment makes are made (SLT0008, SLT0046, SLO0017), and a bit-field is refused
+because it is the one place with no address (SLI0047).
 
 **An output is a write.** An `out` parameter written only by a block is written,
-so SL0600 is satisfied by it; and an output to a variable declared outside a
-`for parallel` body is the race an assignment to one is (SL0373).
+so SLO0023 is satisfied by it; and an output to a variable declared outside a
+`for parallel` body is the race an assignment to one is (SLO0012).
 
 **What may travel in a register** is plain data: an integer, a `bool`, a
 character type, an enum, a pointer or a delegate in a general register, and a
 `float` or a `double` in a vector register. A counted reference cannot — the
 block could copy it anywhere, with nothing to count the copy — nor can a
-struct, which is several values; pass the address instead (SL0719). A value of
-one kind in the other kind of register is SL0721: an integer's bits in an `xmm`
+struct, which is several values; pass the address instead (SLI0044). A value of
+one kind in the other kind of register is SLI0046: an integer's bits in an `xmm`
 register would have to be converted to mean anything, and a conversion belongs
 before the block, where it can be seen.
 
-**Widths.** A value wider than its register is an error (SL0720): `in eax =
+**Widths.** A value wider than its register is an error (SLI0045): `in eax =
 aLong` has nowhere to put the upper half. A narrower one is allowed, and what
 it means is fixed rather than left to the optimiser:
 
@@ -1620,7 +1620,7 @@ one `sext` or `zext` the optimiser folds away whenever the value was wide
 already.
 
 **A literal takes the register's width** where it fits, as it takes a
-declaration's: `in al = 200` is a byte, and `in al = 256` is SL0720. An integer
+declaration's: `in al = 200` is a byte, and `in al = 256` is SLI0045. An integer
 literal given to a vector register is the floating-point number it names.
 
 ### 8.9.2 Registers
@@ -1632,13 +1632,13 @@ literal given to a vector register is the floating-point number it names.
 | arm64 | `x0`–`x30`, `w0`–`w30`, `lr` | `v0`–`v31`, and `d0`–`d31`, `s0`–`s31` |
 
 Names are case-insensitive. The table checked is the target's, so `x0` built for
-x64 is SL0716, and the message names the architecture that was being built for
+x64 is SLI0041, and the message names the architecture that was being built for
 — which is most of the answer when a file meant for another one was compiled by
 mistake. The high-byte registers `ah` to `dh` are not there: they are not the
 low bits of anything, so none of the width rules above would mean anything for
 them.
 
-**Some registers cannot be operands** (SL0717): the stack pointer (`rsp`,
+**Some registers cannot be operands** (SLI0042): the stack pointer (`rsp`,
 `esp`, `sp` and every width of them), because a block that moved it would leave
 every local at the wrong address; the frame pointer (`rbp`, `ebp`, `x29`,
 `fp`), which a function may address its locals through; and on Windows ARM64
@@ -1648,7 +1648,7 @@ it. Linux leaves `x18` to be used, so there it is an ordinary register.
 **A register holds one value going in and one coming out**, so it may be named
 by one `in` and one `out` — `in rcx = count, out rcx = left` puts `count` in and
 stores what the block leaves in `left` — or by one `inout`, which is the same
-thing with the two places the same. Anything more is SL0718, whatever the
+thing with the two places the same. Anything more is SLI0043, whatever the
 names: `eax` is `rax`, and `d3` is `v3`.
 
 On ARM64 a vector register is given to LLVM by the width of what it carries —
@@ -1711,7 +1711,7 @@ it: a misspelt instruction is found by LLVM as the program is built, and put
 back on the line it was about.
 
 ```
-error[SL0723]: the assembler rejected this line of an 'asm' block: invalid
+error[SLI0048]: the assembler rejected this line of an 'asm' block: invalid
 instruction mnemonic 'bogus'
  --> clock.sl:9:9
   |
@@ -1744,8 +1744,8 @@ partner. `vaddps zmm0 {k1}, zmm1, zmm2` is fine, and a comment reading `// }`
 ends the block early. Recognising comments while looking for the end would mean
 knowing which syntax the target has — `#` starts a comment on one and not the
 other — and a rule that changed with `--target` would lex one file two ways. A
-block that is never closed takes the rest of the file (SL0713), and an `asm`
-with no braces after it has no block at all (SL0714).
+block that is never closed takes the rest of the file (SLP0038), and an `asm`
+with no braces after it has no block at all (SLP0039).
 
 **Nothing inside is a directive.** A line beginning `#if` is x86's comment
 rather than a condition; `#if` goes around the whole statement:

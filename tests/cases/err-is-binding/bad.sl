@@ -15,7 +15,7 @@ public variant Value
     Number(double Held);
 }
 
-// SL0585: a name is in scope only where the pattern is known to have
+// SLF0024: a name is in scope only where the pattern is known to have
 // matched -- the rest of an `&&`, the branch the test guards, and after an
 // `if` whose other branch always leaves. Read anywhere else, it may never
 // have been assigned.
@@ -56,21 +56,21 @@ void AfterAWhile(Value value)
     Console.WriteLine(Text.FromDouble(n.Held));
 }
 
-// SL0586: a case that carries nothing has nothing to name.
+// SLF0025: a case that carries nothing has nothing to name.
 void NothingToBind(Value value)
 {
     if (value is Null nothing)
         Console.WriteLine("no");
 }
 
-// SL0587: there is no conversion down to an interface.
+// SLF0026: there is no conversion down to an interface.
 void AnInterface(Animal animal)
 {
     if (animal is ISpeaks s)
         Console.WriteLine("no");
 }
 
-// SL0247: a variant is asked which case it holds and nothing else.
+// SLN0013: a variant is asked which case it holds and nothing else.
 void NoSuchCase(Value value)
 {
     if (value is Animal a)

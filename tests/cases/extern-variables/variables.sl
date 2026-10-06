@@ -25,7 +25,7 @@ extern "C" long  probe_wide;
 extern "C" byte* probe_name;
 
 // Defined here, read by native.c. An exported one may have an initializer,
-// because this side owns the storage; an imported one may not (SL0702).
+// because this side owns the storage; an imported one may not (SLI0040).
 export "C" int sl_depth = 5;
 export "C" int sl_flags;
 

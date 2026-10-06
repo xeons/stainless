@@ -1,17 +1,17 @@
 # a defined class with no superclass
-SL0911
+SLI0060
 # 'virtual', an override of nothing, a selector the superclass answers, one answered twice
-SL0921
+SLI0063
 # a required protocol member no method answers
-SL0305
+SLC0013
 # a static class, a generic message, and 'typeof'
-SL0923
+SLI0064
 # a constructor whose selector is not in the init family
-SL0924
+SLI0065
 # a field with no zero value and no initializer
-SL0813
-SL0949
-SL0950
+SLO0030
+SLI0075
+SLI0076
 # an override naming its own selector, and a class nothing gives an init
-SL0948
-SL0951
+SLI0074
+SLI0077

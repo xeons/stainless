@@ -244,7 +244,7 @@ void ShowPointers()
     // fills a slot only if it is empty. The receiver is read once.
     // `Label` is a `String`, which has no null of its own to stand for "there
     // was no receiver" -- so the `??` is not optional here, and that is
-    // SL0605 rather than a silently nullable answer.
+    // SLO0025 rather than a silently nullable answer.
     Loud? nothing = null;
     PrintValue("?.", nothing?.Label ?? "there was nobody");
     PrintValue("?. present", maybe?.Label ?? "-");

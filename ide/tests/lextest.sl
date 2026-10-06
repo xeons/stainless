@@ -119,7 +119,7 @@ public class Harness
 
     /// Not `Fail`. An unqualified `Fail(x)` is the `Result` variant's own case
     /// constructor, which builds a value and discards it -- so the count never
-    /// moved and every check passed. SL0222 is what caught it.
+    /// moved and every check passed. SLL0001 is what caught it.
     public void ReportFailure(String why)
     {
         _failures++;

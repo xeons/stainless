@@ -133,7 +133,7 @@ public class NicheTests
     public void NoZeroValueMeansANicheUnlessATaggedVariantHasNone(string type, bool taggedVariantInside)
     {
         bool hasZero = !Front.ModuleCodes(Types + $"void F() {{ {type} probe = default; }}")
-            .Contains("SL0810");
+            .Contains("SLO0027");
         bool niche = !OptionalOf(type).HasTag;
 
         Assert.False(hasZero && niche, $"'{type}' has a zero value and a niche");

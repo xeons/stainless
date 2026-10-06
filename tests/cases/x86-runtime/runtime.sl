@@ -57,7 +57,7 @@ int Main()
 
     // `is` with a binding, which asks about the null and the class at once and
     // reads the field exactly where it was checked -- a check on its own does
-    // not narrow a field (SL0248).
+    // not narrow a field (SLO0001).
     int total = head.Value;
     if (head.Next is Node one)
     {

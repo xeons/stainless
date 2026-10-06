@@ -388,7 +388,7 @@ public static class MetadataWriter
         // concerned: symbols to call with the object as the receiver.
         //
         // Protected is here with public because a dispatched method must be one
-        // or the other (SL0506), so a protected method can be filling a slot a
+        // or the other (SLC0046), so a protected method can be filling a slot a
         // derived class has to copy or replace -- and a derived class calls
         // protected members besides. What keeps it protected is the binder;
         // being in this list only makes it nameable.

@@ -21,7 +21,7 @@ last person to edit it -- the suite is the authority.
   `public` exports and an unmarked declaration is module-wide. `internal` writes
   that default down, anywhere a visibility may go, and `protected internal` is
   C#'s union and so the same as `protected`; a second visibility or a repeated
-  modifier is refused (SL0507, SL0109)
+  modifier is refused (SLC0047, SLC0001)
 - Aliases, qualified names without an import, full order independence
 - `string` as a second spelling of `String`, declared as an alias in the
   auto-imported `Standard.Text`, so it needs no import and costs nothing
@@ -95,18 +95,18 @@ last person to edit it -- the suite is the authority.
   every `extern "C"` and `export "C"`
 - No zero value for a type whose zero would hold a null in a never-null
   reference: a class, an interface, `String`, `T[]`, a `closure`, or a struct,
-  tuple or first variant case holding one. `default` of one (SL0810), a local
-  read before each such slot of it is written (SL0811), `new T[n]` (SL0812), a
-  constructor that can leave such a field unwritten (SL0813) and a static
-  property with no value (SL0814) are errors. Locals are held to C#'s definite
+  tuple or first variant case holding one. `default` of one (SLO0027), a local
+  read before each such slot of it is written (SLO0028), `new T[n]` (SLO0029), a
+  constructor that can leave such a field unwritten (SLO0030) and a static
+  property with no value (SLO0031) are errors. Locals are held to C#'s definite
   assignment a field at a time; a constructor's calls to the type's own private
   methods are followed, so `InitializeComponent()` counts; an initializer,
   `: this(...)`, `required` and a primary constructor discharge a field, and so
   does storage a property only fills with `field ??=`. Construction is in two
   phases, as Swift's: every such field has its value before the object can be
-  reached -- before `base(...)`, a method call or `this` handed on (SL0937,
-  SL0938, SL0811) -- so a base constructor's virtual call finds derived fields
-  set. A field whose value needs the finished object is `late` (SL0940), and a
+  reached -- before `base(...)`, a method call or `this` handed on (SLO0032,
+  SLO0033, SLO0028) -- so a base constructor's virtual call finds derived fields
+  set. A field whose value needs the finished object is `late` (SLO0034), and a
   read of one with no value yet stops the program, naming it. Generic bodies are judged
   per instantiation. `Array.Create` and `Array.Repeat` make an array whole,
   `Array.Create` filled in place where it is called, and a `Slot<T>[]` is room
@@ -119,16 +119,16 @@ last person to edit it -- the suite is the authority.
   would, a `required` member or a new array's elements are filled through a
   `fill` that is checked before anything is handed out, and a writer refuses a
   null for a field whose type has no zero value. A com class a factory can
-  activate may not leave a `required` member to it (SL0611), and a static read
+  activate may not leave a `required` member to it (SLI0035), and a static read
   through a call in another static's initializer is ordered, or is a cycle
-  (SL0378), like one read directly
+  (SLO0016), like one read directly
 - `T[]?` and `Notify?`: an array reference and a closure that may be absent,
   narrowed by a check as `C?` is. The array is `C?`'s one pointer; the closure
   is its own two words with a null function word, compared with `null` as both,
-  and never called until a check says it holds one (SL0248)
+  and never called until a check says it holds one (SLO0001)
 - `where T : zeroable`, and a `where` on a member of a generic type that
   constrains the type's parameters: the member exists only in instantiations
-  that meet it, so `Span<String>` has no `Clear` (SL0328, SL0816)
+  that meet it, so `Span<String>` has no `Clear` (SLG0006, SLG0024)
 - `[DoesNotReturn]` on an `extern` function: nothing after a call to it is
   reached, so `sl_fail` ends a function that needs no `return` after it
 - `union`: C's, every member at offset zero, with the size and alignment C
@@ -175,7 +175,7 @@ last person to edit it -- the suite is the authority.
   `(shape as INamed)?.Name() ?? "anonymous"`. The value is read once, the arm
   the test allows is that same pointer with no second check, and a conversion
   that cannot fail gets no test at all. What could only ever be null is a
-  mistake rather than a null (SL0625), and a COM interface is refused because
+  mistake rather than a null (SLT0072), and a COM interface is refused because
   `QueryInterface` is a call that would be made twice
 - `class` with fields, constructors, destructors, methods; ARC with correct
   nested destruction
@@ -189,7 +189,7 @@ last person to edit it -- the suite is the authority.
   `: Base(Id)` after the parameters passes them on to a base class's
   constructor, and a record may derive from a record: equality then also
   asks that the two are the same type, as C#'s does, and a plain class may
-  not derive from a record (SL0804). There is no generated `ToString`, because the
+  not derive from a record (SLC0114). There is no generated `ToString`, because the
   language has none for any type, and no `record struct`, because what makes a
   record a key is the two interfaces it declares and a struct implements none
 - Single inheritance, the C# model: `virtual`, `override`, `abstract`,
@@ -212,7 +212,7 @@ last person to edit it -- the suite is the authority.
   is stamped on when its table is numbered. `[NoUnknown]` describes the vtable a
   C library hands out that is not COM — XAudio2's voices — so its first method
   is slot 0 and ARC counts nothing through it; the cost is no `[Guid]`, no
-  `QueryInterface` and no cast (SL0622, SL0728, SL0624)
+  `QueryInterface` and no cast (SLI0036, SLC0096, SLI0037)
 - **Objective-C.** `objc interface` is a protocol and
   `extern objc class` a class that already exists; every member names its
   selector, a call is clang's `objc_msgSend` through `__objc_selrefs`, and ARC
@@ -240,7 +240,7 @@ last person to edit it -- the suite is the authority.
   `Com.GetClassObject` answers it with an `IClassFactory` — so a `--shared`
   build exporting `DllGetClassObject` is an in-process COM server that C++
   activates and uses. Activation passes no arguments, so an activatable class
-  needs a constructor taking none (SL0611). `DllCanUnloadNow` answers from a
+  needs a constructor taking none (SLI0035). `DllCanUnloadNow` answers from a
   module-wide count of live com class objects, so it says S_FALSE while one is
   held and S_OK once none is — the count is kept only where something can be
   activated, so a program that hosts nothing emits none of it.
@@ -264,9 +264,9 @@ last person to edit it -- the suite is the authority.
   constructor fills in, and written accessors with block or `=>` bodies. They
   lower to a pair of ordinary methods, so an interface property dispatches like
   any other member. `init` is a setter only an object initializer, a `with`
-  and the object's own constructors may call (SL0780–SL0782); `required`
+  and the object's own constructors may call (SLC0102–SLC0104); `required`
   makes every `new` set a field or property unless its constructor is
-  `[SetsRequiredMembers]` (SL0783, SL0784); and `field` in an accessor is the
+  `[SetsRequiredMembers]` (SLC0105, SLC0106); and `field` in an accessor is the
   property's own storage, so `set => field = value.Trim()` needs no field
   written beside it. A static property may be automatic, over a static that
   starts at its type's zero
@@ -289,7 +289,7 @@ last person to edit it -- the suite is the authority.
   declared to clobber what a C call may, so there is no list to get wrong. Run
   on Windows x64, Linux x64 and 32-bit x86 on both, with a test that fails if
   the clobbers are; ARM64 is built to an object file and pinned as text. A
-  mistake in the text is reported on its line by the assembler, as SL0723
+  mistake in the text is reported on its line by the assembler, as SLI0048
 - Win64 struct ABI: register coercion, `byval`, `sret`
 - `if` / `while` / `for` / `foreach` / `break` / `continue` / `return`, recursion
 - `switch` over integers, `char`, `bool`, enums, `String` and variants, with
@@ -335,11 +335,11 @@ last person to edit it -- the suite is the authority.
   cases is one LLVM `switch`, so a switch of constants is a jump table and a
   pattern switch over a variant dispatches on its tag
 - `switch` as an expression: `n switch { < 0 => "negative", _ => "large" }`,
-  which must be exhaustive (SL0620) because it has to produce a value and there
+  which must be exhaustive (SLF0033) because it has to produce a value and there
   is no exception to throw at a value that matched nothing. Coverage follows
   bools, a variant's cases, an enum's members, and the same nested in tuples,
   payloads, members and lists, and an arm nothing reaches is a warning
-  (SL0621). An enum whose members are all named needs no `_`, and a value that
+  (SLL0005). An enum whose members are all named needs no `_`, and a value that
   is none of them ends the program. It lowers by the tree a statement does,
   written as conditionals
 - A lambda with written parameter types has a type of its own, so `var doubled
@@ -348,13 +348,13 @@ last person to edit it -- the suite is the authority.
   interchangeable with them. A block body's result is what its `return`s agree
   on, and one may be written in front: `Node? (bool b) => ...`. A parameter
   default is part of that type, so `var f = (int x = 1) => x; f();` works and a
-  declared closure never sees one (SL0766). `static x => ...` captures nothing
-  (SL0764), and `(_, _) => 0` discards both
+  declared closure never sees one (SLL0013). `static x => ...` captures nothing
+  (SLF0036), and `(_, _) => 0` discards both
 - Field and property initializers: `int Width = 80;` and `int W { get; set; }
   = 80;`, run at the head of every constructor in declaration order. A class
   that declares no constructor is given one to run them in; a constructor that
   chains to `this(...)` does not run them again; and an initializer may not read
-  the object it belongs to (SL0633), because it runs before the constructor's
+  the object it belongs to (SLC0084), because it runs before the constructor's
   body and would be reading zeroes. A value type has no moment to run one at and
   refuses it, unless it has a primary constructor, which every constructor of
   it runs
@@ -363,25 +363,25 @@ last person to edit it -- the suite is the authority.
   initializer reads the parameter, and a member body reads a hidden field the
   constructor copied it into -- made only for the parameters some member body
   names, laid out after the declared fields, counted and released like any
-  other. Every other constructor chains to it with `: this(...)` (SL0785–SL0787)
+  other. Every other constructor chains to it with `: this(...)` (SLC0107–SLC0109)
 - Object and collection initializers: `new Panel { Title = "readme" }` and
   `new List<int> { 1, 2, 3 }`, lowered to the construction held in a name, a
   write or an `Add` per entry, and the name. `Add` is found by name rather than
   by interface, as `foreach` finds `GetEnumerator`; named and bare entries may
-  not be mixed (SL0618)
+  not be mixed (SLC0076)
 - Conversion operators: `public static implicit operator Money(long)` and its
   `explicit` twin, written inside one of the two types they are between. The
   word decides whether a cast has to be written, which puts a declared type into
   the same system the built-in conversions are in. One conversion and no chain:
   the value is exactly what the operator takes, except for a literal, which
   adopts the source type as it does anywhere else. What is refused is anything a
-  reader could not find from the two types (SL0615), and anything the language
-  already answers (SL0632)
+  reader could not find from the two types (SLC0074), and anything the language
+  already answers (SLC0083)
 - Default values on parameters: `void Draw(String text, int width = 8)`, filled
   in at the call from the declaration the caller can see. A constant is what one
-  may be (SL0613), the ones that may be left out are the tail of the list, and
+  may be (SLC0072), the ones that may be left out are the tail of the list, and
   exactly one declaration may give it -- an `override` may not restate a default
-  and neither may a method beside the interface method it implements (SL0627),
+  and neither may a method beside the interface method it implements (SLC0078),
   because a call reads the static type's declaration and two values would make
   the same line mean two things. They cross a library boundary as the value they
   folded to
@@ -389,7 +389,7 @@ last person to edit it -- the suite is the authority.
   declaration, recursive and mutually recursive, generic, `static`. What one
   reads of the function around it is passed at each call as a hidden
   parameter, so it sees current values, allocates nothing and may not assign
-  what it captured (SL0769); one that reads nothing is a plain function and a
+  what it captured (SLF0039); one that reads nothing is a plain function and a
   `delegate`. Its list of captures is learned by binding, and a function whose
   calls were bound against too short a list is bound again
 - `params` on the last parameter: `Sum(1, 2, 3)`, `Sum()` and `Sum(numbers)`
@@ -398,7 +398,7 @@ last person to edit it -- the suite is the authority.
   `params ReadOnlySpan<T>` gathers into an array in the caller's frame, so the
   call allocates nothing;
   the frame checks when the statement ends that nothing kept a reference to it,
-  and stops the program if something did. Misplaced, it is SL0763
+  and stops the program if something did. Misplaced, it is SLC0101
 - Full operator set with C# precedence, short-circuit `&&` and `||`, the
   conditional `a ? b : c`, and `>>>`, which shifts zeros in whatever the sign
   and overloads like the other shifts. The arithmetic C leaves undefined is defined here:
@@ -497,7 +497,7 @@ last person to edit it -- the suite is the authority.
 - A struct implements interfaces — `IEquatable`, `IComparable`, `IHashable`,
   `IFormattable` and any other — with members of its own, and is reached
   through a generic parameter in place; it is never a reference to one
-  (SL0302), so its layout is untouched and it still crosses `extern "C"`
+  (SLC0010), so its layout is untouched and it still crosses `extern "C"`
 - A generic name is declared once per arity, as C#'s `Func<TResult>`,
   `Func<T, TResult>` and `Func<T1, T2, TResult>` are; `Standard` has `Func`
   and `Action` to four arguments
@@ -589,7 +589,7 @@ last person to edit it -- the suite is the authority.
   `this`, or a method called without a receiver. **Which of those copies is
   worth knowing**: a bare `factor` copies the value, `this.factor` captures the
   object and reads it live, and a method call does the same. A captured member
-  that something else assigns is a warning (SL0610), because `if (busy)` in a
+  that something else assigns is a warning (SLL0004), because `if (busy)` in a
   handler reads as a live test and is not one
 - `weak C?`: assignable, so a reference cycle can be broken. A weak reference
   costs the object nothing while it lives and reads back as `null` once it is
@@ -950,9 +950,9 @@ last person to edit it -- the suite is the authority.
 - **Named attribute arguments**: an attribute's fields are filled positionally
   in declaration order and then by name, `[Column("id", Width = 8)]`, with a
   field given neither way keeping its type's default. Positional first
-  (SL0726), each field once (SL0725), and an unknown name refused (SL0724). An
+  (SLC0094), each field once (SLC0093), and an unknown name refused (SLC0092). An
   attribute written where nothing reads one back — a function, a `const`, an
-  alias, an `extern` declaration — is an error (SL0728) rather than a dropped
+  alias, an `extern` declaration — is an error (SLC0096) rather than a dropped
   line. See [§6.1](spec/06-attributes-reflection.md#61-attributes)
 - Stainless libraries consumed by Stainless: `--metadata` writes a `.slmod`
   describing a library's public surface, and `--reference` binds another
@@ -1052,10 +1052,10 @@ last person to edit it -- the suite is the authority.
 - `?.`, `?[`, `??` and `??=`, over a `C?`. The receiver is read once, so
   `Next()?.Name` calls `Next` one time. A reference member or element answers
   null; a value member has no null to answer with, so `node?.Weight` needs a
-  `?? fallback` and says so (SL0605) rather than inventing a zero a caller
+  `?? fallback` and says so (SLO0025) rather than inventing a zero a caller
   cannot tell from a real one. A receiver that cannot be nothing is refused,
   `a?.b.c` is an error where `a?.b?.c` is the question actually being asked,
-  and neither is written through (SL0762). `x!` is `(C)x`, and a null there
+  and neither is written through (SLT0078). `x!` is `(C)x`, and a null there
   stops the program rather than being trusted
 - `default(T)` is the zeroed value of a type, for generic code that cannot
   write a literal for a type it does not know, and a bare `default` is the
@@ -1063,7 +1063,7 @@ last person to edit it -- the suite is the authority.
   has one; `String.Empty` is a static property rather than a field
 - `new(...)` with the type left off, taken from a declared local, a field, a
   return, an argument, an element or the other arm of a conditional; with
-  nothing to take it from it is SL0756
+  nothing to take it from it is SLT0076
 - Type arguments written at a call, `Pick<int>(a, b)`, and a generic type named
   in front of its statics, `Box<int>.Create()`, with C#'s rule for when `<` is
   less-than
@@ -1082,8 +1082,8 @@ Being straight about the edges, roughly in the order they are worth adding:
   An interface's generic method, or a class's generic virtual one, gets a slot
   per instantiation the program calls, filled for every class that could be
   behind the call. So an instantiation that makes a larger one of itself
-  through the interface has no end (SL0798) where C# would make the next one on
-  demand, and such a class does not cross a library boundary (SL0419).
+  through the interface has no end (SLG0021) where C# would make the next one on
+  demand, and such a class does not cross a library boundary (SLD0007).
 - **No exhaustiveness requirement on a statement over an enum**, whose value
   need not be one of its members. A switch expression over
   one is covered by naming them all, and ends the program on a value that is
@@ -1092,21 +1092,21 @@ Being straight about the edges, roughly in the order they are worth adding:
   still need a `_`, and a `when` counts for nothing; C# tracks both.
 - **A `String` is not matched element by element.** Its positions are bytes,
   so `text is ['a', ..]` would be a pattern of bytes posing as one of
-  characters, and is refused (SL0774).
+  characters, and is refused (SLF0042).
 - **A lambda with nothing written needs something to be.** One that writes its
   parameter types out has a type of its own -- `var f = (int x) => x * 2;` is a
   closure -- but `var f = x => x;` has nothing to infer from and is refused
-  (SL0553). Capture
+  (SLT0061). Capture
   is by value only, and a capturing lambda cannot become a `delegate` — a
   function pointer has nowhere to keep what was captured. A lambda that captures `this` keeps its object
   alive, so an object holding its own closure is a cycle; `weak` is how that is
   broken.
 - **No zero-width or unnamed bit-fields.** C's `int : 0;` closes a storage unit
-  and `int : 3;` pads without naming anything; neither is written (SL0473).
-  `[Packed]` together with bit-fields is refused rather than guessed (SL0470),
+  and `int : 3;` pads without naming anything; neither is written (SLI0015).
+  `[Packed]` together with bit-fields is refused rather than guessed (SLI0012),
   because gcc packs the bits and MSVC keeps the unit and nothing here yet says
   which this language means. `[Reflect]` is refused on a type with bit-fields
-  (SL0475): the field tables describe a byte offset, and a bit-field has none.
+  (SLI0017): the field tables describe a byte offset, and a bit-field has none.
 - **There is no alignment on a single field**, only on a whole type.
 - **A slice is owning, and there is no borrowed one.** It retains the array it
   came from, which is what makes it impossible to dangle and also what makes it
@@ -1134,7 +1134,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   once, so there is nothing to prove about a second read.
 - **Hiding an inherited member is refused, not warned about.** C# has `new` for
   it; a language with no way to reach the hidden member has nothing to say it
-  about, so the same name and parameters means `override` or nothing (SL0503).
+  about, so the same name and parameters means `override` or nothing (SLC0043).
 - **Reflection describes fields, properties, array elements, public events and
   the enums a reflected member names.** A property
   is its accessors rather than an offset, so setting one through reflection
@@ -1205,7 +1205,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   alone, because the C runtime's objects are compiled for the MSVC target and
   carry CodeView.
 - **A variant does not cross a library boundary or carry `[Reflect]`.** Both
-  are reported where they are written (SL0419, SL0728) rather than left to be
+  are reported where they are written (SLD0007, SLC0096) rather than left to be
   discovered. The metadata describes layouts and the reflection tables describe
   fields, and a variant's shape is neither — it is its cases, which nothing yet
   writes down. Its tag is also one byte, so 255 cases is the limit.
@@ -1221,7 +1221,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   [bindings/win32](../bindings/win32) spells its constants as bare `const uint`
   rather than as the typed sets they are.
 - **An inline array holds plain data only** and cannot be passed by value
-  (SL0486, SL0491). The first is the same question a union cannot answer; the
+  (SLO0020, SLT0054). The first is the same question a union cannot answer; the
   second is because C decays an array parameter to a pointer and Stainless has
   no decay, so `ref T[N]` is the spelling that lines up.
 - **Sockets are blocking.** `Standard.Net` has one
@@ -1253,7 +1253,7 @@ Being straight about the edges, roughly in the order they are worth adding:
   assigned across a whole program, and a variant's cases are not a layout. A
   slice or a tuple of what the metadata describes does cross.
   Anything reaching one of those through a field or a signature is reported too
-  (SL0419, SL0477), all of them where the library is built
+  (SLD0007, SLD0009), all of them where the library is built
   rather than where the consumer trips over them.
 - **The shared runtime is a file to carry.** Where two Stainless binaries meet
   the runtime is one shared library, which is what puts them on one allocator
@@ -1264,7 +1264,7 @@ Being straight about the edges, roughly in the order they are worth adding:
 - **No `ref` locals and no `ref` returns**, which would need a lifetime story
   the language does not have. `out` does exist, and brought the language's only
   definite-assignment analysis with it: every path out of the function has to
-  write the parameter (SL0600), and the caller's storage is cleared before the
+  write the parameter (SLO0023), and the caller's storage is cleared before the
   call so that a hole in that produces a zero rather than whatever the stack
   held. A local whose type has a zero value may still be read before it is
   written, and reads the zero.

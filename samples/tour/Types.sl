@@ -145,7 +145,7 @@ public variant Shape
 /// **A variant is a value**, and a value cannot contain itself, so the
 /// recursion goes through a class: `Branch<T>` is a reference, which is one
 /// pointer whatever the tree does. That is the same rule C has, arrived at from
-/// the same place, and it is SL0216 when it is broken.
+/// the same place, and it is SLC0006 when it is broken.
 public variant Tree<T>
 {
     Leaf(T Item);

@@ -292,7 +292,7 @@ public sealed class FunctionSymbol
     /// <summary>
     /// Why this member of an instantiation does not exist, or null when it
     /// does: its type's arguments fail its own <c>where</c>. Its body is never
-    /// bound, and a call to it is SL0816.
+    /// bound, and a call to it is SLG0024.
     /// </summary>
     public string? Unavailable { get; set; }
 

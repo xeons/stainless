@@ -64,7 +64,7 @@ public class ObjCTests
         try
         {
             var program = Front.BindModule(Declarations + body, out var diagnostics);
-            Assert.Empty(Front.Codes(diagnostics).Where(c => !c.StartsWith("SL0377", StringComparison.Ordinal)));
+            Assert.Empty(Front.Codes(diagnostics).Where(c => !c.StartsWith("SLO0015", StringComparison.Ordinal)));
 
             var abi = target.IsWindows ? CppAbi.Microsoft : CppAbi.Itanium;
             return Front.Verified(
@@ -131,8 +131,7 @@ public class ObjCTests
             var program = Front.BindModule(
                 Declarations + "public nuint Use() => NSString.Alloc().Init().Length;",
                 out var diagnostics);
-            Assert.DoesNotContain("SL0251", Front.Codes(diagnostics));
-            Assert.Empty(Front.Codes(diagnostics).Where(c => c.StartsWith("SL02", StringComparison.Ordinal)));
+            Assert.Empty(Front.Codes(diagnostics).Where(c => c.StartsWith("SLN", StringComparison.Ordinal)));
             Assert.NotNull(program);
         }
         finally
@@ -160,7 +159,7 @@ public class ObjCTests
 
     [Fact]
     public void AMethodOfAStainlessClassStillRefusesAnAttribute() =>
-        Assert.Contains("SL0728", Front.ModuleCodes("""
+        Assert.Contains("SLC0096", Front.ModuleCodes("""
             public class Plain
             {
                 [Selector("run")]
@@ -324,13 +323,13 @@ public class ObjCTests
     [Fact]
     public void AnOverrideOfNothingAndAnUnmarkedReplacementAreRefused()
     {
-        Assert.Contains("SL0499", CodesFor("""
+        Assert.Contains("SLC0039", CodesFor("""
             public objc class Mine : NSObject
             {
                 public override long Missing() => 1;
             }
             """));
-        Assert.Contains("SL0503", CodesFor("""
+        Assert.Contains("SLC0043", CodesFor("""
             public objc class Mine : NSString
             {
                 [Selector("length")] public nuint Size => 3u;
@@ -374,7 +373,7 @@ public class ObjCTests
 
     [Fact]
     public void AFieldWithNoZeroValueNeedsAnInitializer() =>
-        Assert.Contains("SL0813", CodesFor("""
+        Assert.Contains("SLO0030", CodesFor("""
             public objc class Unset : NSObject
             {
                 String _name;
@@ -519,8 +518,8 @@ public class ObjCTests
     [Fact]
     public void WhatABlockCarriesCrossesAsAMessagesArgumentsDo()
     {
-        Assert.Contains("SL0907", CodesFor("public objc closure void Writes(out long result);"));
-        Assert.Contains("SL0907", CodesFor("public objc closure void Named(String name);"));
+        Assert.Contains("SLI0056", CodesFor("public objc closure void Writes(out long result);"));
+        Assert.Contains("SLI0056", CodesFor("public objc closure void Named(String name);"));
         Assert.Empty(CodesFor("public objc closure NSString? Named(NSString name, bool* stop);"));
     }
 }

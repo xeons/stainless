@@ -206,7 +206,7 @@ elsewhere, and inert. The build says so, naming what is actually in the program
 rather than firing on every script:
 
 ```
-warning[SL0700]: this program's resources include RT_MANIFEST, which only
+warning[SLD0010]: this program's resources include RT_MANIFEST, which only
 Windows acts on: x86_64-pc-linux-gnu carries them and 'Standard.Resources' can
 read them, but nothing here turns one into a window icon, a menu or a manifest
 ```

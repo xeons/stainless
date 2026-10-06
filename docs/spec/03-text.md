@@ -380,7 +380,7 @@ An interpolation with no holes is a literal, and costs what one costs.
 | an enum | its member's name, or the names of its set flags ([§2.13](02-types.md#213-enum--a-distinct-type-over-an-integer)) |
 | a class that implements `IFormattable` | its own `ToText(format)` |
 
-Anything else is refused (SL0557) rather than given a default. There is no
+Anything else is refused (SLT0062) rather than given a default. There is no
 `ToString` that every type owes, and inventing one to make this work would be a
 much larger decision than a formatting syntax — every class would owe an
 implementation, and a default that printed a type name would be worse than
@@ -401,7 +401,7 @@ value is its set flags joined by `", "`, and a value no name covers is its
 number. `value.ToText()` is the same text outside a string.
 
 **Braces.** `{{` and `}}` are how a literal brace is written. A lone `}` closes
-nothing and is refused (SL0554), because it is far more often the end of a hole
+nothing and is refused (SLP0032), because it is far more often the end of a hole
 that was never opened. A hole may contain braces of its own — an index, a
 nested interpolation, a string with braces in it — and the depth is counted:
 
@@ -411,8 +411,8 @@ $"quoted {"has {braces}"}"      // a string inside a hole
 $"{{{n}}}"                      // a literal brace either side of a hole
 ```
 
-**An empty hole** names no value (SL0555), and **two expressions in one hole**
-would mean the second was silently dropped (SL0556). Both are errors.
+**An empty hole** names no value (SLP0033), and **two expressions in one hole**
+would mean the second was silently dropped (SLP0034). Both are errors.
 
 ### 3.8.1 Alignment and format
 
@@ -426,7 +426,7 @@ $"{price,10:N2}"        // both: 1,234.50 right-aligned in ten
 C#'s shape and C#'s meanings. After the expression, a `,` and an **alignment**,
 then a `:` and a **format**, each optional and in that order.
 
-**The alignment is a constant integer** (SL0754): a literal, a negated one or a
+**The alignment is a constant integer** (SLT0075): a literal, a negated one or a
 `const`. Positive pads on the left and negative on the right, with spaces, and
 text already wider is never cut. It counts characters rather than bytes, unlike
 `PadLeft`, because a width is a column and a column holds a character however
@@ -455,7 +455,7 @@ its own width, so an `int` of -1 is `FFFFFFFF` and a `long` of -1 is sixteen
 `F`s. `G` with no precision is the language's shortest spelling of a double
 (§3.2), not .NET's, which differs from it only in where an exponent appears.
 
-**A number's format is checked when the program compiles** (SL0753). It is text
+**A number's format is checked when the program compiles** (SLT0074). It is text
 in the source and the value's type is known, so `{n:Q}`, `{price:X}` on a
 `double` and `{name:D}` on a `String` are errors where they are written rather
 than a failure the first time the line runs. What was rejected is .NET's
@@ -469,10 +469,10 @@ A class that implements `IFormattable` receives the format as written and
 decides what it means, so `{when:yyyy-MM-dd}` is the class's business and is
 not checked.
 
-An enum takes no format, so `{level:D}` is SL0753 too. Its number is a cast
+An enum takes no format, so `{level:D}` is SLT0074 too. Its number is a cast
 away — `{(int)level:D}` — which is also where a reader looks for it.
 
-**A conditional in a hole is parenthesised** (SL0755), as in C#. The `:` that
+**A conditional in a hole is parenthesised** (SLP0050), as in C#. The `:` that
 starts a format is found by the lexer — the format is not code, and
 `{when:HH:mm}` would not lex as any — so `{ok ? 1 : 2}` is `ok ? 1` with a
 format of ` 2`. Only a `:` outside every bracket starts one, so
@@ -491,9 +491,9 @@ $$"""{"id": {{id}}, "tags": []}"""       // {"id": 7, "tags": []}
 
 With `n` dollars a run of fewer than `n` braces is text, and a run of `n` to
 `2n - 1` is text followed by a hole's opening. A longer run, or a run of `n`
-closing braces outside a hole, is SL0750, and so is a hole closed with fewer
+closing braces outside a hole, is SLP0047, and so is a hole closed with fewer
 braces than opened it. More than one `$` on anything but a raw string is
-SL0751, since only a raw string has braces that need telling apart.
+SLP0048, since only a raw string has braces that need telling apart.
 
 ## 3.9 Writing a string
 
@@ -512,8 +512,8 @@ and the string may run over several lines, each line break being part of it.
 **Raw**, three or more quotes: the opening run is the delimiter, and only a run
 of exactly as many closes it, so the content may hold any shorter one. On one
 line the content is what stands between. Across lines the quotes stand on lines
-of their own — nothing but whitespace after the opening ones (SL0746), and
-before the closing ones (SL0747) — and the whitespace in front of the closing
+of their own — nothing but whitespace after the opening ones (SLP0043), and
+before the closing ones (SLP0044) — and the whitespace in front of the closing
 quotes is the literal's indentation, which comes off every line of content:
 
 ```csharp
@@ -523,10 +523,10 @@ String query = """
     """;                            // "SELECT name\n  FROM users"
 ```
 
-A line that does not start with exactly that whitespace is SL0748, a tab where
+A line that does not start with exactly that whitespace is SLP0045, a tab where
 the closing line has spaces included, since there is no telling how wide a tab
 was meant to be. A line of nothing but whitespace is exempt and is empty. A run
-of quotes longer than the delimiter is SL0749, because it can be neither the
+of quotes longer than the delimiter is SLP0046, because it can be neither the
 end nor text.
 
 **A line break inside any string is one `\n`**, however the file was saved.
@@ -540,9 +540,9 @@ in read-only storage with an immortal count, laid out as an embedded file's is
 ([§8.8](08-interop-libraries.md#88-embedding-a-file)). Nothing is allocated,
 copying the slice counts nothing, and a NUL follows the bytes without being
 counted in them. **The bytes are not writable**, and the type says so: a store
-through the slice is refused where it is written (SL0808,
+through the slice is refused where it is written (SLT0082,
 [§2.12.1](02-types.md#2121-readonlyspant)) rather than faulting where it runs.
-An interpolated string cannot take `u8` (SL0752),
+An interpolated string cannot take `u8` (SLP0049),
 since its bytes do not exist until it runs; `ToBytes()` on the `String` is
 that.
 

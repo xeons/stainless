@@ -18,17 +18,17 @@ int Main()
 
     // A value is not a pointer. This is the mistake the arrow exists to catch;
     // written with a dot it would simply be right.
-    int a = point->X;                       // SL0494
+    int a = point->X;                       // SLT0055
 
     // A class reference is a pointer at runtime and not one in the language,
     // and the arrow follows the language.
     var box = new Box();
-    int b = box->Value;                     // SL0494
+    int b = box->Value;                     // SLT0055
 
     // A pointer to something with no members reaches nothing.
     int number = 7;
     int* counted = &number;
-    int c = counted->X;                     // SL0494
+    int c = counted->X;                     // SLT0055
 
     return a + b + c;
 }

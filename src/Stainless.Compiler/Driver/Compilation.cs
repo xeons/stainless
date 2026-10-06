@@ -1169,7 +1169,7 @@ public sealed class Compilation
     /// directory and the linker fills it from this, and everything else carries
     /// the same bytes as ordinary constant data for `Standard.Resources` to
     /// walk. What no other target has is an operating system that reads them --
-    /// see SL0700.
+    /// see SLD0010.
     /// </summary>
     /// <summary>What a target's own debuggers read.</summary>
     private static Emit.DebugFormat DefaultDebugFormat(Binding.TargetPlatform target) =>

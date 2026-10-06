@@ -60,19 +60,19 @@ public class ZeroValueTests
     [InlineData("Holder h; var n = h.Data.Length;")]
     [InlineData("Holder h; while (flag) { var t = h; h.Data = [1]; }")]
     public void AReadBeforeEverySlotIsWrittenIsRefused(string body) =>
-        Assert.Contains("SL0811", Codes(body));
+        Assert.Contains("SLO0028", Codes(body));
 
     [Theory]
-    [InlineData("var h = default(Holder);", "SL0810")]
-    [InlineData("Node n = default;", "SL0810")]
-    [InlineData("var words = new String[3];", "SL0812")]
-    [InlineData("var nodes = new Node[1];", "SL0812")]
+    [InlineData("var h = default(Holder);", "SLO0027")]
+    [InlineData("Node n = default;", "SLO0027")]
+    [InlineData("var words = new String[3];", "SLO0029")]
+    [InlineData("var nodes = new Node[1];", "SLO0029")]
     public void AZeroIsNotMadeOfATypeWithoutOne(string body, string code) =>
         Assert.Contains(code, Codes(body));
 
     [Fact]
     public void AFieldAPrivateHelperWritesIsWritten() =>
-        Assert.DoesNotContain("SL0813", Front.ModuleCodes("""
+        Assert.DoesNotContain("SLO0030", Front.ModuleCodes("""
             public class Form
             {
                 private String _title;
@@ -83,7 +83,7 @@ public class ZeroValueTests
 
     [Fact]
     public void AHelperThatOnlySometimesWritesDoesNot() =>
-        Assert.Contains("SL0813", Front.ModuleCodes("""
+        Assert.Contains("SLO0030", Front.ModuleCodes("""
             public class Form
             {
                 private String _title;
@@ -99,7 +99,7 @@ public class ZeroValueTests
 
     [Fact]
     public void APublicMethodIsNotFollowed() =>
-        Assert.Contains("SL0813", Front.ModuleCodes("""
+        Assert.Contains("SLO0030", Front.ModuleCodes("""
             public class Form
             {
                 private String _title;
@@ -115,12 +115,12 @@ public class ZeroValueTests
     [InlineData("private int _count;")]
     [InlineData("public Node Badge { get => field ??= new Node(); }")]
     public void AFieldThatStartsWithAValueNeedsNoConstructorToGiveItOne(string member) =>
-        Assert.DoesNotContain("SL0813",
+        Assert.DoesNotContain("SLO0030",
             Front.ModuleCodes(Types + $"public class Owner {{ {member} }}"));
 
     [Fact]
     public void AStructFieldMayBeWrittenAFieldAtATime() =>
-        Assert.DoesNotContain("SL0813", Front.ModuleCodes(Types + """
+        Assert.DoesNotContain("SLO0030", Front.ModuleCodes(Types + """
             public class Owner
             {
                 private Pair _pair;
@@ -141,7 +141,7 @@ public class ZeroValueTests
 
     [Fact]
     public void AGenericBodyIsJudgedPerInstantiation() =>
-        Assert.Contains("SL0810", Front.ModuleCodes("""
+        Assert.Contains("SLO0027", Front.ModuleCodes("""
             T Blank<T>() => default(T);
             void Use() { int n = Blank<int>(); String s = Blank<String>(); }
             """));

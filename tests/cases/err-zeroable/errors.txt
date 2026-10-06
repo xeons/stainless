@@ -1,5 +1,5 @@
 # String, and a struct holding one, have no zero value; `class, zeroable`
 # contradicts itself.
-SL0328
-SL0328
-SL0581
+SLG0006
+SLG0006
+SLG0014
