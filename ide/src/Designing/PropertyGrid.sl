@@ -275,7 +275,7 @@ public class PropertyGrid : Panel
         for (nuint i = 0u; i < _type.PropertyCount; i++)
         {
             var property = _type.GetPropertyAt(i);
-            if (!property.IsPublic || !property.CanRead || !property.CanWrite
+            if (!property.IsPublic || !property.CanRead || !property.IsSetterPublic
                 || IsHiddenProperty(property.Name))
                 continue;
 

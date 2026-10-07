@@ -193,6 +193,10 @@ public class Shell : Form
     /// Null until then: a window nobody has asked for should not be built.
     FindDialog? _findDialog;
 
+    /// The window a menu's items and a toolbar's buttons are edited in, made
+    /// on the first ask, as the find window is.
+    ItemsEditor? _itemsEditor;
+
     /// The size every editor's text is, kept here rather than on an editor
     /// because it is a preference of the program's and not of one file's.
     int _textSize;
@@ -336,6 +340,7 @@ public class Shell : Form
         _menuTarget = null;
         _project = null;
         _findDialog = null;
+        _itemsEditor = null;
         _isBuilding = false;
         _compilerProcess = null;
         _icons = null;
@@ -2918,8 +2923,30 @@ public class Shell : Form
         surface.SelectionChanged += () => this.ShowActiveDesign();
         surface.Message += (message) => this.ShowStatus(message);
         surface.KeyNotHandled += this.OnEditorKey;
+        surface.ItemsRequested += (owner) => this.OpenItemsEditor(owner);
         tab.Designer = surface;
         ShowDesigner(tab);
+    }
+
+    /// Shows the items of a menu or a toolbar on the form in front, as
+    /// double-clicking it does. For `--items`, which is how the editor is
+    /// photographed.
+    public void ShowItemsEditor(String owner) => OpenItemsEditor(owner);
+
+    /// Shows the items of a menu or a toolbar on the form in front.
+    void OpenItemsEditor(String owner)
+    {
+        var surface = FindActiveDesign();
+        if (surface == null)
+            return;
+        var editor = _itemsEditor;
+        if (editor == null)
+        {
+            editor = new ItemsEditor();
+            _itemsEditor = editor;
+        }
+        ((ItemsEditor)editor).EditItems((DesignSurface)surface, owner);
+        ShowStatus("Add, order and remove the items there; the Properties grid edits the one chosen.");
     }
 
     /// Shows the designer, from the text as it is now -- so an edit made in
@@ -2996,12 +3023,32 @@ public class Shell : Form
         return tab.Designer;
     }
 
-    void ShowActiveDesign() => _grid.ShowSurface(FindActiveDesign());
+    /// Shows the selection of the form in front in the Properties grid, and
+    /// in the items editor when it is showing that form's items -- which it
+    /// stops doing when another form is in front.
+    void ShowActiveDesign()
+    {
+        var surface = FindActiveDesign();
+        _grid.ShowSurface(surface);
+
+        var editor = _itemsEditor;
+        if (editor == null || !((ItemsEditor)editor).Visible)
+            return;
+        var showing = (ItemsEditor)editor;
+        DesignSurface? shown = showing.Surface;
+        if (surface == null || shown == null || (DesignSurface)shown != (DesignSurface)surface)
+            showing.Hide();
+        else
+            showing.FollowSelection();
+    }
 
     void OnDesignChanged(EditorTab tab)
     {
         WriteDesignBack(tab);
         _toolbox.ClearChoice();
+        var editor = _itemsEditor;
+        if (editor != null && ((ItemsEditor)editor).Visible)
+            ((ItemsEditor)editor).RefreshItems();
         ShowActiveDesign();
     }
 
@@ -3077,8 +3124,15 @@ public class Shell : Form
         long dot = name.LastIndexOf(".");
         if (dot >= 0)
             name = name.Substring((nuint)dot + 1u);
-        if (name == "TimerHandler")
-            return "Timer sender";
+        switch (name)
+        {
+            case "TimerHandler":
+                return "Timer sender";
+            case "MenuEventHandler":
+                return "MenuItem sender";
+            default:
+                break;
+        }
         if (name == "EventHandler" || !name.EndsWith("EventHandler"))
             return "Control sender";
         String stem = name.Substring(0u, name.ByteLength() - "Handler".ByteLength());
@@ -5253,6 +5307,7 @@ public class Shell : Form
 
         ok = TestDesigner() && ok;
         ok = TestToolboxAndGrid() && ok;
+        ok = TestMenusAndToolBars() && ok;
         ok = TestTabClosingAndRecent() && ok;
 
         if (ok)
@@ -5313,6 +5368,122 @@ public class Shell : Form
 
     /// The Toolbox and the Properties grid against a designer, through the
     /// same calls a click and a keystroke make.
+    /// A menu and a toolbar, placed from the Toolbox, with their items added,
+    /// ordered, edited and removed as the items editor does it -- and the
+    /// generated half adding each item to what holds it.
+    bool TestMenusAndToolBars()
+    {
+        bool ok = true;
+        var pad = AddTab(new Document());
+        pad.Editor.Contents.Location = "selftest-menus.slfm";
+        pad.Editor.TypeText("module Test;" + Newline + Newline
+            + "form Probe : Form" + Newline + "{" + Newline
+            + "    Bounds = 0, 0, 320, 240;" + Newline + "}" + Newline);
+        AttachDesigner(pad);
+        var surface = (DesignSurface)pad.Designer;
+
+        // The first menu becomes the form's, and opens the items editor.
+        surface.PlaceComponent("MainMenu", Point.FromXY(4, 4));
+        String file = surface.AddDesignedItem("_mainMenu1", DesignedItemKind.Item);
+        String open = surface.AddDesignedItem(file, DesignedItemKind.Item);
+        String gap = surface.AddDesignedItem(file, DesignedItemKind.Separator);
+        String quit = surface.AddDesignedItem(file, DesignedItemKind.Item);
+        bool moved = surface.MoveDesignedItem(quit, true);
+        String text = pad.Editor.Contents.GetText();
+        if (file != "_menuItem1" || open != "_menuItem2" || gap != "_separator1" || !moved
+            || !text.Contains("Menu = _mainMenu1;") || !text.Contains("MainMenu _mainMenu1 = new MainMenu()")
+            || !text.Contains("MenuItem _menuItem1 = new MenuItem()") || !text.Contains("Text = \"menuItem1\";")
+            || !text.Contains("MenuItem _separator1 = MenuItem.CreateSeparator()")
+            || text.IndexOf("MenuItem _menuItem3") > text.IndexOf("MenuItem _separator1"))
+        {
+            Console.WriteLine("FAIL: a menu's items were not added and ordered in the file as asked");
+            ok = false;
+        }
+
+        var editor = _itemsEditor;
+        if (editor == null || ((ItemsEditor)editor).OwnerName != "_mainMenu1"
+            || ((ItemsEditor)editor).ItemCount != 4u)
+        {
+            Console.WriteLine("FAIL: placing a menu did not open the items editor on its items");
+            ok = false;
+        }
+
+        String generated = GenerateFormSource(surface.Document, "selftest-menus.slfm");
+        if (!generated.Contains("_menuItem1.Add(_menuItem2);") || !generated.Contains("_mainMenu1.Add(_menuItem1);")
+            || generated.IndexOf("Menu = _mainMenu1;") < generated.IndexOf("_mainMenu1.Add(_menuItem1);"))
+        {
+            Console.WriteLine("FAIL: the generated half did not add each item to its menu before setting Menu");
+            ok = false;
+        }
+
+        // An item's text and its Click are the grid's, as a control's are; the
+        // bookkeeping a menu does for the platform is not offered.
+        surface.SelectComponent("_menuItem1");
+        _grid.SelectProperty("Text");
+        _grid.ApplyText("&File");
+        var heading = surface.FindComponent("_menuItem1");
+        if (!pad.Editor.Contents.GetText().Contains("Text = \"&File\";") || heading == null
+            || surface.DescribeItemText((FormComponent)heading) != "&File")
+        {
+            Console.WriteLine("FAIL: a menu item's text set in the grid did not reach the file");
+            ok = false;
+        }
+        if (_grid.FindEventIndex("Click") < 0
+            || DescribeHandlerParameters("Forms.MenuEventHandler") != "MenuItem sender")
+        {
+            Console.WriteLine("FAIL: a menu item's Click was not offered, or its handler not described");
+            ok = false;
+        }
+        if (_grid.SelectProperty("IsOnMenuBar") || _grid.SelectProperty("IsOwnerDrawn"))
+        {
+            Console.WriteLine("FAIL: the grid offered what a menu item keeps for the platform");
+            ok = false;
+        }
+
+        // Renaming the menu renames the form's Menu with it.
+        var menu = surface.FindComponent("_mainMenu1");
+        if (menu == null || !surface.RenameComponent((FormComponent)menu, "_bar")
+            || !pad.Editor.Contents.GetText().Contains("Menu = _bar;"))
+        {
+            Console.WriteLine("FAIL: renaming a menu left the form's Menu naming the old one");
+            ok = false;
+        }
+
+        // A toolbar goes across the top, and its buttons go on the live bar.
+        surface.PlaceComponent("ToolBar", Point.FromXY(40, 40));
+        surface.AddDesignedItem("_toolBar1", DesignedItemKind.Item);
+        surface.AddDesignedItem("_toolBar1", DesignedItemKind.Toggle);
+        surface.AddDesignedItem("_toolBar1", DesignedItemKind.Separator);
+        text = pad.Editor.Contents.GetText();
+        var bar = surface.FindLiveControl("_toolBar1");
+        if (!text.Contains("ToolBar _toolBar1") || !text.Contains("Dock = DockStyle.Top;")
+            || !text.Contains("ToolButton _toolButton2 = new ToolButton()")
+            || !text.Contains("Kind = ToolButtonKind.Toggle;")
+            || !text.Contains("ToolButton _separator2 = ToolButton.CreateSeparator()")
+            || bar == null || !(bar is ToolBar) || ((ToolBar)bar).Buttons.Count != 3u
+            || ((ToolBar)bar).Buttons[1u].Kind != ToolButtonKind.Toggle
+            || ((ToolBar)bar).Buttons[0u].Text != "toolButton1")
+        {
+            Console.WriteLine("FAIL: a toolbar's buttons were not written, or not put on the live bar");
+            ok = false;
+        }
+
+        // Deleting the menu takes its items and the form's Menu with it.
+        surface.SelectComponent("_bar");
+        surface.DeleteSelectedComponent();
+        text = pad.Editor.Contents.GetText();
+        if (text.Contains("Menu = ") || text.Contains("_menuItem1") || !text.Contains("_toolButton1"))
+        {
+            Console.WriteLine("FAIL: deleting a menu left its items, or the form's Menu, behind");
+            ok = false;
+        }
+
+        if (editor != null)
+            ((ItemsEditor)editor).Hide();
+        CloseTab(pad);
+        return ok;
+    }
+
     bool TestToolboxAndGrid()
     {
         bool ok = true;

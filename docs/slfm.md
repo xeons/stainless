@@ -61,6 +61,7 @@ A member is one of three things, told apart by what follows its first name:
 | `Event += Method;` | a handler, which is a method of the form | `target.Event += this.Method;` |
 | `Type Name { ... }` | a control, whose parent is the block it is in | `Name = new Type(parent);` |
 | `Type Name = new Type(...) { ... }` | a component made as it says, with no parent | `Name = new Type(...);` |
+| the same, inside anything but the form | an item of what it is inside | `Name = new Type(...); ... Outer.Add(Name);` |
 
 A value is a string literal, a number (decimal, with an optional fraction or a
 leading `-`, or hexadecimal after `0x`), one or more names joined by `|`, a
@@ -112,6 +113,62 @@ written where a control would get `new Type(parent)`. That keeps the generator
 free of knowing which types take a parent: the file says so. The designer
 shows such a component in a tray under the form, as Visual Studio does, and
 does not start it there.
+
+**One made as it says inside another component is an item of it**, and the
+generated half adds it with `Add` once its own members are set. That is how a
+menu's items and a toolbar's buttons are written, with no knowledge of either:
+`MainMenu.Add`, `MenuItem.Add` and `ToolBar.Add` each take the item.
+
+```
+Menu = _mainMenu;
+
+MainMenu _mainMenu = new MainMenu()
+{
+    MenuItem _fileMenu = new MenuItem()
+    {
+        Text = "&File";
+
+        MenuItem _exitItem = new MenuItem()
+        {
+            Text = "E&xit";
+            Click += OnExit;
+        }
+    }
+}
+
+ToolBar _tools
+{
+    Dock = DockStyle.Top;
+
+    ToolButton _save = new ToolButton()
+    {
+        Text = "Save";
+        Click += OnSave;
+    }
+}
+```
+
+```csharp
+_exitItem = new MenuItem();
+_exitItem.Text = "E&xit";
+_exitItem.Click += this.OnExit;
+_fileMenu.Add(_exitItem);
+_mainMenu.Add(_fileMenu);
+...
+_save = new ToolButton();
+_save.Text = "Save";
+_save.Click += this.OnSave;
+_tools.Add(_save);
+...
+Menu = _mainMenu;
+```
+
+**A property whose value is a component's name is set last**, after every
+component is made, wherever the file puts it. `Menu = _mainMenu;` above comes
+before the menu in the file and after it in the generated half, which is the
+only order in which `_mainMenu` exists to be named. A separator is
+`MenuItem.CreateSeparator()` or `ToolButton.CreateSeparator()`, and a button
+that stays pressed sets `Kind = ToolButtonKind.Toggle;`.
 
 Comments are `//` to the end of a line. One above a member belongs to that
 member and moves with it; one after a member's `;` stays on its line; one before
@@ -224,8 +281,7 @@ class, every handler an `override`, and the class a program shows would not be
 the class it wrote. Two declarations of one class is what Visual Studio does
 with `partial`, and Stainless allows it for a class.
 
-## 6. What is not there yet
-
-- **Items that are not strings.** A list's rows are an array, but a
-  `MenuItem`'s children and a `ToolBar`'s buttons are made by calling methods,
-  not by setting properties.
+**A syntax of its own for items**, such as Lazarus's `object` blocks inside a
+`TMainMenu`. An item is a component like any other, made as the file says,
+and the one rule that adds it to what it is inside covers menus and toolbars
+both. A type with an `Add` that takes its items needs nothing more.

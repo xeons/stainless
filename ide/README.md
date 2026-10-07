@@ -197,6 +197,12 @@ backends render it. The IDE is what found the faults listed in
   click on the form to place one, inside a `Panel`, `GroupBox` or tab page if
   that is what was clicked. A `TabControl` comes with a page, and a `TabPage`
   goes on the `TabControl` clicked; a `Timer` goes in a tray under the form.
+  A `MainMenu` goes in the tray too and becomes the form's `Menu`, drawn as a
+  bar on the designed form; a `ToolBar` goes across the top. Double-clicking
+  either -- the bar, the tray entry, the toolbar -- opens the items editor,
+  Lazarus's menu editor kept small: a tree of the items, and buttons that add,
+  order and remove them. The item chosen there is the one the Properties grid
+  edits, its `Text` and `Click` included.
   An `Image`, a `PaintBox`, a `Shape` and a `Bevel` have no window of their
   own and are designed all the same, as Lazarus designs any `TControl`; an
   `Image` is framed with a dashed line so an empty one can be seen, and a
@@ -333,6 +339,7 @@ ide/src/Designer/FormGenerator.sl .slfm into the generated .designer.sl
 ide/src/Designing/DesignedControls.sl a form file's controls, made for real
 ide/src/Designing/DesignSurface.sl    the designer: live controls, and the overlay
 ide/src/Designing/Toolbox.sl          the control types, picked and placed
+ide/src/Designing/ItemsEditor.sl      a menu's items and a toolbar's buttons
 ide/src/Designing/PropertyGrid.sl     properties and events, through reflection
 ide/slforms/                the generator on its own, for a build with no IDE
 ide/src/Main.sl             the command line

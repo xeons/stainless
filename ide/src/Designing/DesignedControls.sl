@@ -34,7 +34,7 @@ public String[] ListDesignableTypes() =>
     ["Button", "Label", "TextBox", "CheckBox", "RadioButton", "ToggleButton",
      "ListBox", "ComboBox", "CheckListBox", "SpinEdit", "ProgressBar", "TrackBar",
      "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Image", "PaintBox",
-     "Shape", "Bevel", "Timer"];
+     "Shape", "Bevel", "ToolBar", "MainMenu", "Timer"];
 
 /// Whether controls may be put inside one of these. A `TabControl` holds
 /// pages and nothing else, so it is not one.
@@ -43,7 +43,59 @@ public bool IsDesignableContainer(String typeName) =>
 
 /// Whether a type has no window, and so is shown in the tray under the form
 /// and made by the expression its declaration gives, `new Timer()`.
-public bool IsNonVisualType(String typeName) => typeName == "Timer";
+public bool IsNonVisualType(String typeName) => typeName == "Timer" || typeName == "MainMenu";
+
+/// Whether a type is an item of something else -- a menu's or a toolbar's --
+/// made as its declaration says and added to what it is inside. It is shown
+/// by what holds it, and edited in the items editor.
+public bool IsDesignedItemType(String typeName) => typeName == "MenuItem" || typeName == "ToolButton";
+
+/// Whether a type holds items the items editor edits, and which type they
+/// are; "" for one that holds none.
+public String FindItemTypeOf(String typeName)
+{
+    switch (typeName)
+    {
+        case "MainMenu":
+        case "MenuItem":
+            return "MenuItem";
+        case "ToolBar":
+            return "ToolButton";
+        default:
+            return "";
+    }
+}
+
+/// The text a declaration's initializer passes, `new MenuItem("&File")`, or
+/// "" for one that passes no string.
+public String ReadInitializerText(String initializer)
+{
+    long open = initializer.IndexOf("(\"");
+    if (open < 0 || !initializer.EndsWith("\")"))
+        return "";
+    nuint from = (nuint)open + 1u;
+    return UnquoteFormText(initializer.Substring(from, initializer.ByteLength() - from - 1u));
+}
+
+/// Whether an initializer makes a separator, `MenuItem.CreateSeparator()`.
+public bool IsSeparatorInitializer(String initializer) => initializer.EndsWith(".CreateSeparator()");
+
+/// A menu item as its declaration makes it, before its properties are set.
+public MenuItem CreateDesignedMenuItem(FormComponent component)
+{
+    if (IsSeparatorInitializer(component.Initializer))
+        return MenuItem.CreateSeparator();
+    return new MenuItem(ReadInitializerText(component.Initializer));
+}
+
+/// A toolbar button as its declaration makes it, before its properties are
+/// set and before it is put on its bar.
+public ToolButton CreateDesignedToolButton(FormComponent component)
+{
+    if (IsSeparatorInitializer(component.Initializer))
+        return ToolButton.CreateSeparator();
+    return new ToolButton(ReadInitializerText(component.Initializer));
+}
 
 /// A control of the named type inside `parent`, or null for a name the
 /// designer does not know. An `Image` has no window and is drawn by its
@@ -74,6 +126,7 @@ public Control? CreateDesignedControl(String typeName, WindowedControl parent)
         case "PaintBox": return new PaintBox(parent);
         case "Shape": return new Shape(parent);
         case "Bevel": return new Bevel(parent);
+        case "ToolBar": return new ToolBar(parent);
         default: return null;
     }
 }
@@ -120,7 +173,7 @@ public bool ApplyReflectedProperty(byte* raw, Type type, FormProperty property, 
         return false;
 
     var target = type.FindProperty(property.Name);
-    if (!target.Exists || !target.IsPublic || !target.CanWrite)
+    if (!target.Exists || !target.IsPublic || !target.IsSetterPublic)
         return false;
 
     String item = items[0u];

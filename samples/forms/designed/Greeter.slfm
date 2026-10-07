@@ -7,25 +7,62 @@ import Forms.Drawing;
 form GreeterForm : Form
 {
     Text = "Greeter";
-    Bounds = 0, 0, 360, 170;
+    Bounds = 0, 0, 360, 240;
+    Menu = _mainMenu;
+
+    // The same command three ways: the menu, the toolbar and the button.
+    MainMenu _mainMenu = new MainMenu()
+    {
+        MenuItem _fileMenu = new MenuItem()
+        {
+            Text = "&File";
+
+            MenuItem _greetItem = new MenuItem()
+            {
+                Text = "&Greet";
+                Click += OnGreetItem;
+            }
+
+            MenuItem _separator1 = MenuItem.CreateSeparator()
+            {
+            }
+
+            MenuItem _exitItem = new MenuItem()
+            {
+                Text = "E&xit";
+                Click += OnExit;
+            }
+        }
+    }
+
+    ToolBar _tools
+    {
+        Dock = DockStyle.Top;
+
+        ToolButton _greetButton = new ToolButton()
+        {
+            Text = "Greet";
+            Click += OnGreet;
+        }
+    }
 
     Label _prompt
     {
         Text = "Your name:";
-        Bounds = 16, 20, 80, 20;
+        Bounds = 16, 52, 80, 20;
     }
 
     TextBox _name
     {
         Text = "world";
-        Bounds = 100, 16, 240, 24;
+        Bounds = 100, 48, 240, 24;
         Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
     }
 
     Button _greet
     {
         Text = "Greet";
-        Bounds = 250, 56, 90, 28;
+        Bounds = 250, 88, 90, 28;
         Image = Embed("greet.png");
         Anchors = AnchorStyles.Top | AnchorStyles.Right;
         Click += OnGreet;

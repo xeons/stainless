@@ -23,7 +23,11 @@
 // It is generated syntactically, with no knowledge of Forms' types. A value
 // is copied as written; several values go to `SetName(...)` rather than to
 // `Name`; a handler is `+=` on `this.Method`; a control is made with its
-// parent unless the file says how it is made. The compiler checks the result.
+// parent unless the file says how it is made. A component made as the file
+// says, inside anything but the form, is added to what it is inside with
+// `Add`, which is how a menu item reaches its menu and a button its toolbar.
+// A property naming a component is set once every component is made. The
+// compiler checks the result.
 //
 // One value is not copied: `Embed("logo.png")`, a picture carried in the
 // program. An embed is a static and nothing else, so it becomes one -- an
@@ -76,8 +80,12 @@ public String GenerateFormSource(FormDocument document, String sourceName)
 
     var fields = new List<FormComponent>();
     CollectFormFields(form, fields);
+    var names = new List<String>();
     for (nuint i = 0u; i < fields.Count; i++)
+    {
         text.AppendLine("    private late " + fields[i].TypeName + " " + fields[i].Name + ";");
+        names.Add(fields[i].Name);
+    }
     if (fields.Count > 0u)
         text.AppendLine();
 
@@ -102,7 +110,13 @@ public String GenerateFormSource(FormDocument document, String sourceName)
     text.AppendLine("    private void InitializeComponent()");
     text.AppendLine("    {");
     var body = new StringBuilder();
-    GenerateFormMembers(body, form, "");
+    var deferred = new StringBuilder();
+    GenerateFormMembers(body, form, "", names, deferred);
+    if (deferred.HasContent)
+    {
+        body.AppendLine();
+        body.Append(deferred.ToText());
+    }
     text.Append(body.ToText());
     text.AppendLine("    }");
     text.AppendLine("}");
@@ -157,7 +171,12 @@ void CollectFormFields(FormComponent component, List<FormComponent> into)
 /// The statements that set up one component, in the order the file gives
 /// them. `target` is empty for the form, and a field's name followed by a dot
 /// for a control.
-void GenerateFormMembers(StringBuilder text, FormComponent component, String target)
+///
+/// `names` are the form's components. A property set to one of them goes to
+/// `deferred`, which follows everything else: `Menu = _mainMenu;` MUST NOT
+/// run before `_mainMenu` is made, wherever the file puts it.
+void GenerateFormMembers(StringBuilder text, FormComponent component, String target,
+                         List<String> names, StringBuilder deferred)
 {
     String indent = "        ";
     String parent = target == "" ? "this" : component.Name;
@@ -168,7 +187,10 @@ void GenerateFormMembers(StringBuilder text, FormComponent component, String tar
 
         if (member is FormProperty property)
         {
-            if (IsEmbeddedValue(property.Value))
+            if (!property.Value.IsList && names.Contains(property.Value.Items[0u]))
+                deferred.AppendLine(indent + target + property.Name + " = " +
+                                    property.Value.Items[0u] + ";");
+            else if (IsEmbeddedValue(property.Value))
                 text.AppendLine(indent + target + property.Name + " = Bitmap.FromEmbedded(" +
                                 NameEmbeddedField(target == "" ? "" : component.Name, property.Name) + ");");
             else if (property.Value.IsList)
@@ -189,7 +211,9 @@ void GenerateFormMembers(StringBuilder text, FormComponent component, String tar
                 text.AppendLine();
             String made = child.Initializer == "" ? "new " + child.TypeName + "(" + parent + ")" : child.Initializer;
             text.AppendLine(indent + child.Name + " = " + made + ";");
-            GenerateFormMembers(text, child, child.Name + ".");
+            GenerateFormMembers(text, child, child.Name + ".", names, deferred);
+            if (target != "" && child.Initializer != "")
+                text.AppendLine(indent + component.Name + ".Add(" + child.Name + ");");
         }
     }
 }

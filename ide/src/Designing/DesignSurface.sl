@@ -35,35 +35,65 @@ public class DesignedItem
 {
     public FormComponent Component;
 
-    /// The control, or for a component with no window its entry in the tray.
+    /// The control; for a component in the tray, its entry there; for an item,
+    /// what shows it: its menu's entry in the tray, or its toolbar.
     public Control Live;
 
     /// A component with no window, made for the Properties grid to read and
-    /// write. A `Timer` is the one kind today.
-    public Timer? Held;
+    /// write. At most one is set.
+    public Timer? HeldTimer;
+    public MainMenu? HeldMenu;
+    public MenuItem? HeldMenuItem;
+    public ToolButton? HeldButton;
 
     public DesignedItem(FormComponent component, Control live)
     {
         Component = component;
         Live = live;
-        Held = null;
+        HeldTimer = null;
+        HeldMenu = null;
+        HeldMenuItem = null;
+        HeldButton = null;
     }
 
-    public bool IsNonVisual => Held != null;
+    public bool IsNonVisual =>
+        HeldTimer != null || HeldMenu != null || HeldMenuItem != null || HeldButton != null;
+
+    /// Whether it has an entry of its own in the tray: a timer or a menu, and
+    /// not one of a menu's or a toolbar's items.
+    public bool IsInTray => HeldTimer != null || HeldMenu != null;
 
     /// What reflection reads and writes: the control, or the component.
     public byte* Target
     {
         get
         {
-            var held = Held;
-            return held == null ? (byte*)Live : (byte*)((Timer)held);
+            Timer? timer = HeldTimer;
+            if (timer != null)
+                return (byte*)((Timer)timer);
+            MainMenu? menu = HeldMenu;
+            if (menu != null)
+                return (byte*)((MainMenu)menu);
+            MenuItem? item = HeldMenuItem;
+            if (item != null)
+                return (byte*)((MenuItem)item);
+            ToolButton? button = HeldButton;
+            if (button != null)
+                return (byte*)((ToolButton)button);
+            return (byte*)Live;
         }
     }
 }
 
 public closure void DesignChangedHandler();
 public closure void DesignMessageHandler(String message);
+
+/// A menu or a toolbar asked to have its items edited, by name.
+public closure void DesignItemsHandler(String owner);
+
+/// What the items editor adds: an item, a gap, or a button that stays
+/// pressed.
+public enum DesignedItemKind { Item, Separator, Toggle }
 
 /// What a drag is doing: moving the selection, sizing the one control
 /// selected, or drawing a band to select what it touches.
@@ -90,15 +120,22 @@ public class DesignSurface : Panel
     const int FrameSide = 8;
     const int FrameTop = 31;
 
-    /// The tray's entries, one to a component with no window.
-    const int TrayEntryWidth = 128;
+    /// The tray's entries, one to a component with no window. Wide enough for
+    /// `_mainMenu1 : MainMenu`.
+    const int TrayEntryWidth = 168;
     const int TrayHeight = 28;
+
+    /// The height of the menu bar drawn on a form that has one.
+    const int MenuStripHeight = 20;
 
     private FormDocument _document;
     private late Panel _frame;
     /// Below the form, the components with no window: Visual Studio's tray.
     private late Panel _tray;
     private late Label _caption;
+    /// The form's menu bar, drawn from the document between the caption and
+    /// the client, which is where a real one is.
+    private late CustomControl _menuStrip;
     private late Panel _client;
     private late CustomControl _overlay;
     private List<DesignedItem> _items;
@@ -143,6 +180,11 @@ public class DesignSurface : Panel
         _caption = new Label(_frame);
         _caption.ForeColor = SystemColors.HighlightText;
         _caption.BackColor = SystemColors.Highlight;
+        _menuStrip = new CustomControl(_frame);
+        _menuStrip.Visible = false;
+        _menuStrip.Paint += this.OnMenuStripPaint;
+        _menuStrip.MouseDown += this.OnMenuStripMouseDown;
+        _menuStrip.DoubleClick += this.OnMenuStripDoubleClick;
         _client = new Panel(_frame);
         _client.BackColor = SystemColors.Control;
 
@@ -169,6 +211,10 @@ public class DesignSurface : Panel
 
     /// Raised when a different component is selected, or the form.
     public event DesignChangedHandler SelectionChanged;
+
+    /// Raised when a menu or a toolbar is double-clicked, or put on the form:
+    /// its items want editing.
+    public event DesignItemsHandler ItemsRequested;
 
     /// The type the next click on the form places, as the Toolbox names it,
     /// or empty for a click that selects.
@@ -306,7 +352,7 @@ public class DesignSurface : Panel
         int x = 4;
         foreach (var item in _items)
         {
-            if (!item.IsNonVisual)
+            if (!item.IsInTray)
                 continue;
             item.Live.SetBounds(x, 4, TrayEntryWidth, TrayHeight - 8);
             x += TrayEntryWidth + 4;
@@ -323,6 +369,7 @@ public class DesignSurface : Panel
         var entry = new CustomControl(_tray);
         entry.Paint += this.OnTrayEntryPaint;
         entry.MouseDown += this.OnTrayEntryMouseDown;
+        entry.DoubleClick += this.OnTrayEntryDoubleClick;
         return entry;
     }
 
@@ -330,10 +377,22 @@ public class DesignSurface : Panel
     {
         foreach (var item in _items)
         {
-            if (item.Live == entry)
+            if (item.Live == entry && item.IsInTray)
                 return item;
         }
         return null;
+    }
+
+    /// Whether the selection holds anything an entry shows: its component, or
+    /// one of its menu's items.
+    private bool IsShownBySelection(Control shownBy)
+    {
+        foreach (var each in _selection)
+        {
+            if (each.Live == shownBy)
+                return true;
+        }
+        return false;
     }
 
     private void OnTrayEntryPaint(Control sender, PaintEventArgs args)
@@ -342,7 +401,7 @@ public class DesignSurface : Panel
         if (found == null)
             return;
         var item = (DesignedItem)found;
-        bool chosen = IsSelected(item);
+        bool chosen = IsShownBySelection(sender);
         args.Graphics.FillRectangle(new Brush(chosen ? SystemColors.Highlight : SystemColors.Control),
                                     Rectangle.FromBounds(0, 0, sender.Bounds.Width, sender.Bounds.Height));
         args.Graphics.DrawString(item.Component.Name + " : " + item.Component.TypeName, sender.Font,
@@ -366,15 +425,24 @@ public class DesignSurface : Panel
         RefreshSelection();
     }
 
+    /// A menu's entry, double-clicked: its items want editing.
+    private void OnTrayEntryDoubleClick(Control sender)
+    {
+        var found = FindTrayItem(sender);
+        if (found != null && ((DesignedItem)found).HeldMenu != null)
+            ItemsRequested(((DesignedItem)found).Component.Name);
+    }
+
     /// Shows a change of selection: the handles, the tray, the page a
     /// selected control is on, and the Properties grid.
     private void RefreshSelection()
     {
         ShowSelectedPage();
         _overlay.Invalidate();
+        _menuStrip.Invalidate();
         foreach (var item in _items)
         {
-            if (item.IsNonVisual)
+            if (item.IsInTray)
                 item.Live.Invalidate();
         }
         SelectionChanged();
@@ -426,6 +494,7 @@ public class DesignSurface : Panel
         overlay.MouseMove += this.OnOverlayMouseMove;
         overlay.MouseUp += this.OnOverlayMouseUp;
         overlay.KeyDown += this.OnOverlayKeyDown;
+        overlay.DoubleClick += this.OnOverlayDoubleClick;
         overlay.BringToFront();
         return overlay;
     }
@@ -453,9 +522,99 @@ public class DesignSurface : Panel
         _frame.SetBounds(GridStep * 2, GridStep * 2, width, height);
         _caption.Text = title;
         _caption.SetBounds(FrameSide, 7, width - FrameSide * 2, FrameTop - 12);
-        _client.SetBounds(FrameSide, FrameTop, width - FrameSide * 2,
-                          height - FrameTop - FrameSide);
+
+        // A menu bar takes its height from the client, as a real one takes
+        // it from inside the window's bounds.
+        int strip = FindFormMenu() != null ? MenuStripHeight : 0;
+        _menuStrip.Visible = strip > 0;
+        _menuStrip.SetBounds(FrameSide, FrameTop, width - FrameSide * 2, MenuStripHeight);
+        _menuStrip.Invalidate();
+        _client.SetBounds(FrameSide, FrameTop + strip, width - FrameSide * 2,
+                          height - FrameTop - FrameSide - strip);
         LayOutTray();
+    }
+
+    /// The `MainMenu` the form's `Menu` names, or null.
+    private FormComponent? FindFormMenu()
+    {
+        FormProperty? named = _document.Form.FindProperty("Menu");
+        if (named == null || ((FormProperty)named).Value.Items.Count != 1u)
+            return null;
+        var found = _document.Form.FindComponent(((FormProperty)named).Value.Items[0u]);
+        if (found == null || ((FormComponent)found).TypeName != "MainMenu")
+            return null;
+        return found;
+    }
+
+    /// What an item says: its `Text`, or the text its declaration passes.
+    public String DescribeItemText(FormComponent item)
+    {
+        if (IsSeparatorInitializer(item.Initializer))
+            return "-";
+        FormProperty? text = item.FindProperty("Text");
+        if (text != null && ((FormProperty)text).Value.Items.Count == 1u)
+            return UnquoteFormText(((FormProperty)text).Value.Items[0u]);
+        return ReadInitializerText(item.Initializer);
+    }
+
+    /// The menu's headings, as the bar shows them: the `&` that marks an
+    /// accelerator is not drawn.
+    private void OnMenuStripPaint(Control sender, PaintEventArgs args)
+    {
+        Rectangle area = Rectangle.FromBounds(0, 0, sender.Bounds.Width, sender.Bounds.Height);
+        args.Graphics.FillRectangle(new Brush(SystemColors.Control), area);
+
+        var menu = FindFormMenu();
+        if (menu == null)
+            return;
+        bool chosen = false;
+        foreach (var item in _selection)
+        {
+            if (item.HeldMenu != null && item.Component == menu)
+                chosen = true;
+        }
+
+        int x = 6;
+        foreach (var heading in ((FormComponent)menu).ListChildren())
+        {
+            String shown = DescribeItemText(heading).Replace("&", "");
+            if (shown == "")
+                shown = heading.Name;
+            Size extent = args.Graphics.MeasureString(shown, sender.Font);
+            if (IsComponentSelected(heading.Name))
+                args.Graphics.FillRectangle(new Brush(SystemColors.Highlight),
+                    Rectangle.FromBounds(x - 4, 1, extent.Width + 8, MenuStripHeight - 2));
+            args.Graphics.DrawString(shown, sender.Font,
+                IsComponentSelected(heading.Name) ? SystemColors.HighlightText : SystemColors.ControlText,
+                x, (MenuStripHeight - extent.Height) / 2);
+            x += extent.Width + 14;
+        }
+        if (chosen)
+            args.Graphics.DrawRectangle(new Pen(SystemColors.Highlight),
+                Rectangle.FromBounds(0, 0, area.Width - 1, area.Height - 1));
+    }
+
+    /// A click on the bar selects the menu.
+    private void OnMenuStripMouseDown(Control sender, MouseEventArgs args)
+    {
+        var menu = FindFormMenu();
+        if (menu != null)
+            SelectComponent(((FormComponent)menu).Name);
+    }
+
+    private void OnMenuStripDoubleClick(Control sender)
+    {
+        var menu = FindFormMenu();
+        if (menu != null)
+            ItemsRequested(((FormComponent)menu).Name);
+    }
+
+    /// A toolbar, double-clicked: its buttons want editing.
+    private void OnOverlayDoubleClick(Control sender)
+    {
+        var chosen = Primary;
+        if (chosen != null && FindItemTypeOf(((DesignedItem)chosen).Component.TypeName) != "")
+            ItemsRequested(((DesignedItem)chosen).Component.Name);
     }
 
     private void CreateDesignedChildren(FormComponent component, WindowedControl parent,
@@ -465,7 +624,7 @@ public class DesignSurface : Panel
         {
             if (IsNonVisualType(child.TypeName))
             {
-                CreateNonVisualItem(child);
+                CreateNonVisualItem(child, unknown);
                 continue;
             }
 
@@ -486,25 +645,86 @@ public class DesignSurface : Panel
                     ApplyDesignedProperty(live, type, property, BaseDirectory);
             }
             _items.Add(new DesignedItem(child, live));
-            if (live is WindowedControl container)
+            if (live is ToolBar bar)
+                CreateToolButtons(child, bar, unknown);
+            else if (live is WindowedControl container)
                 CreateDesignedChildren(child, container, unknown);
         }
     }
 
     /// A component with no window: the object itself, which never starts,
-    /// and its entry in the tray.
-    private void CreateNonVisualItem(FormComponent component)
+    /// and its entry in the tray. A menu brings its items with it.
+    private void CreateNonVisualItem(FormComponent component, List<String> unknown)
     {
         var item = new DesignedItem(component, CreateTrayEntry());
-        item.Held = new Timer();
-
-        var type = FindDesignedType(component.TypeName);
-        for (nuint i = 0u; i < component.Members.Count; i++)
+        if (component.TypeName == "MainMenu")
         {
-            if (component.Members[i] is FormProperty property)
+            var menu = new MainMenu();
+            item.HeldMenu = menu;
+            ApplyHeldProperties(item);
+            _items.Add(item);
+            CreateMenuItems(component, item.Live, menu, null, unknown);
+            return;
+        }
+
+        item.HeldTimer = new Timer();
+        ApplyHeldProperties(item);
+        _items.Add(item);
+    }
+
+    private void ApplyHeldProperties(DesignedItem item)
+    {
+        var type = FindDesignedType(item.Component.TypeName);
+        for (nuint i = 0u; i < item.Component.Members.Count; i++)
+        {
+            if (item.Component.Members[i] is FormProperty property)
                 ApplyReflectedProperty(item.Target, type, property, BaseDirectory);
         }
-        _items.Add(item);
+    }
+
+    /// A menu's items, or an item's, made and added as the generated half
+    /// adds them. Each is shown by its menu's entry in the tray.
+    private void CreateMenuItems(FormComponent component, Control shownBy, MainMenu? menu,
+                                 MenuItem? heading, List<String> unknown)
+    {
+        foreach (var child in component.ListChildren())
+        {
+            if (child.TypeName != "MenuItem")
+            {
+                unknown.Add(child.Name);
+                continue;
+            }
+            var made = CreateDesignedMenuItem(child);
+            var item = new DesignedItem(child, shownBy);
+            item.HeldMenuItem = made;
+            ApplyHeldProperties(item);
+            if (heading != null)
+                ((MenuItem)heading).Add(made);
+            else if (menu != null)
+                ((MainMenu)menu).Add(made);
+            _items.Add(item);
+            CreateMenuItems(child, shownBy, null, made, unknown);
+        }
+    }
+
+    /// A toolbar's buttons, each put on the live bar once what it is has been
+    /// set, as the generated half does it.
+    private void CreateToolButtons(FormComponent component, ToolBar bar, List<String> unknown)
+    {
+        foreach (var child in component.ListChildren())
+        {
+            if (child.TypeName != "ToolButton")
+            {
+                unknown.Add(child.Name);
+                continue;
+            }
+            var made = CreateDesignedToolButton(child);
+            var item = new DesignedItem(child, bar);
+            item.HeldButton = made;
+            ApplyHeldProperties(item);
+            bar.Add(made);
+            _items.Add(item);
+        }
     }
 
     // ------------------------------------------------------------ geometry
@@ -890,53 +1110,184 @@ public class DesignSurface : Panel
         var chosen = Primary;
         if (chosen == null)
             return;
-        var parent = ((DesignedItem)chosen).Live.Parent;
+        var parent = FindParentComponent(((DesignedItem)chosen).Component.Name);
         _selection.Clear();
         foreach (var item in _items)
         {
-            if (item.Live == parent)
+            if (parent != null && item.Component == parent)
                 _selection.Add(item);
         }
         RefreshSelection();
     }
 
+    /// The component a component is declared inside: the form, another
+    /// component, or null for a name the document does not have.
+    public FormComponent? FindParentComponent(String name) =>
+        FindParentIn(_document.Form, name);
+
+    private static FormComponent? FindParentIn(FormComponent within, String name)
+    {
+        foreach (var child in within.ListChildren())
+        {
+            if (child.Name == name)
+                return within;
+            var deeper = FindParentIn(child, name);
+            if (deeper != null)
+                return deeper;
+        }
+        return null;
+    }
+
     /// Removes the selected components, and everything inside them, from the
-    /// document and from the surface.
+    /// document, and shows the document again. A property that named one --
+    /// the form's `Menu` -- goes with it.
     public void DeleteSelectedComponent()
     {
         if (_selection.IsEmpty)
             return;
 
-        var removed = new List<DesignedItem>();
         foreach (var item in _selection)
         {
-            if (IsInsideSelection(item))
-                continue;
-            _document.Form.RemoveComponent(item.Component.Name);
-            var parent = item.Live.Parent;
-            if (parent != null)
-                ((WindowedControl)parent).RemoveControl(item.Live);
-            removed.Add(item);
+            String name = item.Component.Name;
+            if (_document.Form.RemoveComponent(name))
+                RemovePropertiesNaming(_document.Form, name);
         }
 
-        var kept = new List<DesignedItem>();
-        foreach (var each in _items)
-        {
-            bool gone = false;
-            foreach (var item in removed)
-            {
-                if (each == item || IsInside(each.Live, item.Live))
-                    gone = true;
-            }
-            if (!gone)
-                kept.Add(each);
-        }
-        _items = kept;
         _selection.Clear();
-        LayOutTray();
+        LoadDocument(_document);
+        ApplyFormProperties();
         Changed();
         RefreshSelection();
     }
+
+    /// Takes out every property, at any depth, whose value is a component's
+    /// name.
+    private static void RemovePropertiesNaming(FormComponent within, String name)
+    {
+        for (nuint i = within.Members.Count; i > 0u; i--)
+        {
+            if (within.Members[i - 1u] is FormProperty property && !property.Value.IsList
+                && property.Value.Items[0u] == name)
+                within.Members.RemoveAt(i - 1u);
+        }
+        foreach (var child in within.ListChildren())
+            RemovePropertiesNaming(child, name);
+    }
+
+    /// Gives every property naming one component the name of another.
+    private static void RenamePropertiesNaming(FormComponent within, String from, String to)
+    {
+        foreach (var member in within.Members)
+        {
+            if (member is FormProperty property && !property.Value.IsList
+                && property.Value.Items[0u] == from)
+                property.Value = FormValue.FromName(to);
+        }
+        foreach (var child in within.ListChildren())
+            RenamePropertiesNaming(child, from, to);
+    }
+
+    // ------------------------------------------------------------ items
+
+    /// Adds an item to a menu, a menu's item or a toolbar, at the end, and
+    /// selects it. Answers its name, or "" when the owner holds no items.
+    ///
+    /// An item is written as `new MenuItem()` with its `Text` set, so the
+    /// Properties grid edits it like any other property; a separator is
+    /// written as `MenuItem.CreateSeparator()`.
+    public String AddDesignedItem(String ownerName, DesignedItemKind kind)
+    {
+        FormComponent? found = _document.Form.FindComponent(ownerName);
+        if (found == null)
+            return "";
+        var owner = (FormComponent)found;
+        String itemType = FindItemTypeOf(owner.TypeName);
+        if (itemType == "")
+            return "";
+
+        bool gap = kind == DesignedItemKind.Separator;
+        String name = CreateComponentName(gap ? "Separator" : itemType);
+        var made = new FormComponent(itemType, name);
+        made.HasBlankLineBefore = true;
+        if (gap)
+        {
+            made.Initializer = itemType + ".CreateSeparator()";
+        }
+        else
+        {
+            made.Initializer = "new " + itemType + "()";
+            made.SetProperty("Text", FormValue.FromText(name.Substring(1u)));
+            if (kind == DesignedItemKind.Toggle && itemType == "ToolButton")
+                made.SetProperty("Kind", FormValue.FromName("ToolButtonKind.Toggle"));
+        }
+        owner.Members.Add(made);
+
+        LoadDocument(_document);
+        ApplyFormProperties();
+        SelectComponent(name);
+        Changed();
+        return name;
+    }
+
+    /// Moves an item one place earlier or later among the items of what holds
+    /// it. Answers whether it moved.
+    public bool MoveDesignedItem(String name, bool earlier)
+    {
+        var parent = FindParentComponent(name);
+        if (parent == null)
+            return false;
+        var members = ((FormComponent)parent).Members;
+
+        nuint at = members.Count;
+        for (nuint i = 0u; i < members.Count; i++)
+        {
+            if (members[i] is FormComponent child && child.Name == name)
+                at = i;
+        }
+        if (at == members.Count)
+            return false;
+
+        // The neighbouring component, skipping properties and handlers.
+        nuint other = at;
+        bool found = false;
+        if (earlier)
+        {
+            for (nuint i = at; i > 0u && !found; i--)
+            {
+                if (members[i - 1u] is FormComponent)
+                {
+                    other = i - 1u;
+                    found = true;
+                }
+            }
+        }
+        else
+        {
+            for (nuint i = at + 1u; i < members.Count && !found; i++)
+            {
+                if (members[i] is FormComponent)
+                {
+                    other = i;
+                    found = true;
+                }
+            }
+        }
+        if (!found)
+            return false;
+
+        FormMember moving = members[at];
+        members[at] = members[other];
+        members[other] = moving;
+
+        LoadDocument(_document);
+        ApplyFormProperties();
+        SelectComponent(name);
+        Changed();
+        return true;
+    }
+
+    /// The component of that name, or null.
+    public FormComponent? FindComponent(String name) => _document.Form.FindComponent(name);
 
     private bool IsInside(Control inner, Control outer)
     {
@@ -978,6 +1329,7 @@ public class DesignSurface : Panel
             ApplyFormProperties();
         Changed();
         _overlay.Invalidate();
+        _menuStrip.Invalidate();
     }
 
     /// Adds a module to what the generated half imports, for a value that
@@ -1014,6 +1366,7 @@ public class DesignSurface : Panel
     {
         if (name == "" || _document.Form.FindComponent(name) != null || !IsDesignName(name))
             return false;
+        RenamePropertiesNaming(_document.Form, component.Name, name);
         component.Name = name;
         Changed();
         return true;
@@ -1050,9 +1403,17 @@ public class DesignSurface : Panel
         if (TakesDesignedText(typeName))
             made.SetProperty("Text", FormValue.FromText(name.Substring(1u)));
 
+        bool editsItems = false;
         if (IsNonVisualType(typeName))
         {
             made.Initializer = "new " + typeName + "()";
+
+            // A form has one menu bar, and the first menu put on it is that.
+            if (typeName == "MainMenu" && _document.Form.FindProperty("Menu") == null)
+            {
+                _document.Form.SetProperty("Menu", FormValue.FromName(name));
+                editsItems = true;
+            }
         }
         else if (typeName == "TabPage")
         {
@@ -1077,9 +1438,19 @@ public class DesignSurface : Panel
                 y = at.Y - outer.Y - ((WindowedControl)container.Live).ClientOrigin.Y;
                 parent = container.Component;
             }
-            Size extent = FindDefaultExtent(typeName);
-            made.SetProperty("Bounds", FormValue.FromRectangle(SnapToGrid(x), SnapToGrid(y),
-                                                                extent.Width, extent.Height));
+            if (typeName == "ToolBar")
+            {
+                // Across the top, where a toolbar goes, at the height its
+                // buttons give it.
+                made.SetProperty("Dock", FormValue.FromName("DockStyle.Top"));
+                editsItems = true;
+            }
+            else
+            {
+                Size extent = FindDefaultExtent(typeName);
+                made.SetProperty("Bounds", FormValue.FromRectangle(SnapToGrid(x), SnapToGrid(y),
+                                                                    extent.Width, extent.Height));
+            }
         }
         parent.Members.Add(made);
 
@@ -1092,8 +1463,11 @@ public class DesignSurface : Panel
         }
 
         LoadDocument(_document);
+        ApplyFormProperties();
         SelectComponent(name);
         Changed();
+        if (editsItems)
+            ItemsRequested(name);
     }
 
     /// The `TabControl` under a point, or the one a page or a control under

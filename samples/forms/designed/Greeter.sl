@@ -33,6 +33,10 @@ public class GreeterForm
         _greeting.Text = "Hello, " + _name.Text + "! (" + Standard.Text.FromInteger(_greetings) + ")";
     }
 
+    private void OnGreetItem(MenuItem sender) => OnGreet(_greet);
+
+    private void OnExit(MenuItem sender) => Close();
+
     public bool SelfTest()
     {
         bool ok = true;
@@ -43,11 +47,34 @@ public class GreeterForm
         ok = CheckSame("a nested control is parented", "True",
                        _greeting.Parent == _footer ? "True" : "False") && ok;
 
+        // A menu item and a toolbar button, each added to what holds it.
+        _greetItem.OnPlatformMenuClicked();
+        ok = CheckSame("the menu's Greet reaches the handler", "Hello, designer! (2)", _greeting.Text) && ok;
+        ok = CheckSame("the form's menu is the one the file names", "True",
+                       Menu == _mainMenu ? "True" : "False") && ok;
+        ok = CheckSame("and it holds its items in the file's order", "&Greet, -, E&xit",
+                       DescribeMenuItems(_fileMenu)) && ok;
+        _tools.OnPlatformToolClicked(_greetButton.Index);
+        ok = CheckSame("the toolbar's Greet reaches the handler", "Hello, designer! (3)", _greeting.Text) && ok;
+
         // Embedded by the generated half, so it is here wherever this runs.
         var picture = _greet.Image;
         ok = CheckSame("the button's picture travels in the program", "16",
                        picture == null ? "none" : Standard.Text.FromInteger(((Bitmap)picture).Width)) && ok;
         return ok;
+    }
+
+    /// A heading's items, as their captions, with `-` for a separator.
+    private String DescribeMenuItems(MenuItem heading)
+    {
+        var made = new StringBuilder();
+        foreach (var item in heading.Items)
+        {
+            if (made.HasContent)
+                made.Append(", ");
+            made.Append(item.IsSeparator ? "-" : item.Text);
+        }
+        return made.ToText();
     }
 
     private bool CheckSame(String what, String expected, String actual)

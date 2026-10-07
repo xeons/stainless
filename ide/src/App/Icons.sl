@@ -174,6 +174,12 @@ public static class ToolboxIconFiles
     [Embed("icons/16/bevel.png")]
     public static readonly byte[] Bevel;
 
+    [Embed("icons/16/toolbar.png")]
+    public static readonly byte[] ToolBar;
+
+    [Embed("icons/16/mainmenu.png")]
+    public static readonly byte[] MainMenu;
+
     [Embed("icons/16/timer.png")]
     public static readonly byte[] Timer;
 }
@@ -247,6 +253,8 @@ byte[] FindToolboxIconFile(String typeName)
         case "PaintBox": return ToolboxIconFiles.PaintBox;
         case "Shape": return ToolboxIconFiles.Shape;
         case "Bevel": return ToolboxIconFiles.Bevel;
+        case "ToolBar": return ToolboxIconFiles.ToolBar;
+        case "MainMenu": return ToolboxIconFiles.MainMenu;
         case "Timer": return ToolboxIconFiles.Timer;
         default: return ToolboxIconFiles.Button;
     }

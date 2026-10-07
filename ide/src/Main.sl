@@ -23,11 +23,13 @@
 //   stainless-ide --watch a.b     -- and watch an expression there
 //   stainless-ide --when i == 3   -- and stop only when that holds
 //   stainless-ide --show threads  -- and bring that pane forward
+//   stainless-ide f.slfm --items _mainMenu  edit a menu's items, as a
+//                                 double-click on it does
 //
-// `--break` and `--watch` exist so the debugger can be photographed. A
-// screenshot is the only thing that says a pane drew, and a debugging session
-// cannot be reached from a command line without them -- there is nothing to
-// capture until something has stopped. See forms/screenshot.ps1.
+// `--break` and `--watch` exist so the debugger can be photographed, and
+// `--items` so the items editor can be. A screenshot is the only thing that
+// says a pane drew, and neither can be reached from a command line without
+// them. See forms/screenshot.ps1.
 module Ide;
 
 import Standard.Console;
@@ -48,6 +50,7 @@ int Main()
     String stopAt = "";
     String onlyWhen = "";
     String showing = "";
+    String editing = "";
     var arguments = Env.GetArguments();
     // From zero: `Env.GetArguments` is what `Main(String[] args)` would have been
     // handed, which does not include the program's own name.
@@ -78,6 +81,12 @@ int Main()
         if (argument == "--when" && i + 1u < arguments.Length)
         {
             onlyWhen = arguments[i + 1u];
+            i++;
+            continue;
+        }
+        if (argument == "--items" && i + 1u < arguments.Length)
+        {
+            editing = arguments[i + 1u];
             i++;
             continue;
         }
@@ -125,6 +134,9 @@ int Main()
     // has to be what is showing when the picture is taken.
     if (showing.ByteLength() != 0u)
         window.ShowPaneNamed(showing);
+
+    if (editing.ByteLength() != 0u)
+        window.ShowItemsEditor(editing);
 
     Application.Run();
     return 0;

@@ -406,4 +406,91 @@ void TestGenerating(Harness harness)
                       GenerateFormSource(read.Value, "MainForm.slfm"));
     harness.CheckSame("its path", "forms" + "/" + "MainForm.designer.sl",
                       FindDesignerPath("forms/MainForm.slfm").Replace("\\", "/"));
+
+    TestGeneratingItems(harness);
+}
+
+/// A menu and a toolbar: components made as the file says, each added to what
+/// it is inside, and the form's `Menu` set once the menu exists -- although
+/// the file sets it first.
+void TestGeneratingItems(Harness harness)
+{
+    String form = "module Samples.Editor;\n"
+        + "\n"
+        + "form EditorForm : Form\n"
+        + "{\n"
+        + "    Menu = _mainMenu1;\n"
+        + "\n"
+        + "    MainMenu _mainMenu1 = new MainMenu()\n"
+        + "    {\n"
+        + "        MenuItem _file = new MenuItem(\"&File\")\n"
+        + "        {\n"
+        + "            MenuItem _open = new MenuItem(\"&Open\")\n"
+        + "            {\n"
+        + "                Click += OnOpen;\n"
+        + "            }\n"
+        + "\n"
+        + "            MenuItem _line = MenuItem.CreateSeparator()\n"
+        + "            {\n"
+        + "            }\n"
+        + "        }\n"
+        + "    }\n"
+        + "\n"
+        + "    ToolBar _tools\n"
+        + "    {\n"
+        + "        Dock = DockStyle.Top;\n"
+        + "\n"
+        + "        ToolButton _save = new ToolButton(\"Save\")\n"
+        + "        {\n"
+        + "            Kind = ToolButtonKind.Toggle;\n"
+        + "        }\n"
+        + "    }\n"
+        + "}\n";
+
+    String expected = "// Generated from EditorForm.slfm. Edit that file or the designer;\n"
+        + "// this one is rewritten from it.\n"
+        + "module Samples.Editor;\n"
+        + "\n"
+        + "import Forms;\n"
+        + "\n"
+        + "public class EditorForm : Form\n"
+        + "{\n"
+        + "    private late MainMenu _mainMenu1;\n"
+        + "    private late MenuItem _file;\n"
+        + "    private late MenuItem _open;\n"
+        + "    private late MenuItem _line;\n"
+        + "    private late ToolBar _tools;\n"
+        + "    private late ToolButton _save;\n"
+        + "\n"
+        + "    private void InitializeComponent()\n"
+        + "    {\n"
+        + "        _mainMenu1 = new MainMenu();\n"
+        + "\n"
+        + "        _file = new MenuItem(\"&File\");\n"
+        + "\n"
+        + "        _open = new MenuItem(\"&Open\");\n"
+        + "        _open.Click += this.OnOpen;\n"
+        + "        _file.Add(_open);\n"
+        + "\n"
+        + "        _line = MenuItem.CreateSeparator();\n"
+        + "        _file.Add(_line);\n"
+        + "        _mainMenu1.Add(_file);\n"
+        + "\n"
+        + "        _tools = new ToolBar(this);\n"
+        + "        _tools.Dock = DockStyle.Top;\n"
+        + "\n"
+        + "        _save = new ToolButton(\"Save\");\n"
+        + "        _save.Kind = ToolButtonKind.Toggle;\n"
+        + "        _tools.Add(_save);\n"
+        + "\n"
+        + "        Menu = _mainMenu1;\n"
+        + "    }\n"
+        + "}\n";
+
+    var read = ParseFormDocument(form);
+    harness.Check("a form with a menu and a toolbar reads", read.Ok);
+    if (!read.Ok)
+        return;
+    harness.CheckSame("and each item is added to what it is inside", expected,
+                      GenerateFormSource(read.Value, "EditorForm.slfm"));
 }
