@@ -149,6 +149,22 @@ public class AppKitMenuItemPeer : IMenuItemPeer
 
     public void SetEnabled(bool enabled) => _item.Enabled = enabled;
 
+    /// A key equivalent, which is how a Mac menu shows a shortcut. The form
+    /// takes the key before the menu would, so it only answers here while no
+    /// form of this program is the key window.
+    public void SetShortcut(Shortcut shortcut)
+    {
+        _item.KeyEquivalent = ToNSString(FormatKeyEquivalent(shortcut.Key));
+        var mask = (NSEventModifierFlags)0u;
+        if (shortcut.Modifiers.HasFlag(ModifierKeys.Control))
+            mask = mask | NSEventModifierFlags.Command;
+        if (shortcut.Modifiers.HasFlag(ModifierKeys.Shift))
+            mask = mask | NSEventModifierFlags.Shift;
+        if (shortcut.Modifiers.HasFlag(ModifierKeys.Alt))
+            mask = mask | NSEventModifierFlags.Option;
+        _item.KeyEquivalentModifierMask = mask;
+    }
+
     /// AppKit ticks nothing by itself when an item is chosen, as Windows does
     /// not, so the tick is only ever the program's.
     public void SetChecked(bool checked) => _item.State = checked ? 1 : 0;

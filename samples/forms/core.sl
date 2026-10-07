@@ -27,9 +27,42 @@ import Win32.User32;
 #elif MACOS && !FORMS_GTK
 import Forms.Platform.AppKit;
 import MacOS.AppKit;
+import MacOS.CoreFoundation;
 #elif UNIX
 import Gtk.Api;
 #endif
+
+#if MACOS && !FORMS_GTK
+/// Queues a key going down in `window`, behind whatever is queued already.
+void PostKeyToWindow(NSWindow window, String typed, ushort code, NSEventModifierFlags flags)
+{
+    var text = ToNSString(typed);
+    CGPoint origin;
+    origin.x = 0.0;
+    origin.y = 0.0;
+    var down = NSEvent.KeyEventWithTypeLocationModifierFlagsTimestampWindowNumberContextCharactersCharactersIgnoringModifiersIsARepeatKeyCode(
+        NSEventType.KeyDown, origin, flags, 0.0, window.WindowNumber, null, text, text, false, code);
+    if (down != null)
+        NSApplication.SharedApplication.PostEventAtStart((NSEvent)down, false);
+}
+#endif
+
+/// What the keyboard checks counted.
+public class KeyLog
+{
+    public int Saves;
+    public int Refreshes;
+    public int BoxKeys;
+    public bool Idled;
+
+    public KeyLog()
+    {
+        Saves = 0;
+        Refreshes = 0;
+        BoxKeys = 0;
+        Idled = false;
+    }
+}
 
 /// A graphic control that counts what reached it.
 public class Spot : GraphicControl
@@ -382,10 +415,141 @@ public class CoreForm : Form
         ok = LifetimeChecks(ok);
         ok = WindowChecks(ok);
         ok = ModalChecks(ok);
+        ok = KeyboardChecks(ok);
 
         var squeezed = Rectangle.FromBounds(0, 0, 10, 10).DeflateBy(6);
         ok = Check(ok, "deflating past nothing gives an empty rectangle",
                    squeezed.Width == 0 && squeezed.Height == 0);
+        return ok;
+    }
+
+    /// Shortcuts, a handled key, and the loop going idle.
+    bool KeyboardChecks(bool ok)
+    {
+        var parsed = Shortcut.Parse("ctrl+shift+s");
+        ok = Check(ok, "a shortcut is read from its text",
+                   parsed.Some && parsed.Value.Equals(
+                       Shortcut.FromKey(Key.S, ModifierKeys.Control | ModifierKeys.Shift)));
+        var function = Shortcut.Parse("F5");
+        ok = Check(ok, "and so is a function key", function.Some && function.Value.Key == Key.F5);
+        ok = Check(ok, "text with no key, or an unknown modifier, is refused",
+                   !Shortcut.Parse("Ctrl+").HasValue && !Shortcut.Parse("Hyper+S").HasValue);
+#if !MACOS
+        ok = Check(ok, "and it is written back as a menu shows it",
+                   parsed.Some && parsed.Value.ToText() == "Ctrl+Shift+S");
+#endif
+
+        var log = new KeyLog();
+        var keys = new Form(WindowBorder.Sizable);
+        keys.Text = "Keys";
+        keys.SetBounds(0, 0, 320, 160);
+        var bar = new MainMenu();
+        var file = bar.Add("&File");
+        var save = file.Add("&Save");
+        save.Shortcut = Shortcut.FromKey(Key.S, ModifierKeys.Control);
+        save.Click += (sender) => { log.Saves++; };
+        var refresh = file.Add("&Refresh");
+        refresh.Shortcut = Shortcut.FromKey(Key.F5, ModifierKeys.None);
+        refresh.Click += (sender) => { log.Refreshes++; };
+        var view = bar.Add("&View");
+        var zoom = view.Add("&Zoom");
+        zoom.Shortcut = Shortcut.FromKey(Key.Z, ModifierKeys.Control);
+        view.Enabled = false;
+        keys.Menu = bar;
+
+        var box = new TextBox(keys);
+        box.SetBounds(10, 10, 200, 24);
+        box.KeyDown += (sender, args) =>
+        {
+            log.BoxKeys++;
+            if (args.Key == Key.Left)
+                args.Handled = true;
+        };
+        box.KeyPress += (sender, args) =>
+        {
+            if (args.KeyChar == (char32)'x')
+                args.Handled = true;
+        };
+        keys.Show();
+        Settle();
+        box.Focus();
+        Settle();
+
+        var notify = (IWindowNotify)keys;
+        ok = Check(ok, "a menu item's shortcut reaches it through the form",
+                   notify.OnPlatformShortcut(Key.S, ModifierKeys.Control) && log.Saves == 1);
+        ok = Check(ok, "but not with other modifiers held",
+                   !notify.OnPlatformShortcut(Key.S, ModifierKeys.Control | ModifierKeys.Shift)
+                   && log.Saves == 1);
+        save.Enabled = false;
+        ok = Check(ok, "nor while the item is disabled",
+                   !notify.OnPlatformShortcut(Key.S, ModifierKeys.Control) && log.Saves == 1);
+        save.Enabled = true;
+        ok = Check(ok, "nor under a disabled heading",
+                   !notify.OnPlatformShortcut(Key.Z, ModifierKeys.Control));
+
+#if WINDOWS
+        HWND edit = (HWND)(void*)box.Handle;
+        log.BoxKeys = 0;
+        PostMessageW(edit, WmKeyDown, (ulong)VkF5, 0);
+        Settle();
+        ok = Check(ok, "a shortcut pressed in a text box goes to the menu", log.Refreshes == 1);
+        ok = Check(ok, "and the text box never hears it", log.BoxKeys == 0);
+
+        box.Text = "abc";
+        box.SelectionStart = 3;
+        SendMessageW(edit, WmChar, (ulong)'x', 0);
+        SendMessageW(edit, WmChar, (ulong)'y', 0);
+        ok = Check(ok, "a handled character is not typed", box.Text == "abcy");
+        SendMessageW(edit, WmKeyDown, (ulong)VkLeft, 0);
+        SendMessageW(edit, WmChar, (ulong)'z', 0);
+        ok = Check(ok, "and a handled key does not move the caret", box.Text == "abcyz");
+#elif MACOS && !FORMS_GTK
+        // Through the application's own queue, so each key meets the monitor
+        // and then the field editor exactly as a typed one would.
+        var window = ((AppKitWindowPeer)keys.WindowPeer).Window;
+        log.BoxKeys = 0;
+        PostKeyToWindow(window, "s", (ushort)1, NSEventModifierFlags.Command);
+        Settle();
+        ok = Check(ok, "a shortcut pressed in a text box goes to the menu", log.Saves == 2);
+        ok = Check(ok, "and the text box never hears it", log.BoxKeys == 0);
+
+        box.Text = "abc";
+        box.Focus();
+        Settle();
+        box.SelectionStart = 3;
+        PostKeyToWindow(window, "x", (ushort)7, (NSEventModifierFlags)0u);
+        PostKeyToWindow(window, "y", (ushort)16, (NSEventModifierFlags)0u);
+        Settle();
+        ok = Check(ok, "a handled character is not typed", box.Text == "abcy");
+#else
+        ok = Check(ok, "a handled character is reported as handled",
+                   box.OnPlatformKeyPress((char32)'x'));
+        ok = Check(ok, "and an unhandled one is not", !box.OnPlatformKeyPress((char32)'y'));
+        ok = Check(ok, "a handled key is reported as handled",
+                   box.OnPlatformKeyDown(Key.Left, ModifierKeys.None));
+#endif
+
+        // The dialog closes itself the first time its loop goes idle. The
+        // timer is there so that a loop that never does fails rather than
+        // hangs.
+        var waiting = new Form(WindowBorder.Fixed);
+        waiting.SetBounds(0, 0, 200, 100);
+        waiting.Idle += (sender) =>
+        {
+            log.Idled = true;
+            ((Form)sender).Close();
+        };
+        var giveUp = new Timer();
+        giveUp.Interval = 3000;
+        giveUp.Tick += (sender) => { waiting.Close(); };
+        giveUp.Start();
+        waiting.ShowModal();
+        giveUp.Stop();
+        ok = Check(ok, "a modal loop raises Idle once it has caught up", log.Idled);
+
+        keys.Close();
+        Settle();
         return ok;
     }
 

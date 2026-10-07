@@ -99,8 +99,8 @@ public objc class FormsTableView : NSTableView
 
     public override void KeyDown(NSEvent event)
     {
-        if (FindPeer() is AppKitPeer peer)
-            peer.ReportKey(event, true);
+        if (FindPeer() is AppKitPeer peer && peer.ReportKey(event, true))
+            return;
         base.KeyDown(event);
     }
 
@@ -168,8 +168,8 @@ public objc class FormsOutlineView : NSOutlineView
 
     public override void KeyDown(NSEvent event)
     {
-        if (FindPeer() is AppKitPeer peer)
-            peer.ReportKey(event, true);
+        if (FindPeer() is AppKitPeer peer && peer.ReportKey(event, true))
+            return;
         base.KeyDown(event);
     }
 

@@ -276,6 +276,11 @@ bool HandleDialogKey(Msg* message)
     ControlPeer? peer = FindControlPeer(top);
     if (peer == null)
         return false;
+    // Before the focused control, which is what makes a shortcut work
+    // whatever has the focus -- `TranslateAccelerator`'s place in the loop.
+    if ((message->Message == WmKeyDown || message->Message == WmSysKeyDown)
+        && peer is WindowPeer offered && offered.OfferShortcut(message))
+        return true;
     if (message->Message == WmKeyDown && peer is WindowPeer window)
     {
         if (window.NavigateInControlOrder(message))
@@ -317,6 +322,16 @@ public class WindowPeer : ControlPeer, IWindowPeer
     /// Held, not merely handed to Windows: a menu command names an id, and this
     /// is what turns one back into the item that was chosen.
     IMenuPeer? _menuBar;
+
+    /// Offers a key to the form as a shortcut. True when the form ran one.
+    public bool OfferShortcut(Msg* message)
+    {
+        IWindowNotify? held = _owner;
+        if (held == null)
+            return false;
+        return ((IWindowNotify)held).OnPlatformShortcut((Key)(int)message->WParam,
+                                                        GetCurrentModifiers());
+    }
 
     /// Tab, and the arrows between controls, which `IsDialogMessageW` would
     /// take through the stacking order -- the reverse of the order the
@@ -769,6 +784,8 @@ public class WindowPeer : ControlPeer, IWindowPeer
         Msg message;
         while (_running)
         {
+            if (PeekMessageW(&message, null, 0u, 0u, PeekNoRemove) == 0)
+                Application.RaiseIdle();
             int got = GetMessageW(&message, null, 0u, 0u);
             if (got < 0)
                 break;
@@ -1191,6 +1208,10 @@ public class Win32WidgetSet : IWidgetSet
         Msg message;
         while (true)
         {
+            // An empty queue is the moment the program has caught up with the
+            // user, and the only one: `GetMessageW` is about to wait.
+            if (PeekMessageW(&message, null, 0u, 0u, PeekNoRemove) == 0)
+                Application.RaiseIdle();
             int got = GetMessageW(&message, null, 0u, 0u);
             // Zero is WM_QUIT and -1 is a real failure; the two must not be
             // tested together, which is the bug `Win32.IsBoolSuccess` would

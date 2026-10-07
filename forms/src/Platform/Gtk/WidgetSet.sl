@@ -60,6 +60,34 @@ gboolean OnWakeIdle(gpointer data)
     return 0;
 }
 
+/// Whether the idle source is waiting to run.
+static bool s_idleArmed = false;
+
+/// Every event on its way to GTK. Each one arms the idle source again, so
+/// `Application.RaiseIdle` runs once after each burst of events rather than
+/// continuously, which an idle source that stayed registered would do.
+void OnGdkEvent(GdkEvent* event, gpointer data)
+{
+    ArmIdle();
+    gtk_main_do_event(event);
+}
+
+void ArmIdle()
+{
+    if (s_idleArmed)
+        return;
+    s_idleArmed = true;
+    // Below redrawing, so the program goes idle once its windows are drawn.
+    g_idle_add_full(G_PRIORITY_LOW, OnIdleSource, null, null);
+}
+
+gboolean OnIdleSource(gpointer data)
+{
+    s_idleArmed = false;
+    Application.RaiseIdle();
+    return 0;
+}
+
 /// The monitor `window` is on, or for a window not shown yet the primary one
 /// -- or the first, because a compositor need not name one primary.
 gpointer GetMonitorOf(gpointer window)
@@ -137,6 +165,8 @@ public class GtkWidgetSet : IWidgetSet
             sl_fail(("GTK could not open a display: check DISPLAY or WAYLAND_DISPLAY, " +
                      "or run under broadwayd").ToPointer());
         }
+        gdk_event_handler_set(OnGdkEvent, null, null);
+        ArmIdle();
     }
 
     /// Subscribes a peer and puts it in its parent -- the same two steps for

@@ -177,6 +177,14 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
             return false;
         });
 
+        // Connected before anything else hears the key, and on the window,
+        // which GTK hands a key to before the focused widget: so a shortcut
+        // works whatever has the focus, and true keeps it from going further.
+        ConnectPeerEvent(Widget, "key-press-event", (peer, carried) =>
+        {
+            return ((GtkWindowPeer)peer).OfferShortcut((GdkEvent*)carried);
+        });
+
         ConnectPeerEvent(Widget, "focus-in-event", (peer, carried) =>
         {
             ((GtkWindowPeer)peer).OnActiveChanged(true);
@@ -193,6 +201,14 @@ public class GtkWindowPeer : GtkContainerPeer, IWindowPeer
     /// The client area, which is where a form's mouse is reported and
     /// measured from: see `GtkPeer.Surface`.
     protected override GtkWidget* Surface => Content;
+
+    bool OfferShortcut(GdkEvent* event)
+    {
+        IWindowNotify? held = _owner;
+        if (held == null)
+            return false;
+        return ((IWindowNotify)held).OnPlatformShortcut(GetKey(event), GetModifiers(event));
+    }
 
     void OnActiveChanged(bool gained)
     {

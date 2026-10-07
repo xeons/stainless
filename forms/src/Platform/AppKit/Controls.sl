@@ -111,8 +111,8 @@ public objc class FormsButton : NSButton
 
     public override void KeyDown(NSEvent event)
     {
-        if (FindPeer() is AppKitPeer peer)
-            peer.ReportKey(event, true);
+        if (FindPeer() is AppKitPeer peer && peer.ReportKey(event, true))
+            return;
         base.KeyDown(event);
     }
 
@@ -295,8 +295,8 @@ public objc class FormsTextView : NSTextView
 
     public override void KeyDown(NSEvent event)
     {
-        if (FindPeer() is AppKitPeer peer)
-            peer.ReportKey(event, true);
+        if (FindPeer() is AppKitPeer peer && peer.ReportKey(event, true))
+            return;
         base.KeyDown(event);
     }
 
@@ -687,20 +687,17 @@ public class AppKitTextEntryPeer : AppKitPeer, ITextEntryPeer
         if (owner == null || reported)
             return false;
         var notify = (IControlNotify)owner;
+        // A handled key is a command AppKit MUST NOT then carry out.
         switch (command)
         {
             case "insertNewline:":
-                notify.OnPlatformKeyDown(Key.Enter, ModifierKeys.None);
-                return false;
+                return notify.OnPlatformKeyDown(Key.Enter, ModifierKeys.None);
             case "cancelOperation:":
-                notify.OnPlatformKeyDown(Key.Escape, ModifierKeys.None);
-                return false;
+                return notify.OnPlatformKeyDown(Key.Escape, ModifierKeys.None);
             case "moveUp:":
-                notify.OnPlatformKeyDown(Key.Up, ModifierKeys.None);
-                return false;
+                return notify.OnPlatformKeyDown(Key.Up, ModifierKeys.None);
             case "moveDown:":
-                notify.OnPlatformKeyDown(Key.Down, ModifierKeys.None);
-                return false;
+                return notify.OnPlatformKeyDown(Key.Down, ModifierKeys.None);
             case "insertTab:":
             case "insertBacktab:":
                 notify.OnPlatformKeyDown(Key.Tab, command == "insertBacktab:" ? ModifierKeys.Shift : ModifierKeys.None);

@@ -333,12 +333,41 @@ public class Form : WindowedControl, IWindowNotify
     /// Raised once, the first time the window is shown. Where a form does work
     /// that needs its final size.
     public event EventHandler Shown;
+    /// The program has handled everything the user did and is about to wait
+    /// for more. Raised for every open form, each time the loop goes idle:
+    /// where a command's enabled state is brought up to date.
+    ///
+    /// **On a form and not on `Application`**, because the language refuses a
+    /// static event: its handlers would outlive everything that added them.
+    public event EventHandler Idle;
 
     protected virtual void OnClosing(CancelEventArgs args) => Closing(this, args);
     protected virtual void OnClosed() => Closed(this);
     protected virtual void OnActivated() => Activated(this);
     protected virtual void OnDeactivated() => Deactivated(this);
     protected virtual void OnShown() => Shown(this);
+    protected virtual void OnIdle() => Idle(this);
+
+    /// Raises `Idle`. Called by `Application.RaiseIdle`.
+    public void RaiseIdle() => OnIdle();
+
+    /// Runs the command `key` names, if anything in this form has it as a
+    /// shortcut. Asked before the focused control hears the key; true stops
+    /// it there.
+    ///
+    /// Overriding it is how a form claims a key of its own for the whole
+    /// window. Call `base` for the menu's shortcuts.
+    protected virtual bool ProcessShortcut(KeyEventArgs args)
+    {
+        var menu = _menu;
+        if (menu == null)
+            return false;
+        var item = ((MainMenu)menu).FindItemForShortcut(args.Key, args.Modifiers);
+        if (item == null)
+            return false;
+        ((MenuItem)item).PerformClick();
+        return true;
+    }
 
     // --------------------------------------------- what the platform says
 
@@ -378,6 +407,13 @@ public class Form : WindowedControl, IWindowNotify
         OnActivated();
     }
     public void OnPlatformDeactivated() => OnDeactivated();
+
+    public bool OnPlatformShortcut(Key key, ModifierKeys modifiers)
+    {
+        if (!Enabled)
+            return false;
+        return ProcessShortcut(new KeyEventArgs(key, modifiers));
+    }
 
     public bool OnPlatformNavigate(Key key, bool backward)
     {

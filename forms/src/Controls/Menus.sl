@@ -100,6 +100,7 @@ public class MenuItem : IMenuItemNotify
     bool _enabled;
     bool _checked;
     bool _isSeparator;
+    Shortcut _shortcut;
 
     public MenuItem(String text)
     {
@@ -107,6 +108,7 @@ public class MenuItem : IMenuItemNotify
         _enabled = true;
         _checked = false;
         _isSeparator = false;
+        _shortcut = Shortcut.Empty;
         _builds = new List<MenuItemBuild>();
         _children = new List<MenuItem>();
     }
@@ -178,6 +180,25 @@ public class MenuItem : IMenuItemNotify
         }
     }
 
+    /// The key that chooses this item from anywhere in its form, shown beside
+    /// the caption. The form dispatches it, so it works whether or not the
+    /// menu is open, and only while the item and every heading above it are
+    /// enabled.
+    public Shortcut Shortcut
+    {
+        get => _shortcut;
+        set
+        {
+            _shortcut = value;
+            foreach (var built in _builds)
+            {
+                var peer = built.Peer;
+                if (peer != null)
+                    ((IMenuItemPeer)peer).SetShortcut(value);
+            }
+        }
+    }
+
     /// The items under this one. Adding any makes it a heading rather than a
     /// command, and a heading raises nothing when chosen.
     public List<MenuItem> Items => _children;
@@ -202,6 +223,30 @@ public class MenuItem : IMenuItemNotify
 
     /// What the platform calls when the user picks this item.
     public void OnPlatformMenuClicked() => OnClick();
+
+    /// Chooses the item as the user would. Does nothing while it is disabled.
+    public void PerformClick()
+    {
+        if (_enabled && !_isSeparator)
+            OnClick();
+    }
+
+    /// The enabled command at or under this item that `key` chooses, if any.
+    /// A disabled heading hides everything under it.
+    public MenuItem? FindItemForShortcut(Key key, ModifierKeys modifiers)
+    {
+        if (!_enabled || _isSeparator)
+            return null;
+        if (_children.IsEmpty)
+            return _shortcut.Matches(key, modifiers) ? this : null;
+        foreach (var child in _children)
+        {
+            var found = child.FindItemForShortcut(key, modifiers);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
 
     /// Which renderer drew this item, taken from the menu as it was built.
     ///
@@ -329,6 +374,8 @@ public class MenuItem : IMenuItemNotify
             peer.SetEnabled(false);
         if (_checked)
             peer.SetChecked(true);
+        if (!_shortcut.IsEmpty)
+            peer.SetShortcut(_shortcut);
         if (ownerDrawn)
             built.IsOwnerDrawn = peer.SetOwnerDrawn(true);
         ApplyStyleFrom(built);
@@ -421,6 +468,18 @@ public abstract class Menu
     protected virtual void OnRendererChanged() { }
 
     public List<MenuItem> Items => _items;
+
+    /// The enabled command anywhere in this menu that `key` chooses, if any.
+    public MenuItem? FindItemForShortcut(Key key, ModifierKeys modifiers)
+    {
+        foreach (var item in _items)
+        {
+            var found = item.FindItemForShortcut(key, modifiers);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
 
     /// Adds a top-level item and answers it.
     public MenuItem Add(MenuItem item)

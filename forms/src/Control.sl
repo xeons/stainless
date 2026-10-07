@@ -78,36 +78,45 @@ public struct MouseEventArgs
 }
 
 /// What happened with the keyboard.
-public struct KeyEventArgs
+///
+/// A class, so that a handler can set `Handled` and the control that raised
+/// the event can read it back.
+public class KeyEventArgs
 {
-    public Key Key;
-    public ModifierKeys Modifiers;
+    public Key Key { get; }
+    public ModifierKeys Modifiers { get; }
+
+    /// Set it to keep the key from the control: a text box then does not move
+    /// its caret, a list does not change its selection.
+    public bool Handled { get; set; }
+
+    public KeyEventArgs(Key key, ModifierKeys modifiers)
+    {
+        Key = key;
+        Modifiers = modifiers;
+        Handled = false;
+    }
 
     public bool Shift   => Modifiers.HasFlag(ModifierKeys.Shift);
     public bool Control => Modifiers.HasFlag(ModifierKeys.Control);
     public bool Alt     => Modifiers.HasFlag(ModifierKeys.Alt);
-
-    public static KeyEventArgs FromKey(Key key, ModifierKeys modifiers)
-    {
-        KeyEventArgs args;
-        args.Key = key;
-        args.Modifiers = modifiers;
-        return args;
-    }
 }
 
 /// One character the user typed.
-public struct KeyPressEventArgs
+public class KeyPressEventArgs
 {
     /// A whole Unicode scalar, so a character outside ASCII arrives as one.
     /// `Standard.Text.FromChar` turns it into the UTF-8 a `String` holds.
-    public char32 KeyChar;
+    public char32 KeyChar { get; }
 
-    public static KeyPressEventArgs FromChar(char32 typed)
+    /// Set it to keep the character out of the control. A text box then
+    /// inserts nothing.
+    public bool Handled { get; set; }
+
+    public KeyPressEventArgs(char32 typed)
     {
-        KeyPressEventArgs args;
-        args.KeyChar = typed;
-        return args;
+        KeyChar = typed;
+        Handled = false;
     }
 }
 
@@ -1077,19 +1086,23 @@ public abstract class Control : IControlNotify
         OnMouseWheel(MouseEventArgs.FromButton(MouseButton.None, at, modifiers, delta));
     }
 
-    public void OnPlatformKeyDown(Key key, ModifierKeys modifiers)
+    public bool OnPlatformKeyDown(Key key, ModifierKeys modifiers)
     {
-        OnKeyDown(KeyEventArgs.FromKey(key, modifiers));
+        var args = new KeyEventArgs(key, modifiers);
+        OnKeyDown(args);
+        return args.Handled;
     }
 
     public void OnPlatformKeyUp(Key key, ModifierKeys modifiers)
     {
-        OnKeyUp(KeyEventArgs.FromKey(key, modifiers));
+        OnKeyUp(new KeyEventArgs(key, modifiers));
     }
 
-    public void OnPlatformKeyPress(char32 typed)
+    public bool OnPlatformKeyPress(char32 typed)
     {
-        OnKeyPress(KeyPressEventArgs.FromChar(typed));
+        var args = new KeyPressEventArgs(typed);
+        OnKeyPress(args);
+        return args.Handled;
     }
 
     public void OnPlatformGotFocus() => OnGotFocus();

@@ -124,13 +124,19 @@ public class MenuItemPeer : IMenuItemPeer
     weak IMenuItemNotify? _target;
     /// The menu underneath it, kept so that a search for an id can descend.
     IMenuPeer? _submenu;
+    /// The caption and the shortcut, which Windows holds as one string with a
+    /// tab between them.
+    String _text;
+    Shortcut _shortcut;
 
-    public MenuItemPeer(HMENU menu, int command, int position,
+    public MenuItemPeer(HMENU menu, int command, int position, String text,
                         IMenuItemNotify? notify, IMenuPeer? submenu)
     {
         _owner = menu;
         _id = command;
         _at = position;
+        _text = text;
+        _shortcut = Shortcut.Empty;
         _target = notify;
         _submenu = submenu;
     }
@@ -159,10 +165,23 @@ public class MenuItemPeer : IMenuItemPeer
 
     public void SetText(String text)
     {
+        _text = text;
+        ApplyText();
+    }
+
+    public void SetShortcut(Shortcut shortcut)
+    {
+        _shortcut = shortcut;
+        ApplyText();
+    }
+
+    void ApplyText()
+    {
+        String whole = _shortcut.IsEmpty ? _text : _text + "\t" + _shortcut.ToText();
         MenuItemInfo info;
         ClearMenuItemInfo(&info);
         info.Mask = MiimString;
-        var wide = text.ToUtf16();
+        var wide = whole.ToUtf16();
         info.TypeData = wide.ToPointer();
         SetMenuItemInfoW(_owner, (uint)_at, 1, &info);
     }
@@ -322,7 +341,7 @@ public class MenuPeer : IMenuPeer
             }
         }
 
-        var made = new MenuItemPeer(_menu, id, at, owner, submenu);
+        var made = new MenuItemPeer(_menu, id, at, text, owner, submenu);
         _items.Add(made);
         return made;
     }

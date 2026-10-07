@@ -395,6 +395,30 @@ GTK's half of that is not wired: it reports the menu key through `popup-menu`,
 whose handler answers a `gboolean`, and the plain signal connector here returns
 nothing — so it wants a connector of its own and does not have one yet.
 
+**A key can be refused, and a shortcut is the form's before it is anyone
+else's.** `KeyEventArgs` and `KeyPressEventArgs` carry `Handled`, and a
+handler that sets it keeps the key from the native control: the window
+procedure returns without calling the old one, GTK's handler answers true
+before the widget's own runs, and AppKit is not handed the event. That is
+what a masked edit needs to refuse a character.
+
+`MenuItem.Shortcut` is shown by the platform -- after a tab on Windows,
+through the accelerator label on GTK, as the key equivalent on a Mac -- and
+dispatched by the form, never by the platform, so an item cannot be chosen
+twice. Every key going down is offered to the form's `ProcessShortcut` before
+the focused control hears it: from the message loop on Windows, where
+`TranslateAccelerator` would sit; from the window's `key-press-event` on GTK,
+which runs before the focused widget's; and from a local event monitor on a
+Mac. An item answers only while it and every heading above it are enabled.
+`Control` is Command on a Mac, because the backend reports both as one.
+
+**`Idle` is on the form, not the application.** It is raised for every open
+form each time the loop is about to wait -- an empty queue before
+`GetMessageW`, a low-priority GLib idle source re-armed by each event, a run
+loop observer before it sleeps. The language refuses a static event, whose
+handlers would outlive everything that added them, so the application has no
+event to put it on.
+
 **Z-order and the pointer are asked for, not waited for.** `Control` carries
 two small methods that exist because a *docked* window needs them and nothing
 else in the library did: `BringToFront`, which raises a control above the
@@ -589,7 +613,7 @@ grouped by how much work it is rather than by where it lives.
 | `Control`, `GraphicControl`, `WindowedControl`, docking, anchors | `controls.pp` |
 | `Form`, `Application`, `Screen` | `forms.pp` |
 | `Button`, `CheckBox`, `RadioButton`, `ToggleButton`, `Label`, `TextBox`, `ListBox`, `ComboBox`, `Panel`, `GroupBox`, `ScrollBar` | `stdctrls.pp` |
-| `MainMenu`, `PopupMenu`, `MenuItem` | `menus.pp` |
+| `MainMenu`, `PopupMenu`, `MenuItem`, `Shortcut` | `menus.pp`, `ShortCut` in `lcltype.pp` |
 | `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView`, `CoolBar` | `comctrls.pp` |
 | `ImageList` | `imglist.pp` |
 | `PaintBox`, `Shape`, `Bevel`, `Splitter`, `Notebook` | `extctrls.pp` |
@@ -689,9 +713,6 @@ not turned back into them.
   platforms can attach a tip to a rectangle instead (`TTF_IDISHWND` off on
   Win32, `gtk_widget_set_tooltip_text` with a `query-tooltip` handler on
   GTK), which is what a splitter or a toolbar button would want.
-- **Accelerators.** `&O` underlines a letter and works while a menu is open, and
-  Tab, the arrows, Enter and Escape are handled; `Ctrl+O`
-  still needs an accelerator table and `TranslateAccelerator` in the loop.
 - **`TrayIcon`** (`extctrls.pp`) — needs `Shell_NotifyIconW` bound.
 
 ### Large, and each its own project

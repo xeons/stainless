@@ -233,8 +233,12 @@ public class CommonForm : Form
         bar.Renderer = _chrome;
 
         var file = bar.Add("&File");
-        file.Add("&New").Click += this.OnNew;
-        file.Add("&Open...").Click += this.OnOpen;
+        var created = file.Add("&New");
+        created.Shortcut = Shortcut.FromKey(Key.N, ModifierKeys.Control);
+        created.Click += this.OnNew;
+        var opened = file.Add("&Open...");
+        opened.Shortcut = Shortcut.FromKey(Key.O, ModifierKeys.Control);
+        opened.Click += this.OnOpen;
         file.Add(MenuItem.CreateSeparator());
         file.Add("E&xit").Click += this.OnExit;
 

@@ -144,7 +144,9 @@ public interface IControlNotify
     void OnPlatformMouseLeave();
     void OnPlatformMouseWheel(int delta, Point at, ModifierKeys modifiers);
 
-    void OnPlatformKeyDown(Key key, ModifierKeys modifiers);
+    /// A key went down. **True means a handler took it**, and the backend
+    /// MUST then keep it from the native control.
+    bool OnPlatformKeyDown(Key key, ModifierKeys modifiers);
     void OnPlatformKeyUp(Key key, ModifierKeys modifiers);
     /// One typed character, after the platform has applied the keyboard layout
     /// and any dead keys -- which is why it is a separate notification from
@@ -152,7 +154,10 @@ public interface IControlNotify
     ///
     /// A whole Unicode scalar. A backend whose platform delivers UTF-16 MUST
     /// join a surrogate pair into one call rather than report either half.
-    void OnPlatformKeyPress(char32 typed);
+    ///
+    /// True means a handler took it, and the backend MUST NOT let the native
+    /// control insert it.
+    bool OnPlatformKeyPress(char32 typed);
 
     void OnPlatformGotFocus();
     void OnPlatformLostFocus();
@@ -257,6 +262,12 @@ public interface IWindowNotify : IControlNotify
     /// rather than navigating, since the stacking order puts the last control
     /// made in front and the tab order puts it last.
     bool OnPlatformNavigate(Key key, bool backward);
+
+    /// A key went down somewhere in the window. Asked **before** the focused
+    /// control hears it, so that a menu's shortcut works whatever has the
+    /// focus. True when it was a shortcut, and the backend MUST then deliver
+    /// the key no further.
+    bool OnPlatformShortcut(Key key, ModifierKeys modifiers);
 }
 
 // ====================================================== control to platform
@@ -772,6 +783,10 @@ public interface IMenuItemPeer
     void SetText(String text);
     void SetEnabled(bool enabled);
     void SetChecked(bool checked);
+    /// Shows the key that chooses the item beside its caption. Only shows it:
+    /// the form dispatches the key, so the platform MUST NOT bind it as well,
+    /// or the item would be chosen twice.
+    void SetShortcut(Shortcut shortcut);
     /// Draws it as the default -- bold, and what a double-click would do.
     void SetDefault(bool isDefault);
 

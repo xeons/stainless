@@ -200,6 +200,40 @@ public class AppKitWidgetSet : IWidgetSet
         _application.SetActivationPolicy(NSApplicationActivationPolicy.Regular);
         _application.MainMenu = _plainMenu.Menu;
         _application.FinishLaunching();
+
+        // Every key down passes here before the window dispatches it, which is
+        // the place a shortcut is taken whatever has the focus. Null keeps the
+        // event from going further.
+        _keyMonitor = NSEvent.AddLocalMonitorForEventsMatchingMaskHandler(NSEventMask.KeyDown, (event) =>
+        {
+            if (OfferShortcut(event))
+                return null;
+            return event;
+        });
+
+        // The run loop is about to sleep: the program has caught up.
+        _idleObserver = CFRunLoopObserverCreateWithHandler(null, (CFOptionFlags)CFRunLoopActivity.BeforeWaiting,
+                                                           (Boolean)1, 0, (observer, activity) => Application.RaiseIdle());
+        CFRunLoopAddObserver(CFRunLoopGetMain(), _idleObserver, kCFRunLoopCommonModes);
+    }
+
+    /// The monitor and the observer, held for as long as the widget set.
+    AnyObject? _keyMonitor;
+    CFRunLoopObserverRef? _idleObserver;
+
+    /// Offers a key to the form whose window it is going to.
+    static bool OfferShortcut(NSEvent event)
+    {
+        var window = event.Window;
+        if (window == null)
+            return false;
+        if (!(((NSWindow)window).Delegate is FormsWindowDelegate handler))
+            return false;
+        IWindowNotify? owner = handler.Owner;
+        if (owner == null)
+            return false;
+        return ((IWindowNotify)owner).OnPlatformShortcut(GetKey(event.KeyCode),
+                                                         GetModifiers(event.ModifierFlags));
     }
 
     /// Each visible form, as `WriteWindowScreenshot` writes one: after every

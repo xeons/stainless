@@ -172,6 +172,20 @@ public class GtkMenuItemPeer : IMenuItemPeer
         gtk_widget_set_sensitive(_item, enabled ? 1 : 0);
     }
 
+    /// Shown through the item's accelerator label and bound to nothing, since
+    /// the form dispatches the key.
+    public void SetShortcut(Shortcut shortcut)
+    {
+        GtkWidget* label = gtk_bin_get_child(_item);
+        if (label == null)
+            return;
+        if (shortcut.IsEmpty)
+            gtk_accel_label_set_accel(label, 0u, 0u);
+        else
+            gtk_accel_label_set_accel(label, ConvertToKeyval(shortcut.Key),
+                                      ConvertToModifierMask(shortcut.Modifiers));
+    }
+
     public void SetChecked(bool checked)
     {
         _checked = checked;

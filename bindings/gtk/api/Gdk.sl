@@ -196,8 +196,15 @@ public const guint GDK_KEY_KP_9         = 0xffb9u;
 
 // ================================================================== keymaps
 
+/// `GdkEventFunc`: what sees each event before GTK does.
+public delegate void GdkEventFunc(GdkEvent* event, gpointer data);
+
 public extern "C"
 {
+    /// Replaces the function GDK hands every event to, which is
+    /// `gtk_main_do_event` until this is called.
+    void gdk_event_handler_set(GdkEventFunc function, gpointer data, GDestroyNotify notify);
+
     /// The hardware keycode of a key event. False for any other event.
     gboolean gdk_event_get_keycode(GdkEvent* event, guint16* keycode);
 

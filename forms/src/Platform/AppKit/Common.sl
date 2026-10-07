@@ -142,6 +142,40 @@ public ModifierKeys GetModifiers(NSEventModifierFlags flags)
     return held;
 }
 
+/// What a menu item's key equivalent names a key with: the character it types,
+/// or AppKit's private-use character for a function key. Empty for a key with
+/// none.
+public String FormatKeyEquivalent(Key key)
+{
+    int code = (int)key;
+    if (code >= (int)Key.A && code <= (int)Key.Z)
+        return Text.FromChar((char32)(code + 0x20));
+    if (code >= (int)Key.D0 && code <= (int)Key.D9)
+        return Text.FromChar((char32)code);
+    // `NSF1FunctionKey` onwards.
+    if (code >= (int)Key.F1 && code <= (int)Key.F12)
+        return Text.FromChar((char32)(0xF704 + code - (int)Key.F1));
+    switch (key)
+    {
+        case Key.Space: return " ";
+        case Key.Enter: return Text.FromChar((char32)13);
+        case Key.Tab: return Text.FromChar((char32)9);
+        case Key.Escape: return Text.FromChar((char32)27);
+        case Key.Backspace: return Text.FromChar((char32)8);
+        case Key.Up: return Text.FromChar((char32)0xF700);
+        case Key.Down: return Text.FromChar((char32)0xF701);
+        case Key.Left: return Text.FromChar((char32)0xF702);
+        case Key.Right: return Text.FromChar((char32)0xF703);
+        case Key.Insert: return Text.FromChar((char32)0xF727);
+        case Key.Delete: return Text.FromChar((char32)0xF728);
+        case Key.Home: return Text.FromChar((char32)0xF729);
+        case Key.End: return Text.FromChar((char32)0xF72B);
+        case Key.PageUp: return Text.FromChar((char32)0xF72C);
+        case Key.PageDown: return Text.FromChar((char32)0xF72D);
+        default: return "";
+    }
+}
+
 /// A key by what it means, from the hardware key code a Mac reports -- which
 /// names a position on an ANSI keyboard, as Win32's scan code does, and which
 /// is what a shortcut wants whatever the layout types there.
@@ -542,8 +576,9 @@ public class AppKitPeer : IControlPeer
                                                      GetModifiers(event.ModifierFlags));
     }
 
-    /// A key pressed or released, and what it typed. Answers whether Tab moved
-    /// the focus, which leaves nothing for AppKit to do with the key.
+    /// A key pressed or released, and what it typed. Answers whether the key
+    /// is taken -- Tab moved the focus, or a handler set `Handled` -- which
+    /// leaves nothing for AppKit to do with it.
     public bool ReportKey(NSEvent event, bool down)
     {
         var owner = Owner;
@@ -557,7 +592,8 @@ public class AppKitPeer : IControlPeer
             notify.OnPlatformKeyUp(key, modifiers);
             return false;
         }
-        notify.OnPlatformKeyDown(key, modifiers);
+        if (notify.OnPlatformKeyDown(key, modifiers))
+            return true;
 
         // Tab moves the focus in the order the form's controls were made.
         if (key == Key.Tab)
@@ -575,13 +611,17 @@ public class AppKitPeer : IControlPeer
         if (modifiers.HasFlag(ModifierKeys.Control))
             return false;
         String typed = FromNSString(event.Characters);
+        bool taken = false;
         for (nuint at = 0u; at < typed.ByteLength(); at = typed.SkipCodePoint(at))
         {
             char32 scalar = typed.GetCodePointAt(at);
             if (scalar >= (char32)32 && scalar != (char32)127 && (scalar < (char32)0xF700 || scalar > (char32)0xF8FF))
-                notify.OnPlatformKeyPress(scalar);
+            {
+                if (notify.OnPlatformKeyPress(scalar))
+                    taken = true;
+            }
         }
-        return false;
+        return taken;
     }
 
     /// A modifier pressed or released alone, which AppKit reports as a change

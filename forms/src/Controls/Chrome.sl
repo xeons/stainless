@@ -252,7 +252,7 @@ public class OfficeXpRenderer : ChromeRenderer
         // the menu is as wide as its widest item, and each shortcut is drawn
         // against the right edge of that.
         int shortcut = 0;
-        String keys = plain.SubstringAfter("\t");
+        String keys = item.Shortcut.IsEmpty ? plain.SubstringAfter("\t") : item.Shortcut.ToText();
         if (keys != "")
             shortcut = ShortcutGap + surface.MeasureString(keys, Font).Width;
         return Size.FromDimensions(GutterWidth + text.Width + shortcut + 18,
@@ -323,7 +323,7 @@ public class OfficeXpRenderer : ChromeRenderer
         // as Windows draws a menu it owns.
         var ink = disabled ? DisabledText : TextColor;
         DrawMnemonicText(surface, caption.SubstringBefore("\t"), ink, text, format);
-        String keys = caption.SubstringAfter("\t");
+        String keys = item.Shortcut.IsEmpty ? caption.SubstringAfter("\t") : item.Shortcut.ToText();
         if (keys != "")
         {
             format.Horizontal = HorizontalAlignment.Right;

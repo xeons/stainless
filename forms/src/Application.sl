@@ -148,6 +148,21 @@ public static class Application
         return !s_quitting;
     }
 
+    /// Raises `Form.Idle` on every open form.
+    ///
+    /// The backend calls it each time its loop is about to wait. A program
+    /// driving its own loop with `DoEvents` calls it where it would wait. The
+    /// forms are taken first, so a handler that closes one does not disturb
+    /// the walk.
+    public static void RaiseIdle()
+    {
+        var forms = new List<Form>();
+        foreach (var form in s_open)
+            forms.Add(form);
+        foreach (var form in forms)
+            form.RaiseIdle();
+    }
+
     /// Makes `Run` return, whether or not any window is still open.
     public static void Exit()
     {

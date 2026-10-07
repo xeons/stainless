@@ -174,6 +174,10 @@ public extern "C"
     /// Runs the main loop until `gtk_main_quit`.
     void gtk_main();
 
+    /// What GTK does with an event. A handler installed with
+    /// `gdk_event_handler_set` MUST pass every event on to this.
+    void gtk_main_do_event(GdkEvent* event);
+
     /// Ends the innermost `gtk_main`. Nested loops are what a modal dialog is,
     /// so this is a stack rather than a switch.
     void gtk_main_quit();
@@ -269,7 +273,10 @@ public extern "C"
     /// The single child of a `GtkBin` -- a window, a button, a scrolled
     /// window -- or null.
     GtkWidget* gtk_bin_get_child(GtkWidget* bin);
+    /// The window the widget is in -- or the widget itself, when it is in
+    /// none, which `gtk_widget_is_toplevel` tells apart.
     GtkWidget* gtk_widget_get_toplevel(GtkWidget* widget);
+    gboolean gtk_widget_is_toplevel(GtkWidget* widget);
 
     /// The events the widget asks to receive. A `GtkDrawingArea` gets almost
     /// none by default, so a mouse handler on one needs this first.
@@ -320,6 +327,8 @@ public extern "C"
     void gtk_window_set_decorated(GtkWidget* window, gboolean decorated);
 
     void gtk_window_present(GtkWidget* window);
+    /// The widget with the keyboard, **borrowed**, or null for none.
+    GtkWidget* gtk_window_get_focus(GtkWidget* window);
     void gtk_window_maximize(GtkWidget* window);
     void gtk_window_unmaximize(GtkWidget* window);
     void gtk_window_fullscreen(GtkWidget* window);
@@ -617,6 +626,10 @@ public extern "C"
 
     /// Chooses the item as the user would, signals and all.
     void gtk_menu_item_activate(GtkWidget* item);
+
+    /// Shows a key beside a menu item's caption without binding it to
+    /// anything. `label` is the item's child, a `GtkAccelLabel`.
+    void gtk_accel_label_set_accel(GtkWidget* label, guint key, guint modifiers);
     void gtk_menu_shell_append(GtkWidget* shell, GtkWidget* child);
 }
 

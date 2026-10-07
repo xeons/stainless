@@ -684,7 +684,8 @@ public class ControlPeer : IControlPeer
 
         if (message == WmKeyDown || message == WmSysKeyDown)
         {
-            control.OnPlatformKeyDown((Key)(int)wParam, GetCurrentModifiers());
+            if (control.OnPlatformKeyDown((Key)(int)wParam, GetCurrentModifiers()))
+                return 0;
             return DefWndProc(message, wParam, lParam);
         }
         if (message == WmKeyUp || message == WmSysKeyUp)
@@ -708,9 +709,15 @@ public class ControlPeer : IControlPeer
                 if (HighSurrogate == 0u)
                     return DefWndProc(message, wParam, lParam);
                 typed = 0x10000u + ((HighSurrogate - 0xD800u) << 10) + (unit - 0xDC00u);
+                // The high half went on to the control already, so the low
+                // one MUST as well, whatever a handler says.
+                HighSurrogate = 0u;
+                control.OnPlatformKeyPress((char32)typed);
+                return DefWndProc(message, wParam, lParam);
             }
             HighSurrogate = 0u;
-            control.OnPlatformKeyPress((char32)typed);
+            if (control.OnPlatformKeyPress((char32)typed))
+                return 0;
             return DefWndProc(message, wParam, lParam);
         }
 

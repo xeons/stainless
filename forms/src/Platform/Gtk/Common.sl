@@ -485,6 +485,52 @@ public bool IsShortcut(GdkEvent* event)
 /// and `Key.A` is 65, and folding case is the whole of the conversion. The
 /// digits, the function keys and the keypad digits are consecutive in both
 /// numberings.
+/// The keyval for a key, which is what GTK shows a shortcut with. Zero for a
+/// key with no name of its own.
+public guint ConvertToKeyval(Key key)
+{
+    int code = (int)key;
+    if (code >= (int)Key.A && code <= (int)Key.Z)
+        return (guint)(code + 0x20);
+    if (code >= (int)Key.D0 && code <= (int)Key.D9)
+        return (guint)code;
+    if (code >= (int)Key.F1 && code <= (int)Key.F12)
+        return GDK_KEY_F1 + (guint)(code - (int)Key.F1);
+    switch (key)
+    {
+        case Key.Space: return GDK_KEY_space;
+        case Key.Backspace: return GDK_KEY_BackSpace;
+        case Key.Tab: return GDK_KEY_Tab;
+        case Key.Enter: return GDK_KEY_Return;
+        case Key.Escape: return GDK_KEY_Escape;
+        case Key.Delete: return GDK_KEY_Delete;
+        case Key.Insert: return GDK_KEY_Insert;
+        case Key.Home: return GDK_KEY_Home;
+        case Key.End: return GDK_KEY_End;
+        case Key.Left: return GDK_KEY_Left;
+        case Key.Up: return GDK_KEY_Up;
+        case Key.Right: return GDK_KEY_Right;
+        case Key.Down: return GDK_KEY_Down;
+        case Key.PageUp: return GDK_KEY_Page_Up;
+        case Key.PageDown: return GDK_KEY_Page_Down;
+        case Key.Pause: return GDK_KEY_Pause;
+        default: return 0u;
+    }
+}
+
+/// The `GdkModifierType` bits for a shortcut's modifiers.
+public guint ConvertToModifierMask(ModifierKeys modifiers)
+{
+    guint mask = 0u;
+    if (modifiers.HasFlag(ModifierKeys.Shift))
+        mask = mask | GDK_SHIFT_MASK;
+    if (modifiers.HasFlag(ModifierKeys.Control))
+        mask = mask | GDK_CONTROL_MASK;
+    if (modifiers.HasFlag(ModifierKeys.Alt))
+        mask = mask | GDK_MOD1_MASK;
+    return mask;
+}
+
 public Key ConvertKeyval(guint keyval)
 {
     if (keyval >= 0x61u && keyval <= 0x7Au)
@@ -891,6 +937,31 @@ public class GtkPeer : IControlPeer
         return CreatePoint(x, y);
     }
 
+    /// Whether a key event is this peer's to report.
+    ///
+    /// **GTK gives a key to the window first, and then to each widget from
+    /// the focused one up; Win32 sends it to the focused window alone.** So a
+    /// peer reports a key only when the nearest marked widget at or above the
+    /// focus is its own -- and a window only when nothing in it has the focus.
+    /// Without this a form heard every key typed into its controls.
+    public bool OwnsKeyEvent()
+    {
+        GtkWidget* top = gtk_widget_get_toplevel(Inner);
+        if (gtk_widget_is_toplevel(top) == 0)
+            return false;
+        GtkWidget* at = gtk_window_get_focus(top);
+        if (at == null)
+            return top == Widget;
+        while (at != null)
+        {
+            gpointer mark = g_object_get_data((gpointer)at, PeerMark.ToPointer());
+            if (mark != null)
+                return mark == (gpointer)Surface;
+            at = gtk_widget_get_parent(at);
+        }
+        return false;
+    }
+
     /// Where a mouse event happened, in this peer's own coordinates.
     ///
     /// **Not the event's coordinates**, which are in whichever window GTK
@@ -974,30 +1045,33 @@ public class GtkPeer : IControlPeer
         ConnectEvent(Inner, "key-press-event", (sender, carried) =>
         {
             var owner = relay.Owner;
-            if (owner == null)
+            var peer = relay.Peer;
+            if (owner == null || peer == null || !((GtkPeer)peer).OwnsKeyEvent())
                 return false;
             var event = (GdkEvent*)carried;
 
             guint keyval = 0u;
             gdk_event_get_keyval(event, &keyval);
             var modifiers = GetModifiers(event);
-            ((IControlNotify)owner).OnPlatformKeyDown(GetKey(event), modifiers);
+            // True stops the signal before the widget's own handler, which is
+            // what keeps a handled key out of an entry.
+            if (((IControlNotify)owner).OnPlatformKeyDown(GetKey(event), modifiers))
+                return true;
 
             // The typed character, which the seam keeps separate from the key
             // for the reason it says: the layout and any dead keys have been
             // applied by now, and nothing about the keyval says so.
             guint typed = gdk_keyval_to_unicode(keyval);
             if (typed >= 32u && typed != 127u && !IsShortcut(event))
-            {
-                ((IControlNotify)owner).OnPlatformKeyPress((char32)typed);
-            }
+                return ((IControlNotify)owner).OnPlatformKeyPress((char32)typed);
             return false;
         });
 
         ConnectEvent(Inner, "key-release-event", (sender, carried) =>
         {
             var owner = relay.Owner;
-            if (owner == null)
+            var peer = relay.Peer;
+            if (owner == null || peer == null || !((GtkPeer)peer).OwnsKeyEvent())
                 return false;
             var event = (GdkEvent*)carried;
             ((IControlNotify)owner).OnPlatformKeyUp(GetKey(event), GetModifiers(event));
