@@ -127,6 +127,14 @@ public class ImageList
 /// button an object the platform knows nothing about -- a Windows toolbar owns
 /// its buttons and lays them out itself. This is a handle on one of those: an
 /// index, a caption and a `Click`.
+///
+/// **Described first and added second**, as a `MenuItem` is: a button made
+/// with `new ToolButton("Save")` remembers its caption, picture and kind until
+/// `ToolBar.Add` puts it on a bar. That is what lets a form file write one
+/// like any other component.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class ToolButton
 {
     weak ToolBar? _bar;
@@ -137,19 +145,40 @@ public class ToolButton
 
     bool _enabled;
 
-    public ToolButton(ToolBar owner, int at, String text, int image,
-                      ToolButtonKind kind)
+    /// Held until the button is on a bar, which is where a checked state
+    /// lives once it is.
+    bool _checked;
+
+    /// A button on no bar yet.
+    public ToolButton(String text)
     {
-        _bar = owner;
-        _index = at;
+        _bar = null;
+        _index = -1;
         _text = text;
-        _image = image;
-        _kind = kind;
+        _image = -1;
+        _kind = ToolButtonKind.Button;
         _enabled = true;
+        _checked = false;
     }
 
-    /// Where it sits on the bar, counting separators.
+    /// A button with no caption yet, which is how a form file makes one before
+    /// it sets `Text`.
+    public ToolButton() => this("");
+
+    /// The gap between groups of buttons.
+    public static ToolButton CreateSeparator()
+    {
+        var made = new ToolButton("");
+        made._kind = ToolButtonKind.Separator;
+        return made;
+    }
+
+    /// Where it sits on the bar, counting separators, or -1 before it is on
+    /// one.
     public int Index => _index;
+
+    /// Whether `ToolBar.Add` has put it on a bar.
+    public bool IsOnBar => _index >= 0;
 
     /// The caption, exactly as it was given -- accelerator markers and all,
     /// since it is the platform that eats those and the platform that draws
@@ -159,13 +188,58 @@ public class ToolButton
     /// having: comctl32 owns the string it draws, and asking for it back means
     /// `TB_GETBUTTONTEXTW` twice per button per paint -- once for the length
     /// and once for the text -- into a buffer, during a paint.
-    public String Text => _text;
+    public String Text
+    {
+        get => _text;
+        set
+        {
+            _text = value;
+            ToolBar? owner = _bar;
+            if (owner != null)
+                ((ToolBar)owner).SetButtonText(_index, value);
+        }
+    }
 
     /// Which picture in the bar's image list, or -1 for none.
-    public int Image => _image;
+    public int Image
+    {
+        get => _image;
+        set
+        {
+            _image = value;
+            ToolBar? owner = _bar;
+            if (owner != null)
+                ((ToolBar)owner).SetButtonImage(_index, value);
+        }
+    }
+
+    /// A plain button, one that stays pressed, or a gap. It MUST be set before
+    /// the button is added; a platform button cannot change kind, so a change
+    /// afterwards is ignored.
+    public ToolButtonKind Kind
+    {
+        get => _kind;
+        set
+        {
+            if (!IsOnBar)
+                _kind = value;
+        }
+    }
 
     /// A gap between groups rather than something that can be pressed.
     public bool IsSeparator => _kind == ToolButtonKind.Separator;
+
+    /// Puts the button on a bar at an index, and gives the bar what was set
+    /// while it was on none.
+    internal void AttachToBar(ToolBar owner, int at)
+    {
+        _bar = owner;
+        _index = at;
+        if (!_enabled)
+            owner.SetButtonEnabled(at, false);
+        if (_checked)
+            owner.SetButtonChecked(at, true);
+    }
 
     /// This button's picture, or null if it has none or the bar has no list.
     public Bitmap? Picture
@@ -218,11 +292,12 @@ public class ToolButton
         {
             ToolBar? owner = _bar;
             if (owner == null)
-                return false;
+                return _checked;
             return ((ToolBar)owner).GetButtonChecked(_index);
         }
         set
         {
+            _checked = value;
             ToolBar? owner = _bar;
             if (owner != null)
                 ((ToolBar)owner).SetButtonChecked(_index, value);
@@ -250,6 +325,9 @@ public class ToolButton
 }
 
 /// A row of buttons.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class ToolBar : WindowedControl
 {
     late IToolBarPeer _native;
@@ -298,14 +376,26 @@ public class ToolBar : WindowedControl
     /// which is what a screenshot is for.
     public bool IsOwnerDrawn => _isOwnerDrawn;
 
-    /// Adds a button and answers it, so a handler can be attached to the result.
+    /// Puts a button at the end of the bar and answers it, so a handler can
+    /// be attached to the result. A button already on a bar is answered as it
+    /// is.
+    public ToolButton Add(ToolButton button)
+    {
+        if (button.IsOnBar)
+            return button;
+        int at = _native.AddButton(button.Text, button.Image, button.Kind);
+        button.AttachToBar(this, at);
+        _buttons.Add(button);
+        _native.ResizeToFit();
+        return button;
+    }
+
+    /// Adds a button made from a caption and a picture.
     public ToolButton Add(String text, int image)
     {
-        int at = _native.AddButton(text, image, ToolButtonKind.Button);
-        var made = new ToolButton(this, at, text, image, ToolButtonKind.Button);
-        _buttons.Add(made);
-        _native.ResizeToFit();
-        return made;
+        var made = new ToolButton(text);
+        made.Image = image;
+        return Add(made);
     }
 
     public ToolButton Add(String text) => Add(text, -1);
@@ -313,21 +403,15 @@ public class ToolBar : WindowedControl
     /// A button that stays pressed until pressed again.
     public ToolButton AddToggle(String text, int image)
     {
-        int at = _native.AddButton(text, image, ToolButtonKind.Toggle);
-        var made = new ToolButton(this, at, text, image, ToolButtonKind.Toggle);
-        _buttons.Add(made);
-        _native.ResizeToFit();
-        return made;
+        var made = new ToolButton(text);
+        made.Image = image;
+        made.Kind = ToolButtonKind.Toggle;
+        return Add(made);
     }
 
     /// A gap between groups of buttons. Answers nothing: a separator has no
     /// state and nothing to handle.
-    public void AddSeparator()
-    {
-        int at = _native.AddButton("", -1, ToolButtonKind.Separator);
-        _buttons.Add(new ToolButton(this, at, "", -1, ToolButtonKind.Separator));
-        _native.ResizeToFit();
-    }
+    public void AddSeparator() => Add(ToolButton.CreateSeparator());
 
     public List<ToolButton> Buttons => _buttons;
 
@@ -358,6 +442,18 @@ public class ToolBar : WindowedControl
     void SetButtonEnabled(int index, bool enabled) => _native.SetButtonEnabled(index, enabled);
     void SetButtonChecked(int index, bool checked) => _native.SetButtonChecked(index, checked);
     bool GetButtonChecked(int index) => _native.GetButtonChecked(index);
+
+    void SetButtonText(int index, String text)
+    {
+        _native.SetButtonText(index, text);
+        _native.ResizeToFit();
+    }
+
+    void SetButtonImage(int index, int image)
+    {
+        _native.SetButtonImage(index, image);
+        _native.ResizeToFit();
+    }
 
     public override Size PreferredSize => _native.PreferredSize;
 

@@ -48,6 +48,9 @@ module Forms;
 import Standard.Collections;
 import Forms.Drawing;
 import Forms.Platform;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 /// What a menu item's handler is given. Not `EventHandler`, because a menu item
 /// is not a `Control` -- it has no position, no parent window and nothing to
@@ -86,6 +89,9 @@ class MenuItemBuild
 }
 
 /// One line in a menu: a command, a separator, or a heading with more under it.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class MenuItem : IMenuItemNotify
 {
     List<MenuItemBuild> _builds;
@@ -104,6 +110,10 @@ public class MenuItem : IMenuItemNotify
         _builds = new List<MenuItemBuild>();
         _children = new List<MenuItem>();
     }
+
+    /// An item with no caption yet, which is how a form file makes one before
+    /// it sets `Text`.
+    public MenuItem() => this("");
 
     /// The line between groups of commands.
     ///
@@ -477,6 +487,9 @@ public abstract class Menu
 /// file.Add("E&xit").Click += this.OnExit;
 /// Menu = bar;
 /// ```
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public class MainMenu : Menu
 {
     /// The form this bar was last given to. Weak, because the form holds it.

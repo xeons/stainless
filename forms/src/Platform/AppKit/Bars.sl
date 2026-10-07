@@ -452,6 +452,24 @@ public class AppKitToolBarPeer : AppKitPeer, IToolBarPeer
         return (nuint)(byte*)_items[(nuint)index];
     }
 
+    public void SetButtonText(int index, String text)
+    {
+        if (index < 0 || (nuint)index >= _items.Count)
+            return;
+        _texts[(nuint)index] = text;
+        ApplyFace(index);
+        ArrangeItems();
+    }
+
+    public void SetButtonImage(int index, int image)
+    {
+        if (index < 0 || (nuint)index >= _items.Count)
+            return;
+        _pictures[(nuint)index] = image;
+        ApplyFace(index);
+        ArrangeItems();
+    }
+
     public void SetButtonEnabled(int index, bool enabled)
     {
         if (index >= 0 && (nuint)index < _items.Count && _items[(nuint)index] is NSButton button)

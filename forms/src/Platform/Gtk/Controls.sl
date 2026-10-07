@@ -1950,12 +1950,15 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
     /// Which of them are toggles, so that a checked state can be refused for
     /// a plain button rather than silently doing nothing to one.
     List<bool> _toggles;
+    /// Which are separators, which have no label or icon to set.
+    List<bool> _separators;
     GtkImageListBackend? _images;
     bool _showText;
 
     public GtkToolBarPeer(IControlNotify owner)
     {
         _toggles = new List<bool>();
+        _separators = new List<bool>();
         _items = new List<GtkWidget*>();
         base(gtk_toolbar_new(), owner);
         _images = null;
@@ -2000,6 +2003,7 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         gtk_widget_show_all(item);
         _items.Add(item);
         _toggles.Add(kind == ToolButtonKind.Toggle);
+        _separators.Add(kind == ToolButtonKind.Separator);
 
         if (kind != ToolButtonKind.Separator)
         {
@@ -2030,6 +2034,28 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         if (index < 0 || (nuint)index >= _items.Count)
             return 0u;
         return (nuint)(void*)_items[(nuint)index];
+    }
+
+    public void SetButtonText(int index, String text)
+    {
+        if (index < 0 || (nuint)index >= _items.Count || _separators[(nuint)index])
+            return;
+        gtk_tool_button_set_label(_items[(nuint)index], text.ToPointer());
+    }
+
+    public void SetButtonImage(int index, int image)
+    {
+        if (index < 0 || (nuint)index >= _items.Count || _separators[(nuint)index])
+            return;
+        GtkWidget* icon = null;
+        if (image >= 0 && _images != null)
+        {
+            gpointer picture = ((GtkImageListBackend)_images).GetPixbuf(image);
+            if (picture != null)
+                icon = gtk_image_new_from_pixbuf(picture);
+        }
+        gtk_tool_button_set_icon_widget(_items[(nuint)index], icon);
+        gtk_widget_show_all(_items[(nuint)index]);
     }
 
     public void SetButtonEnabled(int index, bool enabled)

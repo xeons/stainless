@@ -288,6 +288,27 @@ public struct ToolBarButton
     public nuint Text;
 }
 
+/// `TBBUTTONINFOW`: what `TB_SETBUTTONINFOW` changes about one button.
+public struct ToolBarButtonInfo
+{
+    public uint Size;
+    public uint Mask;
+    public int Command;
+    public int Image;
+    public byte State;
+    public byte Style;
+    public ushort Width;
+    public nuint Data;
+    public nuint Text;
+    public int TextLength;
+}
+
+/// Which `TBBUTTONINFOW` fields are meant, and that the button is named by
+/// index rather than by command id.
+public const uint TbifImage   = 0x00000001u;
+public const uint TbifText    = 0x00000002u;
+public const uint TbifByIndex = 0x80000000u;
+
 public const uint ToolBarMessageFirst = 0x0400u;   // WM_USER
 
 public const uint TbAddBitmap       = 0x0413u;
@@ -306,6 +327,7 @@ public const uint TbCheckButton     = 0x0402u;
 public const uint TbIsButtonChecked = 0x040Au;
 public const uint TbSetMaxTextRows  = 0x043Cu;
 public const uint TbGetItemRect     = 0x041Du;
+public const uint TbSetButtonInfoW  = 0x0440u;
 
 /// Toolbar button styles.
 public const byte BtnsButton    = 0u;

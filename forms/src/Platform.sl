@@ -852,6 +852,10 @@ public interface IToolBarPeer : IControlPeer
     void SetButtonEnabled(int index, bool enabled);
     void SetButtonChecked(int index, bool checked);
     bool GetButtonChecked(int index);
+    /// A button's caption and picture after it was added. A separator has
+    /// neither, and MUST be ignored.
+    void SetButtonText(int index, String text);
+    void SetButtonImage(int index, int image);
     void SetImages(IImageListBackend? images);
     /// Shows a caption beside each button rather than only its picture.
     void SetTextVisible(bool visible);

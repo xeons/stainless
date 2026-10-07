@@ -279,6 +279,29 @@ public class ToolBarPeer : ControlPeer, IToolBarPeer
         return (nuint)command;
     }
 
+    public void SetButtonText(int index, String text)
+    {
+        if (GetCommandAt(index) < 0)
+            return;
+        ToolBarButtonInfo info = default;
+        info.Size = (uint)sizeof(ToolBarButtonInfo);
+        info.Mask = TbifText | TbifByIndex;
+        var wide = text.ToUtf16();
+        info.Text = (nuint)(void*)wide.ToPointer();
+        SendMessageW(Window, TbSetButtonInfoW, (ulong)index, (long)(nuint)&info);
+    }
+
+    public void SetButtonImage(int index, int image)
+    {
+        if (GetCommandAt(index) < 0)
+            return;
+        ToolBarButtonInfo info = default;
+        info.Size = (uint)sizeof(ToolBarButtonInfo);
+        info.Mask = TbifImage | TbifByIndex;
+        info.Image = image >= 0 ? image : IImageNone;
+        SendMessageW(Window, TbSetButtonInfoW, (ulong)index, (long)(nuint)&info);
+    }
+
     public void SetButtonEnabled(int index, bool enabled)
     {
         int command = GetCommandAt(index);
