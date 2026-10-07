@@ -44,12 +44,17 @@ internal static class Replay
                 .Where(f => !Path.GetFileName(f).StartsWith("minimal-"))
                 .Order()
                 .ToList();
-            foreach (string minimal in Directory.GetFiles(directory, "minimal-*.sl"))
+            var minimals = Directory.GetFiles(directory, "minimal-*.sl").Order().ToList();
+            foreach (string minimal in minimals)
             {
                 int which = int.Parse(Path.GetFileNameWithoutExtension(minimal)["minimal-".Length..]);
                 if (which < files.Count)
                     files[which] = minimal;
             }
+
+            // A finding kept as its minimised files alone is replayed from those.
+            if (files.Count == 0)
+                files = minimals;
 
             string targetFile = Path.Combine(directory, "target.txt");
             string? target = File.Exists(targetFile) ? File.ReadAllText(targetFile).Trim() : null;

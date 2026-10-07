@@ -135,8 +135,18 @@ internal static class Corpus
         foreach (string file in Directory.GetFiles(Path.Combine(repository, "samples"), "*.sl", SearchOption.AllDirectories))
             programs.Add([Read(file)]);
 
-        foreach (string file in Directory.GetFiles(Path.Combine(repository, "stdlib"), "*.sl", SearchOption.AllDirectories))
-            programs.Add([Read(file)]);
+        // A file of the libraries and programs built on the language, each
+        // alone: most of what they name is missing, and the binder has to
+        // say so rather than fall over -- while the attributes, events,
+        // reflection and objc they use are in reach of every mutation.
+        foreach (string tree in (string[])["stdlib", "forms/src", "ide/src", "debug/src"])
+        {
+            string root = Path.Combine(repository, tree);
+            if (!Directory.Exists(root))
+                continue;
+            foreach (string file in Directory.GetFiles(root, "*.sl", SearchOption.AllDirectories))
+                programs.Add([Read(file)]);
+        }
 
         if (only is not null)
             programs.RemoveAll(p => !p.Any(f => f.Path.Contains(only, StringComparison.Ordinal)));

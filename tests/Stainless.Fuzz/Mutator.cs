@@ -33,18 +33,35 @@ internal sealed class Mutator
 {
     private static readonly HashSet<string> s_symbols = Compilation.PlatformSymbols([]);
 
-    /// <summary>The literals, keywords and shapes that tend to find the edges.</summary>
+    /// <summary>
+    /// The literals, keywords and shapes that tend to find the edges.
+    ///
+    /// Every keyword and every operator comes from the lexer's own tables, so
+    /// one added to the language is fuzzed without this list being touched. A
+    /// contextual word -- `late`, `required`, `and`, `not` -- is an identifier
+    /// to the lexer and reaches a mutant through the identifiers of the corpus.
+    /// What is written out here is what no table holds: edge values, and
+    /// shapes several tokens long.
+    /// </summary>
     private static readonly string[] s_interesting =
     [
+        .. TokenKindExtensions.Keywords.Keys,
+        .. Enum.GetValues<TokenKind>().Select(k => k.FixedText()).OfType<string>()
+            .Where(t => t.Length > 0 && !char.IsLetter(t[0])),
+
         "0", "-1", "1", "255", "256", "2147483647", "-2147483648", "9223372036854775807",
         "18446744073709551615", "99999999999999999999999", "1e308", "1e999", "0.0", "0x", "0b",
-        "\"\"", "\"\\u{10FFFF}\"", "'\\0'", "''", "null", "default", "true", "this", "base",
-        "void", "var", "int", "String", "byte*", "void*", "int[]", "int[..]", "List<int>",
-        "Result<int, String>", "T", "?", "!", "...", "..", "=>", "::", "@", "#", "$\"{", "}", "{",
-        "(", ")", "[", "]", "<", ">", ";", ",", ".", "new", "ref", "out", "in", "spawn", "try",
-        "yield", "fixed", "sizeof", "typeof", "nameof", "is", "as", "switch", "case", "when",
-        "where", "operator", "implicit", "const", "static", "override", "virtual", "partial",
-        "extern \"C\"", "export \"C\"", "#if", "#else", "#endif", "///", "/*", "*/", "\\",
+        "1u << 63", "1 << 31", "~0u", "(int)0x80000000u", "-2147483648 / -1",
+        "\"\"", "\"\\u{10FFFF}\"", "'\\0'", "''", "void", "int", "String", "byte*", "void*",
+        "int[]", "int[..]", "byte[16]", "byte[0]", "vfloat4", "List<int>", "Result<int, String>",
+        "Optional<int>", "T", "...", "$\"{", "extern \"C\"", "export \"C\"", "#if", "#else",
+        "#endif", "///", "/*", "*/", "\\",
+
+        // Shapes the corpus spells only one way.
+        "late", "required", "init", "weak", "threadsafe", "readonly", "record", "variant",
+        "union", "closure", "event", "objc", "checked", "unchecked", "parallel", "with",
+        "and", "or", "not", "is not", "goto case", "for parallel (", "[Flags]", "[Reflect]",
+        "[Embed(\"x\")]", "[Selector(\"x\")]", "Ok(", "Fail(", "?.", "??", "^1", "..^",
 
         // An asm statement's shapes: the body is lexed as raw text, so a stray
         // brace, a missing one and an operand list left open are all edges.
