@@ -29,7 +29,9 @@ import Ide.Designer;
 
 public class ItemsEditor : Form
 {
-    private DesignSurface? _surface;
+    /// Weak: the surface's tab owns it, and the surface's handlers reach the
+    /// shell that holds this window.
+    private weak DesignSurface? _surface;
     private String _owner;
 
     private late TreeView _tree;
@@ -66,14 +68,25 @@ public class ItemsEditor : Form
         _tree.Anchors = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
         _tree.SelectedNodeChanged += this.OnNodeChosen;
 
-        _addItem = CreateEditorButton("Add item", 0, this.OnAddItem);
-        _addChild = CreateEditorButton("Add sub-item", 1, this.OnAddChild);
-        _addToggle = CreateEditorButton("Add toggle", 1, this.OnAddToggle);
-        _addSeparator = CreateEditorButton("Add separator", 2, this.OnAddSeparator);
-        _moveUp = CreateEditorButton("Move up", 3, this.OnMoveUp);
-        _moveDown = CreateEditorButton("Move down", 4, this.OnMoveDown);
-        _delete = CreateEditorButton("Delete", 5, this.OnDelete);
-        _close = CreateEditorButton("Close", 7, this.OnCloseClicked);
+        // Each `+=` names the method where it subscribes, which is what makes
+        // the subscription weak. Handed through a parameter, the method would
+        // be a closure holding this window, and the window holds the button.
+        _addItem = CreateEditorButton("Add item", 0);
+        _addItem.Click += this.OnAddItem;
+        _addChild = CreateEditorButton("Add sub-item", 1);
+        _addChild.Click += this.OnAddChild;
+        _addToggle = CreateEditorButton("Add toggle", 1);
+        _addToggle.Click += this.OnAddToggle;
+        _addSeparator = CreateEditorButton("Add separator", 2);
+        _addSeparator.Click += this.OnAddSeparator;
+        _moveUp = CreateEditorButton("Move up", 3);
+        _moveUp.Click += this.OnMoveUp;
+        _moveDown = CreateEditorButton("Move down", 4);
+        _moveDown.Click += this.OnMoveDown;
+        _delete = CreateEditorButton("Delete", 5);
+        _delete.Click += this.OnDelete;
+        _close = CreateEditorButton("Close", 7);
+        _close.Click += this.OnCloseClicked;
     }
 
     /// The surface whose items are shown, or null before any are.
@@ -85,13 +98,12 @@ public class ItemsEditor : Form
     /// How many items are listed, at any depth.
     public nuint ItemCount => _names.Count;
 
-    private Button CreateEditorButton(String text, int row, EventHandler handler)
+    private Button CreateEditorButton(String text, int row)
     {
         var made = new Button(this);
         made.Text = text;
         made.SetBounds(232, 12 + row * 34, 104, 28);
         made.Anchors = AnchorStyles.Top | AnchorStyles.Right;
-        made.Click += handler;
         return made;
     }
 
@@ -113,7 +125,7 @@ public class ItemsEditor : Form
     /// window.
     public void RefreshItems()
     {
-        var surface = _surface;
+        DesignSurface? surface = _surface;
         if (surface == null)
             return;
         var designer = (DesignSurface)surface;
@@ -181,7 +193,7 @@ public class ItemsEditor : Form
     /// one of these items.
     public void FollowSelection()
     {
-        var surface = _surface;
+        DesignSurface? surface = _surface;
         if (surface == null)
             return;
         FormComponent? chosen = ((DesignSurface)surface).SelectedComponent;
@@ -217,7 +229,7 @@ public class ItemsEditor : Form
 
         // A sub-item goes under an item that is not a gap.
         bool heading = false;
-        var surface = _surface;
+        DesignSurface? surface = _surface;
         if (surface != null && chosen != "")
         {
             FormComponent? item = ((DesignSurface)surface).FindComponent(chosen);
@@ -238,7 +250,7 @@ public class ItemsEditor : Form
     private void ShowChosenItem()
     {
         UpdateButtons();
-        var surface = _surface;
+        DesignSurface? surface = _surface;
         String chosen = SelectedItemName;
         if (surface != null && chosen != "")
             ((DesignSurface)surface).SelectComponent(chosen);
@@ -248,7 +260,7 @@ public class ItemsEditor : Form
     /// nothing is chosen. `under` puts it inside the chosen item instead.
     private void AddDesignedItemHere(DesignedItemKind kind, bool under)
     {
-        var surface = _surface;
+        DesignSurface? surface = _surface;
         if (surface == null)
             return;
         var designer = (DesignSurface)surface;
@@ -282,7 +294,7 @@ public class ItemsEditor : Form
 
     private void MoveChosenItem(bool earlier)
     {
-        var surface = _surface;
+        DesignSurface? surface = _surface;
         String chosen = SelectedItemName;
         if (surface == null || chosen == "")
             return;
@@ -296,7 +308,7 @@ public class ItemsEditor : Form
 
     private void OnDelete(Control sender)
     {
-        var surface = _surface;
+        DesignSurface? surface = _surface;
         String chosen = SelectedItemName;
         if (surface == null || chosen == "")
             return;
