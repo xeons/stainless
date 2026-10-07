@@ -3261,7 +3261,16 @@ public sealed class Parser
                     int labelStart = _pos;
                     Advance();
 
+                    int valueStart = _pos;
                     var pattern = ParsePattern();
+
+                    // A pattern stops before `&`, `^` and `|`, since it combines
+                    // with `and` and `or`. A label's constant goes on through
+                    // them: `case Access.Read | Access.Write:`.
+                    if (pattern is ConstantPatternSyntax written &&
+                        BinaryPrecedence(Current.Kind) is >= BitwiseOrPrecedence and <= BitwiseAndPrecedence)
+                        pattern = new ConstantPatternSyntax(SpanFrom(valueStart),
+                            ClimbBitwise(written.Value, valueStart, BitwiseOrPrecedence));
                     patterns.Add(pattern);
                     guards.Add(AtWhenWord() ? ParseGuard() : null);
 
@@ -3948,6 +3957,27 @@ public sealed class Parser
 
     /// <summary>Where <c>is</c> and <c>as</c> bind: exactly where a relational operator does.</summary>
     private const int TypeTestPrecedence = 7;
+
+    /// <summary>The loosest and the tightest of <c>|</c>, <c>^</c> and <c>&amp;</c>.</summary>
+    private const int BitwiseOrPrecedence = 3;
+    private const int BitwiseAndPrecedence = 5;
+
+    /// <summary>
+    /// <paramref name="left"/> carried on through the bitwise operators, each
+    /// binding as tightly as it does anywhere else.
+    /// </summary>
+    private ExpressionSyntax ClimbBitwise(ExpressionSyntax left, int start, int minPrecedence)
+    {
+        while (BinaryPrecedence(Current.Kind) is var precedence &&
+               precedence >= minPrecedence && precedence <= BitwiseAndPrecedence)
+        {
+            var op = Advance().Kind;
+            int rightStart = _pos;
+            var right = ClimbBitwise(ParseBinary(TypeTestPrecedence), rightStart, precedence + 1);
+            left = new BinarySyntax(SpanFrom(start), left, op, right);
+        }
+        return left;
+    }
 
     private static readonly TokenKind[] AssignmentOperators =
     [

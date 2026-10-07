@@ -1331,7 +1331,7 @@ public sealed partial class Binder
                     continue;
                 }
 
-                if (FoldSwitchLabel(bound) is not { } bits)
+                if (FoldCaseLabel(bound) is not { } bits)
                 {
                     diagnostics.Report(Codes.CaseLabelNotConstant, label.Span,
                         $"a 'case' label must be a constant of type '{value.Type.Name}', " +

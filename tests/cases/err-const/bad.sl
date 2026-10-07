@@ -19,8 +19,10 @@ const String Greeting = "hello";
 sealed class Box { }
 const Box Empty = null;                             // SLT0048
 
-// Not fine either: the initializer is not a literal.
-const int Computed = 32 + 32;                       // SLT0001
+// Not fine either: the initializer is worked out at run time. `32 + 32` is a
+// constant expression; a call is not one.
+int Twice(int value) => value * 2;
+const int Computed = Twice(32);                     // SLT0001
 
 // A literal that cannot be negated.
 const bool Negated = -true;                         // SLT0001

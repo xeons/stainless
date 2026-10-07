@@ -327,7 +327,7 @@ public static class Codes
     // ------------------------------------------------------------- T: Types
 
     public static readonly DiagnosticDescriptor InvalidConstantInitializer =
-        Error("SLT0001", "a constant is initialized with something other than a literal");
+        Error("SLT0001", "a constant is initialized with something that is not a constant expression");
 
     public static readonly DiagnosticDescriptor VarWithoutInitializer =
         Error("SLT0002", "a var declaration has no initializer to infer its type from");
@@ -615,6 +615,12 @@ public static class Codes
 
     public static readonly DiagnosticDescriptor VectorLaneTargetUnstable =
         Error("SLT0092", "a compound lane write targets a vector that is not a stable location");
+
+    public static readonly DiagnosticDescriptor ConstantExpressionOverflow =
+        Error("SLT0093", "a constant expression's value lies outside its type");
+
+    public static readonly DiagnosticDescriptor ConstantDependsOnItself =
+        Error("SLT0094", "a constant's value depends on itself");
 
     // ---------------------------------------------------------- G: Generics
 

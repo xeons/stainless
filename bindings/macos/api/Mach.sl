@@ -62,14 +62,16 @@ public const int EXC_BAD_INSTRUCTION = 2;
 public const int EXC_ARITHMETIC = 3;
 public const int EXC_BREAKPOINT = 6;
 
-public const uint EXC_MASK_BAD_ACCESS = 0x02u;
-public const uint EXC_MASK_BAD_INSTRUCTION = 0x04u;
-public const uint EXC_MASK_ARITHMETIC = 0x08u;
-public const uint EXC_MASK_BREAKPOINT = 0x40u;
+public const uint EXC_MASK_BAD_ACCESS = 1u << EXC_BAD_ACCESS;
+public const uint EXC_MASK_BAD_INSTRUCTION = 1u << EXC_BAD_INSTRUCTION;
+public const uint EXC_MASK_ARITHMETIC = 1u << EXC_ARITHMETIC;
+public const uint EXC_MASK_BREAKPOINT = 1u << EXC_BREAKPOINT;
 
-/// `EXCEPTION_DEFAULT | MACH_EXCEPTION_CODES`: a `mach_exception_raise`
-/// message, with 64-bit codes.
-public const int EXCEPTION_DEFAULT_64 = -2147483647;
+public const int EXCEPTION_DEFAULT = 1;
+public const int MACH_EXCEPTION_CODES = (int)0x80000000u;
+
+/// A `mach_exception_raise` message, with 64-bit codes.
+public const int EXCEPTION_DEFAULT_64 = EXCEPTION_DEFAULT | MACH_EXCEPTION_CODES;
 
 /// `mach_exception_raise`, and its reply, which is the request's id plus 100.
 public const int MACH_EXCEPTION_RAISE_ID = 2405;

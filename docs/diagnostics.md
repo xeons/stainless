@@ -4,7 +4,7 @@ Every diagnostic the compiler can report, with what it means. Generated from
 `src/Stainless.Compiler/Source/Codes.cs` by `stainless explain --markdown`;
 edit that file, not this one.
 
-520 codes: 494 errors and 26 warnings.
+522 codes: 496 errors and 26 warnings.
 
 A code is `SL`, the letter of its category, and a number within it:
 
@@ -12,7 +12,7 @@ A code is `SL`, the letter of its category, and a number within it:
 |---|---|---|---|
 | P | Parsing | lexing, tokens, literals, preprocessor directives and grammar | 53 |
 | N | Names | name lookup, modules and imports, duplicate declarations, visibility and receivers | 23 |
-| T | Types | expression typing, operators, calls and arguments, conversions, casts, arrays, ranges, vectors and constants | 92 |
+| T | Types | expression typing, operators, calls and arguments, conversions, casts, arrays, ranges, vectors and constants | 94 |
 | G | Generics | type parameters and arguments, inference, constraints, variance and static abstract members | 24 |
 | C | Classes and members | type and member declarations: inheritance, interfaces, overrides, constructors, properties, events, operators, enums, variants, records and attributes | 129 |
 | F | Flow and patterns | statements and jumps, returns, switch, patterns, try, deconstruction, lambdas and local functions | 49 |
@@ -111,7 +111,7 @@ A code is `SL`, the letter of its category, and a number within it:
 
 | Code | Severity | Means |
 |---|---|---|
-| SLT0001 | error | a constant is initialized with something other than a literal |
+| SLT0001 | error | a constant is initialized with something that is not a constant expression |
 | SLT0002 | error | a var declaration has no initializer to infer its type from |
 | SLT0003 | error | a condition is not of type bool |
 | SLT0004 | error | the address of something with no storage is taken |
@@ -203,6 +203,8 @@ A code is `SL`, the letter of its category, and a number within it:
 | SLT0090 | error | a vector is made from a vector with a different element type |
 | SLT0091 | error | a vector is made from values that do not fill its lanes |
 | SLT0092 | error | a compound lane write targets a vector that is not a stable location |
+| SLT0093 | error | a constant expression's value lies outside its type |
+| SLT0094 | error | a constant's value depends on itself |
 
 ## G: Generics
 

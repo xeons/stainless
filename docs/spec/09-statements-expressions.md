@@ -465,9 +465,32 @@ of it the compiler enforces today.
 
 A `const` is a compile-time value inlined at every use, so it holds what fits in
 one: a number, a `bool`, a `char`, an enum member, or a string compiled into
-read-only data (below). Its initializer is a
-literal, or a negated one — `const int GwlpUserData = -21;` — since a C header
-is full of those.
+read-only data (below).
+
+**Its initializer is a constant expression**: literals, other constants, enum
+members, and the operators, casts and `?:` between them. It is bound as the
+same expression would be in a body, so its type and every conversion in it are
+the ones a reader already knows, and then folded:
+
+```csharp
+public const uint MaskBadAccess = 1u << 1;
+public const uint Masks = MaskBadAccess | MaskBreakpoint;   // named before it is declared
+public const int ExceptionDefault64 = 1 | (int)0x80000000u;
+public const String Greeting = "hello, " + "world";
+public const Area = Width * Height;                          // an 'int', from what it folds to
+```
+
+A constant may name one declared later, or in another module; each is folded
+the first time something needs it. One whose value comes back to itself is
+SLT0094.
+
+**The arithmetic is checked.** `+`, `-`, `*` and a negation whose result does
+not fit the operation's type are an error (SLT0093) where, worked out at run
+time, they would wrap -- `const int Next = 2147483647 + 1;` says so rather than
+being a negative number. A division by a zero that was worked out is SLT0040.
+A shift and an explicit narrowing cast wrap, because that is what they are
+written for: `(int)0x80000000u` is `int.MinValue`. A call, a variable or
+anything else read while the program runs is not a constant (SLT0001).
 
 **It may be written at module scope or inside a type**, and means the same
 thing in both. Inside a type it is named `Type.Name` from outside and without
@@ -488,9 +511,12 @@ nuint blocks = length / Aes.BlockSize;          // and the type's name outside
 ```
 
 A constant is inlined rather than stored, so there is nothing to initialize.
-The one place it does not reach is an inline array's length, `T[N]`,
-which is settled during layout — before any type has its members — so a length
-there must still be a literal or a module-level `const`.
+An inline array's length, `T[N]`, is settled before any type has its members,
+so a length there is a constant expression of literals and module-level
+constants: `byte[Count * 2]`, but not `byte[Sizes.Twice]`.
+
+**A `case` label is a constant expression too**, and is folded to the value it
+compares against: `case Count + 2:` and `case Access.Read | Access.Write:`.
 
 **A string literal makes three kinds of constant**, each compiled into
 read-only data once and named by its address:

@@ -299,6 +299,8 @@ public sealed partial class Binder(
         CheckVarianceDeclarations();
                                     //         and every 'where' clause could be met
         ResolveAttributes();        // pass 6: attributes fold to constants
+        FoldPendingConstants();     //         and so does every constant expression left,
+                                    //         once '[Flags]' says which enums combine
         CheckObjCClasses();         //         and every objc class is one the runtime can find
         CheckObjCConstants();       //         and every objc constant a string object
         SettleLayoutsWaitingForAttributes();

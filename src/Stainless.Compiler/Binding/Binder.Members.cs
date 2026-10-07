@@ -50,6 +50,15 @@ public sealed partial class Binder
                     DeclareDelegateSignature(type, declared, scope);
         }
 
+        // Module constants next, so that an inline array's length or another
+        // constant can name one declared later in the program.
+        foreach (var (scope, unit) in _units)
+        {
+            _context.File = scope;
+            foreach (var constant in unit.Declarations.OfType<GlobalConstDeclSyntax>())
+                DeclareGlobalConstant(scope, constant);
+        }
+
         foreach (var (scope, unit) in _units)
         {
             _context.File = scope;
@@ -103,8 +112,8 @@ public sealed partial class Binder
                             DeclareEnumMembers((EnumTypeSymbol)enumType, enumDecl, scope);
                         break;
 
-                    case GlobalConstDeclSyntax constant:
-                        DeclareGlobalConstant(scope, constant);
+                    // Declared above, before anything that could name one.
+                    case GlobalConstDeclSyntax:
                         break;
 
                     // Storage that crosses to C is the one module-level
@@ -264,6 +273,11 @@ public sealed partial class Binder
 
         ulong next = 0;
 
+        // A member whose value is an expression waits until every name
+        // exists, and the members after it with it (Binder.ConstantFolding).
+        var members = new List<(EnumMemberSymbol Member, ExpressionSyntax? Value)>();
+        bool waits = false;
+
         foreach (var member in declaration.Members)
         {
             if (type.FindMember(member.Name) is not null)
@@ -281,20 +295,26 @@ public sealed partial class Binder
                 if (FoldEnumValue(member.Value, type.UnderlyingType) is { } folded)
                     value = folded;
                 else
-                    diagnostics.Report(Codes.EnumValueNotConstant, member.Value.Span,
-                        $"the value of '{type.Name}.{member.Name}' must be an integer constant",
-                        type);
+                    waits = true;
             }
 
-            type.Members.Add(new EnumMemberSymbol(member.Name, type, value)
+            var made = new EnumMemberSymbol(member.Name, type, value)
             {
                 Documentation = member.Documentation,
-            });
+            };
+            type.Members.Add(made);
+            members.Add((made, member.Value));
             next = value + 1;
         }
+
+        if (waits)
+            _pendingEnums[type] = new PendingEnum(scope, members);
     }
 
-    /// <summary>An enum member's constant: an integer literal, optionally negated.</summary>
+    /// <summary>
+    /// An enum member's value when it is an integer literal, optionally
+    /// negated, or null for anything to be folded.
+    /// </summary>
     private ulong? FoldEnumValue(ExpressionSyntax syntax, PrimitiveTypeSymbol underlying)
     {
         bool negate = false;

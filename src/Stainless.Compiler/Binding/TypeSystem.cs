@@ -1187,8 +1187,12 @@ public sealed class EnumMemberSymbol(string name, EnumTypeSymbol declaringEnum, 
     public string Name { get; } = name;
     public EnumTypeSymbol DeclaringEnum { get; } = declaringEnum;
 
-    /// <summary>The constant, stored as raw bits of the underlying type.</summary>
-    public ulong Value { get; } = value;
+    /// <summary>
+    /// The constant, stored as raw bits of the underlying type. Set again when
+    /// a member's value is an expression, which is folded after every name
+    /// exists.
+    /// </summary>
+    public ulong Value { get; set; } = value;
 
     /// <summary>The <c>///</c> block written above this case, or null.</summary>
     public string? Documentation { get; init; }

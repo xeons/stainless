@@ -393,8 +393,8 @@ public sealed partial class Binder
             new PatternTestKey(PatternTestKind.Null, null, Negated: true));
 
     /// <summary>What a folded constant is, as far as coverage is concerned.</summary>
-    private static ValueKey? ConstantKeyOf(BoundExpression value) =>
-        FoldSwitchLabel(value) is { } bits ? new ValueKey(bits)
+    private ValueKey? ConstantKeyOf(BoundExpression value) =>
+        FoldCaseLabel(value) is { } bits ? new ValueKey(bits)
         : Underlying(value) is BoundStringLiteral text ? new ValueKey(text.Value)
         : null;
 

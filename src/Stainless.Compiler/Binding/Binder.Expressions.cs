@@ -819,7 +819,7 @@ public sealed partial class Binder
                  i--)
                 function = _context.Closures[i].OuterFunction;
 
-            return function?.ContainingType;
+            return function?.ContainingType ?? _context.ConstantOwner;
         }
     }
 
@@ -1072,6 +1072,11 @@ public sealed partial class Binder
 
             if (LookupLocalFunction(name) is { } localFunction)
                 return LocalFunctionValue(localFunction, syntax.Span);
+
+            // An enum member's value may name the members before it without
+            // the enum, as C#'s may.
+            if (_context.FoldingEnum is { } folding && FindEarlierEnumMember(folding, name) is { } sibling)
+                return new BoundLiteral(syntax.Span, folding, sibling.Value);
 
             // A constant the enclosing type declares, named without the type
             // in front of it -- which is how it reads inside its own methods,
@@ -3324,11 +3329,13 @@ public sealed partial class Binder
             return ErrorTypeSymbol.Instance;
         }
 
-        if (ConstantLength(syntax.Length, scope) is not { } length)
+        if (ConstantLength(syntax.Length, scope, out bool reported) is not { } length)
         {
-            diagnostics.Report(Codes.InlineArrayLengthNotConstant, syntax.Length.Span,
-                "the length of an inline array must be a constant, because it is " +
-                "part of the type: an integer literal, or a 'const' holding one");
+            if (!reported)
+                diagnostics.Report(Codes.InlineArrayLengthNotConstant, syntax.Length.Span,
+                    "the length of an inline array must be a constant, because it is " +
+                    "part of the type: an integer constant expression, of literals, " +
+                    "module constants and the operators between them");
             return ErrorTypeSymbol.Instance;
         }
 
@@ -3356,11 +3363,12 @@ public sealed partial class Binder
     }
 
     /// <summary>
-    /// The value of an inline array's length: an integer literal, or a name that
-    /// reaches a constant holding one.
+    /// The value of an inline array's length: an integer literal, a name that
+    /// reaches a constant holding one, or a constant expression of those.
     /// </summary>
-    private long? ConstantLength(ExpressionSyntax syntax, FileScope scope)
+    private long? ConstantLength(ExpressionSyntax syntax, FileScope scope, out bool reported)
     {
+        reported = false;
         switch (syntax)
         {
             case LiteralSyntax { Kind: TokenKind.IntLiteral, Value: ulong number }:
@@ -3375,7 +3383,7 @@ public sealed partial class Binder
                 return LookUpConstant(imported, member.Member, scope, requirePublic: true);
 
             default:
-                return null;
+                return FoldConstantLength(syntax, scope, out reported);
         }
     }
 
@@ -3398,6 +3406,7 @@ public sealed partial class Binder
             return null;
         }
 
+        EnsureConstantFolded(constant);
         return constant.Value is ulong number && number <= long.MaxValue ? (long)number : null;
     }
 }

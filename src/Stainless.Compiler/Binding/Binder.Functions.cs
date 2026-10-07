@@ -1181,10 +1181,11 @@ public sealed partial class Binder
             return;
         }
 
-        // Module constants must fold at compile time, so only literals are allowed
-        // for now -- and a negated one, which the parser sees as a unary minus
-        // over a literal rather than as a literal. A C header is full of them.
+        // A literal, or a negated one -- which the parser sees as a unary minus
+        // over a literal -- is read here. Anything else is a constant
+        // expression, folded once every name exists (Binder.ConstantFolding).
         object? value = null;
+        bool folded = false;
         TypeSymbol type = declaration.Type is null
             ? PrimitiveTypeSymbol.Int
             : ResolveType(declaration.Type, scope);
@@ -1217,10 +1218,15 @@ public sealed partial class Binder
             else if (!settledLater && !Suits(literal.Kind, type))
                 ReportUnsuitableLiteral(declaration, literal, type);
         }
-        else
+        else if (settledLater)
         {
             diagnostics.Report(Codes.InvalidConstantInitializer, declaration.Value.Span,
-                "a 'const' must be initialized with a literal");
+                "an Objective-C string constant is a string literal, which is what clang " +
+                "lays out as the object");
+        }
+        else
+        {
+            folded = true;
         }
 
         // A constant is a value inlined at every use, so it has to be something
@@ -1235,6 +1241,8 @@ public sealed partial class Binder
         {
             IsPublic = declaration.Modifiers.HasFlag(Modifiers.Public),
         };
+        if (folded)
+            _pendingConstants[symbol] = new PendingConstant(scope, declaration, containingType);
 
         if (containingType is not null) containingType.Constants.Add(symbol);
         else module.Constants[declaration.Name] = symbol;
@@ -1321,6 +1329,9 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression ConstantAccess(Source.SourceSpan span, ConstantSymbol constant)
     {
+        EnsureConstantFolded(constant);
+        if (_unfoldedConstants.Contains(constant))
+            return new BoundErrorExpression(span);
         if (_builtins.IsString(constant.Type) && constant.Value is string text)
             return new BoundStringLiteral(span, constant.Type, text);
         if (IsObjCReference(constant.Type)) RequireDarwin(span);

@@ -40,6 +40,19 @@ public sealed partial class Binder
         /// </summary>
         public FileScope? File { get; set; }
 
+        /// <summary>
+        /// The type a constant being folded is declared in, whose constants its
+        /// initializer names without the type in front.
+        /// </summary>
+        public NamedTypeSymbol? ConstantOwner { get; set; }
+
+        /// <summary>
+        /// The enum whose member values are being folded, and how many of its
+        /// members have one: those the next value may name without the enum.
+        /// </summary>
+        public EnumTypeSymbol? FoldingEnum { get; set; }
+        public int FoldedEnumMembers { get; set; }
+
         /// <summary>The type arguments in force while binding inside an instantiation.</summary>
         public Dictionary<string, TypeSymbol> Substitution { get; set; } =
             new(StringComparer.Ordinal);

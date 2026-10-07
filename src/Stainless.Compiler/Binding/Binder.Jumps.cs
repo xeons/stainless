@@ -148,7 +148,7 @@ public sealed partial class Binder
             if (value.Type.IsError())
                 return statement;
 
-            key = FoldSwitchLabel(value) is { } bits ? bits
+            key = FoldCaseLabel(value) is { } bits ? bits
                 : Underlying(value) is BoundStringLiteral text ? text.Value
                 : null;
 

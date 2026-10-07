@@ -310,7 +310,11 @@ public sealed partial class Binder
         if (!syntax.ThroughPointer && ResolveEnumPrefix(syntax.Target, syntax.Member) is { } enumType)
         {
             if (enumType.FindMember(syntax.Member) is { } member)
+            {
+                if (!IsEnumMemberReady(enumType, member, syntax.Span))
+                    return new BoundErrorExpression(syntax.Span);
                 return new BoundLiteral(syntax.Span, enumType, member.Value);
+            }
 
             diagnostics.Report(Codes.MemberNotFound, syntax.Span,
                 $"enum '{enumType.Name}' has no member named '{syntax.Member}'",

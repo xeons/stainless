@@ -777,8 +777,20 @@ public sealed class AliasSymbol(string name, string moduleName)
 public sealed class ConstantSymbol(string name, TypeSymbol type, object? value)
 {
     public string Name { get; } = name;
-    public TypeSymbol Type { get; } = type;
-    public object? Value { get; } = value;
+
+    /// <summary>
+    /// What it is. Settled when it is declared, or for one written without a
+    /// type, when its initializer is folded.
+    /// </summary>
+    public TypeSymbol Type { get; set; } = type;
+
+    /// <summary>
+    /// Its value: an integer's two's complement in a <c>ulong</c>, a code unit's
+    /// scalar, a float, a bool or a string. Null until a constant expression is
+    /// folded, and after one that could not be.
+    /// </summary>
+    public object? Value { get; set; } = value;
+
     public bool IsPublic { get; init; }
 }
 

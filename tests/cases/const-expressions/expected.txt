@@ -1,0 +1,15 @@
+masks 66
+doubled 200 later 100
+default64 -2147483647
+big 1099511627776 page 16384
+low 255 negative -33 remainder -1
+inverted 15 shifted -4
+letter 67 wide yes chosen 3
+half 0.5 third 0.3333333432674408
+hello, world 21
+access 3 7 8 default 5
+header 6
+sizes 16
+a case label folds too
+and so does one of an enum's members combined
+and keeps the bitwise operators' precedence

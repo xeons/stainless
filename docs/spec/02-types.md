@@ -2287,8 +2287,8 @@ counters[9]             // error[SLT0053], at compile time
 counters[variable]      // bounds checked, against a constant
 ```
 
-A length must be an integer literal or a `const` holding one (SLT0050) and at
-least 1 (SLT0051).
+A length must be an integer constant expression of literals and module-level
+constants (SLT0050) and at least 1 (SLT0051).
 
 **An inline array may not hold a counted reference** (SLO0020): every copy of
 whatever held it would have to retain each element, which is the question a
@@ -2536,6 +2536,22 @@ continues from the member before it, so `Severe` above is 11. The underlying
 type is `int` unless another integer type is named, and the representation is
 *exactly* that type — a Stainless enum is the same bytes as the C enum or
 integer it lines up with, and crosses `extern "C"` with no conversion.
+
+**A value is a constant expression**
+([section 9.3](09-statements-expressions.md#93-const-and-static)), and may name the
+members before it, with or without the enum's name, as C#'s may. Naming one
+at or after it is a value that depends on itself (SLT0094).
+
+```csharp
+[Flags]
+public enum Access : byte
+{
+    Read = 1 << 0,
+    Write = 1 << 1,
+    ReadWrite = Read | Write,
+    Execute = 1 << 2,
+}
+```
 
 **An enum never converts implicitly, in either direction.**
 
