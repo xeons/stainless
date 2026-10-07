@@ -35,38 +35,84 @@
 #include "stainless.h"
 #include <string.h>
 
+/*
+ * What a handle that found nothing reads as: a type, a field, a property and
+ * an attribute with no name and nothing in them. Every accessor goes through
+ * these, so a missing type answers that it has no members, a missing property
+ * that it cannot be read or written, and an index into either fails its bounds
+ * check -- rather than any of them reading through null.
+ */
+static const SlTypeInfo     sl_no_type      = { .name = "" };
+static const SlFieldInfo    sl_no_field     = { .name = "" };
+static const SlPropertyInfo sl_no_property  = { .name = "" };
+static const SlAttribute    sl_no_attribute = { .name = "" };
+
+static const SlTypeInfo *sl_type_info(const void *type)
+{
+    return type != NULL ? (const SlTypeInfo *)type : &sl_no_type;
+}
+
+static const SlFieldInfo *sl_field_info(const void *field)
+{
+    return field != NULL ? (const SlFieldInfo *)field : &sl_no_field;
+}
+
+static const SlPropertyInfo *sl_property_info(const void *property)
+{
+    return property != NULL ? (const SlPropertyInfo *)property : &sl_no_property;
+}
+
+static const SlAttribute *sl_attribute_info(const void *attribute)
+{
+    return attribute != NULL ? (const SlAttribute *)attribute : &sl_no_attribute;
+}
+
+/* The kinds a field holds a counted reference in. */
+static _Bool sl_kind_is_counted(uint32_t kind)
+{
+    switch (kind) {
+        case SL_KIND_STRING:
+        case SL_KIND_CLASS:
+        case SL_KIND_INTERFACE:
+        case SL_KIND_ARRAY:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
 /* ------------------------------------------------------------------- types */
 
 const char *sl_type_name(const void *type)
 {
-    return ((const SlTypeInfo *)type)->name;
+    return sl_type_info(type)->name;
 }
 
 size_t sl_type_size(const void *type)
 {
-    return ((const SlTypeInfo *)type)->size;
+    return sl_type_info(type)->size;
 }
 
 size_t sl_type_field_count(const void *type)
 {
-    return ((const SlTypeInfo *)type)->fieldCount;
+    return sl_type_info(type)->fieldCount;
 }
 
 const void *sl_type_field(const void *type, size_t index)
 {
-    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    const SlTypeInfo *info = sl_type_info(type);
     if (index >= info->fieldCount) sl_array_bounds_fail(index, info->fieldCount);
     return &info->fields[index];
 }
 
 size_t sl_type_attribute_count(const void *type)
 {
-    return ((const SlTypeInfo *)type)->attributeCount;
+    return sl_type_info(type)->attributeCount;
 }
 
 const void *sl_type_attribute(const void *type, size_t index)
 {
-    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    const SlTypeInfo *info = sl_type_info(type);
     if (index >= info->attributeCount) sl_array_bounds_fail(index, info->attributeCount);
     return &info->attributes[index];
 }
@@ -75,32 +121,32 @@ const void *sl_type_attribute(const void *type, size_t index)
 
 const char *sl_field_name(const void *field)
 {
-    return ((const SlFieldInfo *)field)->name;
+    return sl_field_info(field)->name;
 }
 
 size_t sl_field_offset(const void *field)
 {
-    return ((const SlFieldInfo *)field)->offset;
+    return sl_field_info(field)->offset;
 }
 
 uint32_t sl_field_kind(const void *field)
 {
-    return ((const SlFieldInfo *)field)->kind;
+    return sl_field_info(field)->kind;
 }
 
 const void *sl_field_type(const void *field)
 {
-    return ((const SlFieldInfo *)field)->type;
+    return sl_field_info(field)->type;
 }
 
 size_t sl_field_attribute_count(const void *field)
 {
-    return ((const SlFieldInfo *)field)->attributeCount;
+    return sl_field_info(field)->attributeCount;
 }
 
 const void *sl_field_attribute(const void *field, size_t index)
 {
-    const SlFieldInfo *info = (const SlFieldInfo *)field;
+    const SlFieldInfo *info = sl_field_info(field);
     if (index >= info->attributeCount) sl_array_bounds_fail(index, info->attributeCount);
     return &info->attributes[index];
 }
@@ -109,17 +155,17 @@ const void *sl_field_attribute(const void *field, size_t index)
 
 const char *sl_attribute_name(const void *attribute)
 {
-    return ((const SlAttribute *)attribute)->name;
+    return sl_attribute_info(attribute)->name;
 }
 
 size_t sl_attribute_value_count(const void *attribute)
 {
-    return ((const SlAttribute *)attribute)->valueCount;
+    return sl_attribute_info(attribute)->valueCount;
 }
 
 static const SlAttributeValue *sl_attribute_value(const void *attribute, size_t index)
 {
-    const SlAttribute *info = (const SlAttribute *)attribute;
+    const SlAttribute *info = sl_attribute_info(attribute);
     if (index >= info->valueCount) sl_array_bounds_fail(index, info->valueCount);
     return &info->values[index];
 }
@@ -153,30 +199,32 @@ void    sl_write_at_double(void *address, uint32_t kind, double value);
  */
 static const void *sl_field_address(const void *instance, const void *field)
 {
-    return (const uint8_t *)instance + ((const SlFieldInfo *)field)->offset;
+    return (const uint8_t *)instance + sl_field_info(field)->offset;
 }
 
 int64_t sl_read_integer(const void *instance, const void *field)
 {
     return sl_read_at_integer(sl_field_address(instance, field),
-                              ((const SlFieldInfo *)field)->kind);
+                              sl_field_info(field)->kind);
 }
 
 double sl_read_double(const void *instance, const void *field)
 {
     return sl_read_at_double(sl_field_address(instance, field),
-                             ((const SlFieldInfo *)field)->kind);
+                             sl_field_info(field)->kind);
 }
 
 _Bool sl_read_bool(const void *instance, const void *field)
 {
-    if (((const SlFieldInfo *)field)->kind != SL_KIND_BOOL) return 0;
+    if (sl_field_info(field)->kind != SL_KIND_BOOL) return 0;
     return sl_read_at_bool(sl_field_address(instance, field));
 }
 
-/* Borrowed: the instance still owns it, so the caller must retain to keep it. */
+/* Borrowed: the instance still owns it, so the caller must retain to keep it.
+   Null for a field that holds no counted reference. */
 void *sl_read_reference(const void *instance, const void *field)
 {
+    if (!sl_kind_is_counted(sl_field_info(field)->kind)) return NULL;
     return *(void *const *)sl_field_address(instance, field);
 }
 
@@ -184,7 +232,7 @@ void *sl_read_reference(const void *instance, const void *field)
 
 static void *sl_field_slot(void *instance, const void *field)
 {
-    return (uint8_t *)instance + ((const SlFieldInfo *)field)->offset;
+    return (uint8_t *)instance + sl_field_info(field)->offset;
 }
 
 /*
@@ -196,18 +244,18 @@ static void *sl_field_slot(void *instance, const void *field)
 void sl_write_integer(void *instance, const void *field, int64_t value)
 {
     sl_write_at_integer(sl_field_slot(instance, field),
-                        ((const SlFieldInfo *)field)->kind, value);
+                        sl_field_info(field)->kind, value);
 }
 
 void sl_write_double(void *instance, const void *field, double value)
 {
     sl_write_at_double(sl_field_slot(instance, field),
-                       ((const SlFieldInfo *)field)->kind, value);
+                       sl_field_info(field)->kind, value);
 }
 
 void sl_write_bool(void *instance, const void *field, _Bool value)
 {
-    if (((const SlFieldInfo *)field)->kind != SL_KIND_BOOL) { return; }
+    if (sl_field_info(field)->kind != SL_KIND_BOOL) { return; }
     *(_Bool *)sl_field_slot(instance, field) = value;
 }
 
@@ -218,7 +266,10 @@ void sl_write_bool(void *instance, const void *field, _Bool value)
  */
 void sl_write_reference(void *instance, const void *field, void *value)
 {
-    if (value == NULL && (((const SlFieldInfo *)field)->flags & SL_FIELD_NO_ZERO)) return;
+    /* Anything else would be retained, released and stored over bytes that
+       are not a reference. */
+    if (!sl_kind_is_counted(sl_field_info(field)->kind)) return;
+    if (value == NULL && (sl_field_info(field)->flags & SL_FIELD_NO_ZERO)) return;
 
     sl_write_at_reference(sl_field_slot(instance, field), value);
 }
@@ -242,7 +293,7 @@ void sl_write_at_reference(void *address, void *value)
 void sl_write_text(void *instance, const void *field,
                    const void *bytes, size_t length)
 {
-    if (((const SlFieldInfo *)field)->kind != SL_KIND_STRING) { return; }
+    if (sl_field_info(field)->kind != SL_KIND_STRING) { return; }
 
     void *text = sl_string_from_bytes((const uint8_t *)bytes, length);
     sl_write_reference(instance, field, text);
@@ -251,14 +302,14 @@ void sl_write_text(void *instance, const void *field,
 
 void *sl_type_create(const void *type)
 {
-    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    const SlTypeInfo *info = sl_type_info(type);
     if (info == NULL || info->create == NULL) return NULL;
     return info->create();
 }
 
 _Bool sl_type_can_create(const void *type)
 {
-    return type != NULL && ((const SlTypeInfo *)type)->create != NULL;
+    return type != NULL && sl_type_info(type)->create != NULL;
 }
 
 /*
@@ -301,7 +352,7 @@ static _Bool sl_slot_is_complete(const uint8_t *address, uint32_t kind,
  */
 _Bool sl_type_is_complete(const void *type, const void *instance)
 {
-    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    const SlTypeInfo *info = sl_type_info(type);
     size_t i;
 
     for (i = 0; i < info->fieldCount; i++) {
@@ -316,7 +367,7 @@ _Bool sl_type_is_complete(const void *type, const void *instance)
 
 _Bool sl_field_element_is_complete(const void *field, const void *address)
 {
-    const SlFieldInfo *info = (const SlFieldInfo *)field;
+    const SlFieldInfo *info = sl_field_info(field);
     return sl_slot_is_complete((const uint8_t *)address, info->elementKind,
                                info->flags & SL_FIELD_ELEMENT_NO_ZERO, info->elementType);
 }
@@ -325,17 +376,17 @@ _Bool sl_field_element_is_complete(const void *field, const void *address)
 
 uint32_t sl_field_element_kind(const void *field)
 {
-    return ((const SlFieldInfo *)field)->elementKind;
+    return sl_field_info(field)->elementKind;
 }
 
 const void *sl_field_element_type(const void *field)
 {
-    return ((const SlFieldInfo *)field)->elementType;
+    return sl_field_info(field)->elementType;
 }
 
 size_t sl_field_element_size(const void *field)
 {
-    return ((const SlFieldInfo *)field)->elementSize;
+    return sl_field_info(field)->elementSize;
 }
 
 /*
@@ -366,7 +417,7 @@ size_t sl_field_element_size(const void *field)
  */
 void *sl_field_new_array(const void *field, size_t length)
 {
-    const SlFieldInfo *info = (const SlFieldInfo *)field;
+    const SlFieldInfo *info = sl_field_info(field);
 
     if (info->kind != SL_KIND_ARRAY || info->type == NULL) return NULL;
 
@@ -473,17 +524,17 @@ void sl_write_at_text(void *address, const void *bytes, size_t length)
 
 uint32_t sl_field_flags(const void *field)
 {
-    return ((const SlFieldInfo *)field)->flags;
+    return sl_field_info(field)->flags;
 }
 
 _Bool sl_type_is_enum(const void *type)
 {
-    return ((const SlTypeInfo *)type)->enumeration != NULL;
+    return sl_type_info(type)->enumeration != NULL;
 }
 
 size_t sl_type_enum_count(const void *type)
 {
-    const SlEnumInfo *members = ((const SlTypeInfo *)type)->enumeration;
+    const SlEnumInfo *members = sl_type_info(type)->enumeration;
     return members == NULL ? 0 : members->count;
 }
 
@@ -491,85 +542,85 @@ const char *sl_type_enum_name(const void *type, size_t index)
 {
     size_t count = sl_type_enum_count(type);
     if (index >= count) sl_array_bounds_fail(index, count);
-    return ((const SlTypeInfo *)type)->enumeration->names[index];
+    return sl_type_info(type)->enumeration->names[index];
 }
 
 int64_t sl_type_enum_value(const void *type, size_t index)
 {
     size_t count = sl_type_enum_count(type);
     if (index >= count) sl_array_bounds_fail(index, count);
-    return ((const SlTypeInfo *)type)->enumeration->values[index];
+    return sl_type_info(type)->enumeration->values[index];
 }
 
 size_t sl_type_event_count(const void *type)
 {
-    return ((const SlTypeInfo *)type)->eventCount;
+    return sl_type_info(type)->eventCount;
 }
 
 const char *sl_type_event_name(const void *type, size_t index)
 {
-    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    const SlTypeInfo *info = sl_type_info(type);
     if (index >= info->eventCount) sl_array_bounds_fail(index, info->eventCount);
     return info->events[index].name;
 }
 
 const char *sl_type_event_handler_type(const void *type, size_t index)
 {
-    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    const SlTypeInfo *info = sl_type_info(type);
     if (index >= info->eventCount) sl_array_bounds_fail(index, info->eventCount);
     return info->events[index].handlerType;
 }
 
 uint32_t sl_property_flags(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->flags;
+    return sl_property_info(property)->flags;
 }
 
 size_t sl_type_property_count(const void *type)
 {
-    return ((const SlTypeInfo *)type)->propertyCount;
+    return sl_type_info(type)->propertyCount;
 }
 
 const void *sl_type_property(const void *type, size_t index)
 {
-    const SlTypeInfo *info = (const SlTypeInfo *)type;
+    const SlTypeInfo *info = sl_type_info(type);
     if (index >= info->propertyCount) sl_array_bounds_fail(index, info->propertyCount);
     return &info->properties[index];
 }
 
 const char *sl_property_name(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->name;
+    return sl_property_info(property)->name;
 }
 
 uint32_t sl_property_kind(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->kind;
+    return sl_property_info(property)->kind;
 }
 
 const void *sl_property_type(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->type;
+    return sl_property_info(property)->type;
 }
 
 _Bool sl_property_can_read(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->getter != NULL;
+    return sl_property_info(property)->getter != NULL;
 }
 
 _Bool sl_property_can_write(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->setter != NULL;
+    return sl_property_info(property)->setter != NULL;
 }
 
 size_t sl_property_attribute_count(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->attributeCount;
+    return sl_property_info(property)->attributeCount;
 }
 
 const void *sl_property_attribute(const void *property, size_t index)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     if (index >= info->attributeCount) sl_array_bounds_fail(index, info->attributeCount);
     return &info->attributes[index];
 }
@@ -584,7 +635,7 @@ const void *sl_property_attribute(const void *property, size_t index)
  */
 int64_t sl_property_get_integer(void *instance, const void *property)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     const void *getter = info->getter;
     if (getter == NULL) return 0;
 
@@ -608,7 +659,7 @@ int64_t sl_property_get_integer(void *instance, const void *property)
 
 double sl_property_get_double(void *instance, const void *property)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     const void *getter = info->getter;
     if (getter == NULL) return 0.0;
 
@@ -621,7 +672,7 @@ double sl_property_get_double(void *instance, const void *property)
 
 _Bool sl_property_get_bool(void *instance, const void *property)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     if (info->getter == NULL || info->kind != SL_KIND_BOOL) return 0;
 
     return ((_Bool (*)(void *))info->getter)(instance);
@@ -634,7 +685,7 @@ _Bool sl_property_get_bool(void *instance, const void *property)
  */
 void *sl_property_get_reference(void *instance, const void *property)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     const void *getter = info->getter;
     if (getter == NULL) return NULL;
 
@@ -650,7 +701,7 @@ void *sl_property_get_reference(void *instance, const void *property)
 
 void sl_property_set_integer(void *instance, const void *property, int64_t value)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     const void *setter = info->setter;
     if (setter == NULL) return;
 
@@ -675,7 +726,7 @@ void sl_property_set_integer(void *instance, const void *property, int64_t value
 
 void sl_property_set_double(void *instance, const void *property, double value)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     const void *setter = info->setter;
     if (setter == NULL) return;
 
@@ -688,7 +739,7 @@ void sl_property_set_double(void *instance, const void *property, double value)
 
 void sl_property_set_bool(void *instance, const void *property, _Bool value)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     if (info->setter == NULL || info->kind != SL_KIND_BOOL) return;
 
     ((void (*)(void *, _Bool))info->setter)(instance, value);
@@ -696,12 +747,12 @@ void sl_property_set_bool(void *instance, const void *property, _Bool value)
 
 uint32_t sl_property_element_kind(const void *property)
 {
-    return ((const SlPropertyInfo *)property)->elementKind;
+    return sl_property_info(property)->elementKind;
 }
 
 void sl_property_get_struct(void *instance, const void *property, void *value)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     if (info->getter == NULL || info->kind != SL_KIND_STRUCT) return;
 
     ((void (*)(void *, void *))info->getter)(instance, value);
@@ -709,7 +760,7 @@ void sl_property_get_struct(void *instance, const void *property, void *value)
 
 void sl_property_set_struct(void *instance, const void *property, const void *value)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     if (info->setter == NULL || info->kind != SL_KIND_STRUCT) return;
 
     ((void (*)(void *, const void *))info->setter)(instance, value);
@@ -721,7 +772,7 @@ void sl_property_set_struct(void *instance, const void *property, const void *va
  */
 void sl_property_set_reference(void *instance, const void *property, void *value)
 {
-    const SlPropertyInfo *info = (const SlPropertyInfo *)property;
+    const SlPropertyInfo *info = sl_property_info(property);
     const void *setter = info->setter;
     if (setter == NULL) return;
     if (value == NULL && (info->flags & SL_PROPERTY_NO_ZERO)) return;

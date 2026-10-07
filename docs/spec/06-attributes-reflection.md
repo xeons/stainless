@@ -234,6 +234,11 @@ the lookup is a binary search per binary and the answer is the same constant
 A program that could name any type at run time would be a program whose linker
 could drop nothing, which is the trade `[Reflect]` exists to make explicit.
 
+A type that was not found is a `Type` whose `Exists` is false, and it answers
+every question as a type with nothing in it: no name, no members, no fields,
+no properties, and a property found on it that cannot be read or written. An
+index into any of those fails its bounds check. Nothing reads through null.
+
 Together with [§6.4.1](#641-properties-which-are-not-fields) that is enough to build an object graph from data: a
 document names a type, this finds it, `CreateInstance` allocates one and the property
 table sets it up. What is still missing is a method — an event handler named
@@ -259,7 +264,9 @@ SetInteger(raw, dock, style.GetEnumMemberValue(5));
 ```
 
 An enum carries this without `[Reflect]` of its own: it is described where a
-reflected field or property names it, and nowhere else.
+reflected field or property names it. Marking the enum `[Reflect]` as well puts
+it in the type table, so `typeof(Key)` and `FindType("App.Key")` reach it with
+nothing reflected naming it.
 
 **A reflected class lists its public events**, its bases' first, each with the
 delegate a handler has to match:

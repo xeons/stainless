@@ -452,7 +452,10 @@ public sealed partial class LlvmEmitter
     {
         var handleType = (StructTypeSymbol)expression.Type;
         string slot = Alloca(StructName(handleType), "typeof");
-        Line($"store ptr {TypeInfoOf(expression.MeasuredType)}, ptr {slot}");
+        string info = expression.MeasuredType is EnumTypeSymbol enumeration
+            ? EnumTypeInfo(enumeration)
+            : TypeInfoOf(expression.MeasuredType);
+        Line($"store ptr {info}, ptr {slot}");
         return new Val(slot, "ptr", handleType);
     }
 

@@ -821,10 +821,14 @@ public sealed partial class Binder
     {
         var reflect = ReflectAttribute;
 
-        // Enums live in their own table, and until [Flags] there was nothing an
-        // attribute on one could mean -- so they were silently dropped.
+        // Enums live in their own table. `[Reflect]` on one puts its members in
+        // the type table, where `typeof` and `FindType` reach them.
         foreach (var (type, entry) in _enumSyntax)
+        {
             BindAttributes(entry.Declaration.Attributes, type.Attributes, entry.Scope, type.Name);
+            if (reflect is not null && type.Attributes.Any(a => a.Type == reflect))
+                type.IsReflected = true;
+        }
 
         foreach (var (type, entry) in _typeSyntax)
             if (entry.Declaration.Attributes.Count > 0 &&

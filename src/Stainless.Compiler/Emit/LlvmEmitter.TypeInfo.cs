@@ -232,6 +232,12 @@ public sealed partial class LlvmEmitter
                      .Where(t => t.IsReflected))
             reflected.Add((structType.QualifiedName, "@" + StructTypeInfoName(structType)));
 
+        foreach (var enumType in program.Modules
+                     .SelectMany(m => m.Types.Values)
+                     .OfType<EnumTypeSymbol>()
+                     .Where(t => t.IsReflected))
+            reflected.Add((enumType.QualifiedName, EnumTypeInfo(enumType)));
+
         if (reflected.Count == 0) return;
 
         // Sorted by UTF-8 bytes, because the search is `strcmp` and that is

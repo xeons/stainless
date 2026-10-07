@@ -31,7 +31,10 @@ module Standard.Reflection;
 /// attributes; methods are not described, so there is nothing here to call.
 ///
 /// **An enum is described where a reflected field or property names it**: its
-/// members, and its attributes, which is where `[Flags]` is read.
+/// members, and its attributes, which is where `[Flags]` is read. One marked
+/// `[Reflect]` itself is in the type table too.
+///
+/// A type that was not found answers as one with nothing in it.
 ///
 /// @see FindType
 public struct Type

@@ -1,0 +1,5 @@
+typeof: ReflectByName.Key enum yes members 3
+by name: ReflectByName.Key Enter = 13
+unreflected: exists no, name '', enum no, members 0, fields 0, properties 0, events 0
+its property: exists no, public no, readable no
+an int written as a reference: 7, read as one: null
