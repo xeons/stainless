@@ -6,5 +6,6 @@ Edges flags yes
 set Docked to Fill: yes
 read back 5
 Docked public yes, Hidden public no
+Docked setter public yes, Counted setter public no, Counted writable yes
 event Clicked : ReflectEnums.Handler
 event Changed : ReflectEnums.Handler

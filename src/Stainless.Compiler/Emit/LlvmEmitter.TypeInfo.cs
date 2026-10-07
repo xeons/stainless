@@ -535,10 +535,13 @@ public sealed partial class LlvmEmitter
             // SL_PROPERTY_PUBLIC, so a tool listing what a caller can set --
             // a form designer's grid -- can leave out what a caller cannot.
             // SL_PROPERTY_NO_ZERO, so a setter is never handed a null its type
-            // refuses.
+            // refuses. SL_PROPERTY_PUBLIC_SETTER, because a public property's
+            // setter may be narrowed, and then a caller cannot set it either.
             int flags = property.IsPublic ? 1 : 0;
             if (!ZeroValues.HasZeroValue(property.Type))
                 flags |= 2;
+            if (property.Setter is { IsPublic: true })
+                flags |= 4;
 
             var array = (property.Type.NonNullForm() ?? property.Type) as ArrayTypeSymbol;
             int elementKind = array is null ? 0 : (int)KindOf(array.Element);

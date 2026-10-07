@@ -71,7 +71,14 @@ public struct Property
 
     /// False for a read-only property -- `public int Left { get; }` -- which
     /// is worth checking before a loader decides a document was ignored.
+    ///
+    /// True for a `private set` too, as .NET's is: reflection reaches what the
+    /// class can. `IsSetterPublic` is whether any caller can.
     public bool CanWrite => sl_property_can_write(Handle);
+
+    /// Whether any code may call the setter: false for a read-only property
+    /// and for `{ get; private set; }`.
+    public bool IsSetterPublic => (sl_property_flags(Handle) & 4u) != 0u;
 
     /// The type of an aggregate property, for walking into it. A handle of
     /// null for a primitive.

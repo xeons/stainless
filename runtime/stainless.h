@@ -213,6 +213,10 @@ typedef struct SlPropertyInfo {
 /* A property whose type has no zero value, so its setter MUST NOT get null. */
 #define SL_PROPERTY_NO_ZERO 2u
 
+/* A property whose setter anything can reach: `{ get; private set; }` has a
+   setter and not this. */
+#define SL_PROPERTY_PUBLIC_SETTER 4u
+
 /*
  * An enum, described for reflection: its members' names and values, and the
  * kind of integer it is. Reached from the TypeInfo a reflected property or

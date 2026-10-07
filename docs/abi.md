@@ -322,7 +322,8 @@ struct SlPropertyInfo {
     const void        *setter;        /* NULL for a read-only one       */
     size_t             attributeCount;
     const SlAttribute *attributes;
-    uint32_t           flags;         /* SL_PROPERTY_PUBLIC, _NO_ZERO       */
+    uint32_t           flags;         /* SL_PROPERTY_PUBLIC, _NO_ZERO,
+                                         _PUBLIC_SETTER                     */
 };
 
 struct SlEnumInfo {
@@ -346,6 +347,9 @@ says the same of an array field's elements. `SL_FIELD_REQUIRED` (4) marks a
 `required` member the constructor `create` runs does not set, which whoever
 makes an instance MUST supply. `SL_PROPERTY_NO_ZERO` (2) does for a
 property's setter what `SL_FIELD_NO_ZERO` does for a field.
+`SL_PROPERTY_PUBLIC` (1) says the property is public, and
+`SL_PROPERTY_PUBLIC_SETTER` (4) that its setter is too: a `private set` has
+a setter in the row and not this flag.
 
 **`create` is the only way reflection makes an object.** For a reflected
 class that `new C()` could make — not abstract, not a com class, with a public

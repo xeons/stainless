@@ -2,7 +2,8 @@
 //
 // Reflection over an enum property and over events: an enum is its integer to
 // the accessors, its members and [Flags] are described, and a class lists its
-// public events with their delegates, its base's first.
+// public events with their delegates, its base's first. A public property with
+// a private setter can be written by reflection and not by a caller.
 module ReflectEnums;
 
 import Standard.Console;
@@ -23,6 +24,7 @@ public class Base
     public Edges Anchored { get; set; }
     public event Handler Clicked;
     int Hidden { get; set; }
+    public int Counted { get; private set; }
 }
 
 [Reflect]
@@ -49,6 +51,10 @@ int Main()
 
     Console.WriteLine("Docked public " + (docked.IsPublic ? "yes" : "no")
                       + ", Hidden public " + (type.FindProperty("Hidden").IsPublic ? "yes" : "no"));
+    var counted = type.FindProperty("Counted");
+    Console.WriteLine("Docked setter public " + (docked.IsSetterPublic ? "yes" : "no")
+                      + ", Counted setter public " + (counted.IsSetterPublic ? "yes" : "no")
+                      + ", Counted writable " + (counted.CanWrite ? "yes" : "no"));
     for (nuint i = 0u; i < type.EventCount; i++)
         Console.WriteLine("event " + type.GetEventAt(i).Name + " : " + type.GetEventAt(i).HandlerTypeName);
     return 0;
