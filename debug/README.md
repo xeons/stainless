@@ -14,8 +14,12 @@ among them.
 
 **A binary to debug MUST carry DWARF.** On Windows an ordinary `-g` build
 writes CodeView into a `.pdb`, which this reads none of, so build with
-`--debug-format dwarf -O0`. Without it `sldb` says so rather than quietly
-reporting addresses that have no lines.
+`--debug-format dwarf -O0`. On macOS a `-g` build writes its DWARF into a
+`.dSYM` beside the program, and it is read from there. Without DWARF `sldb`
+says so rather than quietly reporting addresses that have no lines.
+
+It runs on x86-64 Windows, x86-64 Linux and arm64 macOS; see
+[macOS](#macos) for what that one needs.
 
 ## What is here
 
@@ -25,6 +29,7 @@ reporting addresses that have no lines.
 | `src/Image.sl` | an executable reduced to its sections, and the sniff that picks a reader |
 | `src/Image/Pe.sl` | the COFF header structures |
 | `src/Image/Elf.sl` | the ELF header structures, section and program both |
+| `src/Image/MachO.sl` | the Mach-O load commands, and the dSYM beside an executable |
 | `src/Dwarf/Constants.sl` | the tags, attributes and forms, and names for printing them |
 | `src/Dwarf/Abbrev.sl` | `.debug_abbrev`, and a skip rule for every form |
 | `src/Dwarf/Info.sl` | `.debug_info` as units and entries, indirections resolved |
@@ -32,7 +37,9 @@ reporting addresses that have no lines.
 | `src/Target.sl` | the seam: `ITarget`, and a `DebugEvent` variant |
 | `src/Target/Win32.sl` | the `DEBUG_EVENT` loop |
 | `src/Target/Linux.sl` | the `ptrace` loop |
-| `src/Target/Select.sl` | the one `#if` in the engine |
+| `src/Target/Mach.sl` | the Mach exception loop |
+| `src/Target/Select.sl` | which target this build has, chosen in one `#if` |
+| `src/Target/Architecture.sl` | the trap, the registers and what a call does, per processor |
 | `src/Engine.sl` | breakpoints, the slide, run control and stepping |
 | `src/Paths.sl` | whether two spellings name one source file |
 | `src/Session.sl` | a stop, read into a `Snapshot` a window can hold |
@@ -40,6 +47,7 @@ reporting addresses that have no lines.
 | `src/Unwind.sl` | the seam: one frame in, its caller out |
 | `src/Unwind/Cfi.sl` | `.eh_frame`, which is a bytecode and so an interpreter |
 | `src/Unwind/Xdata.sl` | `.pdata` and `UNWIND_INFO`, a prologue to undo |
+| `src/Unwind/Compact.sl` | `__unwind_info`, Apple's one word per function |
 | `src/Values.sl` | a location and a type, read out of the process |
 | `src/Watch.sl` | a watch expression, parsed and then walked |
 | `tests/sldb.sl` | the console debugger |
@@ -52,9 +60,9 @@ this repository's most expensive lesson is that a GUI self test proves the
 model and nothing about the screen. `sldb` is what a scripted test drives; the
 IDE is the second consumer, and it gets no capability the console tool lacks.
 
-It cannot live in `stdlib/` either: reading a process needs `DEBUG_EVENT` and
-`ptrace`, and the standard library declares its own `extern "C"` and never
-imports `bindings/`.
+It cannot live in `stdlib/` either: reading a process needs `DEBUG_EVENT`,
+`ptrace` and Mach, and the standard library declares its own `extern "C"` and
+never imports `bindings/`.
 
 **The DWARF is read from the file on disk, never out of the target's memory.**
 That is what `fpdebug` does, and it is what lets every reader here be exercised
@@ -502,6 +510,121 @@ Linux's default `ptrace_scope` a process may trace its own child and nothing
 else, so every test here launches. That is said where it matters rather than
 left to be discovered.
 
+## macOS
+
+arm64 only. Intel Macs are built for and not shipped, and a process under
+Rosetta cannot be read through the arm64 thread state.
+
+```
+$ sldb run ./f0 fixture.sl:43
+breakpoint at 0x1000005c0  fixture.sl:43
+image slid by 0xf9c000
+stopped at /Users/brandon/fx/fixture.sl:43
+      in Total                                  (four times, then exit 0)
+```
+
+### What it needs from the machine
+
+**The task port, which macOS guards twice.** Every read, write and register
+goes through the port `task_for_pid` answers, and it answers only a caller
+that is
+
+- **signed with `com.apple.security.cs.debugger`.** `debug/stainless.json`
+  names `debugger.entitlements` in its `macos` section, and the build signs
+  sldb with it ad hoc; the IDE's project names the same file. A build without
+  it gets `KERN_FAILURE`.
+- **granted `system.privilege.taskport`.** The default rule asks a `_developer`
+  user for a password in a window. Over ssh there is no window, and authd
+  logs `interaction not allowed (session has no ui access)`. This is also why
+  lldb cannot launch a program over ssh. A machine that is debugged remotely
+  needs the rule relaxed, once, by an administrator at the machine:
+
+      sudo security authorizationdb write system.privilege.taskport allow
+
+  That lets any signed debugger running as a user take the task port of that
+  user's unhardened programs without asking. `authenticate-developer` puts the
+  password prompt back.
+
+A program built by this compiler is unhardened and linker-signed, so nothing
+is needed on the debuggee's side.
+
+### The reading half
+
+**The DWARF is in the dSYM, not in the executable.** Apple's linker leaves it
+in the object files, and the compiler runs `dsymutil` for every `-g` build.
+The dSYM is a Mach-O with only a `__DWARF` segment, already at the
+executable's link addresses, so its sections are added to the executable's
+image. `LC_UUID` MUST match; a dSYM from another build is refused by name
+rather than read as lines that point at the wrong code.
+
+**A section name is sixteen bytes**, so `__debug_str_offsets` is
+`__debug_str_offs`. Names are mapped to the ELF spelling, which is what keeps
+one DWARF reader over three containers.
+
+**dsymutil moves every type into one unit of its own**, named
+`__artificial_type_unit`, and every other unit reaches it through
+`DW_FORM_ref_addr`. `Unit.At` and `ChildrenOf` follow a reference into
+whichever unit holds it.
+
+`sldb dies` and `sldb lines` against `llvm-dwarfdump` on a fixture with a
+struct, a variant, bit fields, a class and arrays: 640 entries and 390 line
+rows, none differing.
+
+**The executable has no `__eh_frame`.** Apple's linker turns each function's
+CFI into one word in `__unwind_info` and keeps `__eh_frame` only for what a
+word cannot say. `Unwind/Compact.sl` reads FRAME (the frame record), FRAMELESS
+(a stack size, with the return address still in the link register) and DWARF
+(an offset into `__eh_frame`, handed to the CFI reader). `sldb cfi` prints
+the entries as `llvm-objdump --macho --unwind-info` does; sldb's own 124
+entries across several pages match it exactly. FRAME is wrong for the few
+instructions of a prologue or an epilogue, where the record is not there yet
+or has gone.
+
+### arm64
+
+**The trap is the instruction, not a byte.** `brk #0` is four bytes, so a
+breakpoint saves four, and the program counter is left on it rather than past
+it.
+
+**A call does not push its return address.** `bl` puts it in x30 and leaves
+the stack alone, so `Registers` carries the link register, which is zero on
+x86-64 and above frame zero. A step recognises a call by x30 holding the
+address after the instruction just stepped, and runs to its return by x30
+rather than `[sp]`.
+
+**The frame record is x86-64's.** `[fp]` is the caller's frame pointer and
+`[fp + 8]` the return address, so the frame-pointer walk and
+`DW_OP_call_frame_cfa` are unchanged. DWARF numbers the registers 29, 30 and
+31.
+
+**A return address may be signed.** An arm64 program calls into the system's
+arm64e libraries, which sign what they save. The walk clears the top bits of
+every return address before it follows one.
+
+### The Mach target
+
+The program is spawned with `POSIX_SPAWN_START_SUSPENDED`, before dyld runs,
+and its exception ports are pointed at a port sldb receives on. A breakpoint
+or a fault then arrives as a message from the faulting thread, which waits
+for the reply.
+
+**The rest of the task keeps running**, which is not what `ITarget` promises.
+Every exception suspends the whole task and the reply is held until `Resume`.
+A single step suspends every other thread for its one instruction, since
+anything else running would pass the breakpoint lifted for it.
+
+**A fault is handed back.** `Resume(false)` replies `KERN_FAILURE`, and the
+kernel delivers the fault to the program as its signal. The engine resumes a
+fault that way on every platform. Answered as handled, the faulting
+instruction runs again and faults again.
+
+**Break All is a message.** `RequestBreak` sends to a second port in the set
+the session thread receives on, from whichever thread asks, so one wait covers
+both. `sldb pause <binary> <ms>` does it from a console.
+
+`ptrace` is not used. The program is sldb's child, so `waitpid` reports its
+exit, and Mach does everything else.
+
 ## What the window gets
 
 A `Snapshot`: where the program stopped, its call stack, and every local in
@@ -535,16 +658,17 @@ is busy.
 The two exceptions are `Engine.RequestBreak` and `ITarget.RequestBreak`, which
 another thread MAY call. Neither touches the tracing relationship: Windows
 creates a thread inside the target that executes an `int3`, Linux sends
-`SIGSTOP`, and each arrives at the session's thread as an ordinary event. Only
+`SIGSTOP`, macOS sends a message to a port the session waits on, and each
+arrives at the session's thread as an ordinary event. Only
 the engine can tell the result from a fault, because only the engine knows it
 asked -- which is what `StopKind.Paused` is.
 
 ## Still to come
 
 **Another module's unwind information.** What is read is the executable's own,
-so a frame in a shared library -- `libc`, `kernel32` -- falls back to the frame
-pointer. Reading theirs means enumerating the loaded modules and mapping each,
-which the target seam does not do.
+so a frame in a shared library -- `libc`, `kernel32`, `libSystem` -- falls back
+to the frame pointer. Reading theirs means enumerating the loaded modules and
+mapping each, which the target seam does not do.
 
 **Another frame's variables.** Reading one needs that frame's own frame base,
 and only the session's thread may ask for it. The walk now carries a stack

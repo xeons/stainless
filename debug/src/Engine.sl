@@ -33,22 +33,15 @@ module Debugger;
 import Standard.Collections;
 import Standard.Text;
 
-/// `int3`, the one-byte instruction that stops a process.
-///
-/// One byte matters: a longer trap would overwrite the instruction after the
-/// one being trapped, so restoring it would need to know how long that was --
-/// which is a disassembler, for a problem this size.
-const byte Int3 = 0xCC;
-
 /// One planted breakpoint.
 public class Breakpoint
 {
     /// Where it is, in the running process rather than in the file.
     public nuint Address;
 
-    /// The byte that was there, which must go back before the instruction can
-    /// execute.
-    public byte Original;
+    /// The bytes the trap replaced, which MUST go back before the instruction
+    /// can execute. As long as the trap: see `MakeTrapInstruction`.
+    public byte[] Original;
 
     public bool Planted;
 
@@ -69,7 +62,7 @@ public class Breakpoint
     public Breakpoint(nuint address, String where)
     {
         Address = address;
-        Original = 0;
+        Original = new byte[0u];
         Planted = false;
         Where = where;
         Condition = null;
@@ -196,6 +189,10 @@ public class Engine
     /// See `RequestBreak` for why that needs no lock.
     bool _breakWanted;
 
+    /// Whether the stop last reported was a fault, which the next resume
+    /// hands back to the program.
+    bool _faultPending;
+
     /// What the program has written through `OutputDebugString`, or its
     /// platform equivalent, since anybody last asked.
     ///
@@ -233,6 +230,7 @@ public class Engine
         _steppingThread = 0u;
         _stepIsWanted = false;
         _breakWanted = false;
+        _faultPending = false;
         _output = new List<String>();
         _watches = new List<String>();
         _unwinder = new Unwinder(image);
@@ -386,7 +384,7 @@ public class Engine
                 if (_steppingOver != null)
                     StepOffBreakpoint();
                 else
-                    _target.Resume(true);
+                    ResumeFromStop();
             }
             resume = true;
 
@@ -423,10 +421,7 @@ public class Engine
 
         var where = (Subprogram)found;
 
-        Registers frame;
-        frame.Pc = 0u;
-        frame.StackPointer = 0u;
-        frame.FramePointer = 0u;
+        Registers frame = default;
         if (!_target.ReadRegisters(stop.Thread, &frame))
             return true;
 
@@ -524,10 +519,9 @@ public class Engine
 
         if (code == BreakpointExceptionCode())
         {
-            // **The trap has already executed, so the program counter is one
-            // byte past it.** Reporting the address the exception carried is
-            // right; leaving the register where it is means resuming into the
-            // middle of the instruction the trap replaced.
+            // The target reports the trap's own address. On x86-64 the program
+            // counter is already one byte past it, and resuming there would
+            // land in the middle of the instruction the trap replaced.
             var hit = FindBreakpoint(address);
             if (hit != null)
             {
@@ -544,13 +538,25 @@ public class Engine
             }
         }
 
-        // Something the program did. A first-chance exception is handed back so
-        // the program's own handler can have it; a second-chance one is the end.
+        // Something the program did. The next resume hands it back, so the
+        // program's own handler, or the system's, can have it.
+        _faultPending = true;
         var fault = new Stop(StopKind.Fault);
         fault.Thread = thread;
         fault.Address = address;
         fault.Code = code;
         return fault;
+    }
+
+    /// Lets the program go from the stop just reported.
+    ///
+    /// A fault is resumed as not handled. Answered as handled, the faulting
+    /// instruction runs again and faults again, for ever.
+    void ResumeFromStop()
+    {
+        bool handled = !_faultPending;
+        _faultPending = false;
+        _target.Resume(handled);
     }
 
     /// Puts the trap byte back and single-steps off it.
@@ -569,43 +575,61 @@ public class Engine
             PlantOne(_breakpoints[i]);
     }
 
-    /// Saves the byte that is there and writes the trap.
+    /// Saves the bytes that are there and writes the trap.
     bool PlantOne(Breakpoint one)
     {
         if (one.Planted)
             return true;
 
-        nuint at = ToRuntime(one.Address);
-        byte[] saved = new byte[1];
-        if (!_target.ReadMemory(at, saved, 1u))
-            return false;
-
-        // Already trapped -- two breakpoints on one address, or a re-plant that
-        // never unplanted. Saving 0xCC as the original is how a breakpoint
-        // becomes permanent.
-        if (saved[0u] == Int3)
+        // Two breakpoints on one address share one trap. Reading memory here
+        // would save the trap as the original, and unplanting would then
+        // leave it there for ever.
+        var sharing = FindPlantedAt(one.Address);
+        if (sharing != null)
         {
+            one.Original = ((Breakpoint)sharing).Original;
             one.Planted = true;
             return true;
         }
 
-        one.Original = saved[0u];
-        byte[] trap = [Int3];
-        if (!_target.WriteMemory(at, trap, 1u))
+        byte[] trap = MakeTrapInstruction();
+        nuint at = ToRuntime(one.Address);
+        byte[] saved = new byte[trap.Length];
+        if (!_target.ReadMemory(at, saved, trap.Length))
+            return false;
+        if (!_target.WriteMemory(at, trap, trap.Length))
             return false;
 
+        one.Original = saved;
         one.Planted = true;
         return true;
     }
 
+    /// Puts the original bytes back. Every breakpoint sharing the address
+    /// stops being planted with it, since the trap is gone.
     bool UnplantOne(Breakpoint one)
     {
         if (!one.Planted)
             return true;
-        byte[] back = [one.Original];
-        bool ok = _target.WriteMemory(ToRuntime(one.Address), back, 1u);
-        one.Planted = false;
+        bool ok = _target.WriteMemory(ToRuntime(one.Address), one.Original,
+                                      one.Original.Length);
+        for (nuint i = 0u; i < _breakpoints.Count; i++)
+        {
+            if (_breakpoints[i].Address == one.Address)
+                _breakpoints[i].Planted = false;
+        }
         return ok;
+    }
+
+    /// Another breakpoint whose trap is already at this link-time address.
+    Breakpoint? FindPlantedAt(nuint linkedAddress)
+    {
+        for (nuint i = 0u; i < _breakpoints.Count; i++)
+        {
+            if (_breakpoints[i].Planted && _breakpoints[i].Address == linkedAddress)
+                return _breakpoints[i];
+        }
+        return null;
     }
 
     Breakpoint? FindBreakpoint(nuint runtimeAddress)
@@ -621,10 +645,7 @@ public class Engine
     /// Puts the program counter back on to the trapped instruction.
     void RewindOnto(uint thread, nuint address)
     {
-        Registers registers;
-        registers.Pc = 0u;
-        registers.StackPointer = 0u;
-        registers.FramePointer = 0u;
+        Registers registers = default;
         if (!_target.ReadRegisters(thread, &registers))
             return;
         registers.Pc = address;
@@ -650,7 +671,7 @@ public class Engine
         }
 
         _target.SetSingleStep(thread, true);
-        _target.Resume(true);
+        ResumeFromStop();
         return WaitForStop();
     }
 
@@ -664,7 +685,7 @@ public class Engine
     ///
     /// **Single-stepped rather than run to.** Running there means a temporary
     /// breakpoint, and an address taken from the line table and not proved to
-    /// be inside this function is `0xCC` written into somebody else's code. A
+    /// be inside this function is a trap written into somebody else's code. A
     /// prologue is a handful of instructions, so stepping costs nothing and
     /// cannot land anywhere it should not.
     Stop AtPrologueEnd(uint thread, Stop arrival, nuint entry)
@@ -684,10 +705,7 @@ public class Engine
         // worse than stopping early.
         for (int guard = 0; guard < 256; guard++)
         {
-            Registers now;
-            now.Pc = 0u;
-            now.StackPointer = 0u;
-            now.FramePointer = 0u;
+            Registers now = default;
             if (!_target.ReadRegisters(thread, &now))
                 return AtLine(arrival, entry);
 
@@ -754,14 +772,12 @@ public class Engine
         }
     }
 
-    /// Steps one source line, entering any function that has line information
-    /// and running straight through any that has none.
+    /// Steps one source line, entering a function of the program's own and
+    /// running straight through anything else.
     ///
-    /// **Running through a function with no lines is the point, not a
-    /// shortcut.** Under `-g` the C runtime is compiled `-O0 -g` too, so
-    /// stepping into `sl_retain` is a thing that can happen -- and a step that
-    /// lands in the allocator is a step nobody asked for. A function this
-    /// engine has no lines for is stepped over whole.
+    /// **Running through the runtime is the point, not a shortcut.** Under `-g`
+    /// the C runtime is compiled `-O0 -g` too, so it can have lines -- and a
+    /// step that lands in the allocator is a step nobody asked for.
     public Stop StepIn(uint thread) => StepLine(thread, false);
 
     /// Steps one source line, running whole any function that is called.
@@ -769,29 +785,19 @@ public class Engine
 
     Stop StepLine(uint thread, bool over)
     {
-        Registers start;
-        start.Pc = 0u;
-        start.StackPointer = 0u;
-        start.FramePointer = 0u;
+        Registers start = default;
         if (!_target.ReadRegisters(thread, &start))
             return new Stop(StopKind.NotRunning);
 
         String startLine = LineKeyAt(start.Pc);
 
-        // **Where the current function is, which is how a call is recognised.**
-        //
-        // The obvious test is that the stack pointer went down, and it is
-        // wrong: a function's own prologue pushes the frame pointer, so the
-        // first instruction of every function looks like a call was taken.
-        // Stepping into `Total` then "arrived" at `Total` again and stopped
-        // dead on its opening line, and stepping over it read a saved `rbp`
-        // where it expected a return address and planted a breakpoint on
-        // nothing.
-        //
-        // Leaving the function's address range is what a call actually is.
+        // **Leaving the function's address range is what a call is.** The stack
+        // pointer alone cannot say: a prologue pushes the frame pointer, so
+        // every function's first instruction would look like a call taken.
         nuint low = 0u;
         nuint high = 0u;
         bool bounded = FunctionRangeAt(start.Pc, &low, &high);
+        Registers previous = start;
 
         // A bound on the work rather than on the answer: a single source line
         // is a few dozen instructions, and a loop that never leaves it means
@@ -802,10 +808,7 @@ public class Engine
             if (stop.Kind != StopKind.Step)
                 return stop;
 
-            Registers now;
-            now.Pc = 0u;
-            now.StackPointer = 0u;
-            now.FramePointer = 0u;
+            Registers now = default;
             if (!_target.ReadRegisters(thread, &now))
                 return stop;
 
@@ -813,17 +816,15 @@ public class Engine
             if (!inside)
             {
                 // Deeper: a call. The program counter is at the callee's first
-                // instruction, so the cell the stack pointer names is the
-                // return address `call` pushed -- and nothing has pushed over
-                // it yet, which is why the range test has to be what gets us
-                // here.
-                if (now.StackPointer < start.StackPointer)
+                // instruction, where nothing has yet moved the return address.
+                if (WasCallTaken(start, previous, now))
                 {
-                    bool known = LineKeyAt(now.Pc).ByteLength() != 0u;
-                    if (over || !known)
+                    if (over || !IsProgramCodeAt(now.Pc))
                     {
-                        var ran = RunToReturn(thread, now.StackPointer);
+                        var ran = RunToReturn(thread, now);
                         if (ran.Kind != StopKind.Step)
+                            return ran;
+                        if (!_target.ReadRegisters(thread, &previous))
                             return ran;
                         continue;
                     }
@@ -840,6 +841,7 @@ public class Engine
             String here = LineKeyAt(now.Pc);
             if (here.ByteLength() != 0u && here != startLine)
                 return AtLine(stop, now.Pc);
+            previous = now;
         }
 
         return new Stop(StopKind.Step);
@@ -858,14 +860,14 @@ public class Engine
         return RunToAddress(thread, frames[1u].Pc);
     }
 
-    /// Runs until the address the stack pointer is pointing at is reached,
-    /// which is how a call is stepped over.
-    Stop RunToReturn(uint thread, nuint stackPointer)
+    /// Runs a function just entered until it returns, which is how a call is
+    /// stepped over.
+    Stop RunToReturn(uint thread, Registers entered)
     {
-        byte[] cell = new byte[8];
-        if (!_target.ReadMemory(stackPointer, cell, 8u))
+        nuint returnTo = 0u;
+        if (!ReadReturnAddressAtEntry(_target, entered, &returnTo))
             return new Stop(StopKind.Step);
-        return RunToAddress(thread, (nuint)LittleEndianWord(cell));
+        return RunToAddress(thread, returnTo);
     }
 
     /// A breakpoint that exists for one stop.
@@ -1000,6 +1002,23 @@ public class Engine
                                       here.Line, true);
         }
         return new SourcePosition("", 0u, false);
+    }
+
+    /// Whether an address is in the program's own code: it has a line, and
+    /// its unit is not the C runtime's.
+    bool IsProgramCodeAt(nuint runtimeAddress)
+    {
+        nuint linked = ToLinked(runtimeAddress);
+        for (nuint u = 0u; u < _tables.Count; u++)
+        {
+            var row = _tables[u].RowCovering(linked);
+            if (row == null)
+                continue;
+            if (((LineRow)row).Line == 0u)
+                return false;
+            return u >= _info.Units.Count || !_info.Units[u].IsC;
+        }
+        return false;
     }
 
     /// A file and line as one string, for telling two positions apart.

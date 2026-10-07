@@ -73,6 +73,13 @@ public const uint AtStmtList        = 0x10u;
 public const uint AtLowPc           = 0x11u;
 public const uint AtHighPc          = 0x12u;
 public const uint AtLanguage        = 0x13u;
+
+// `DW_LANG_*` for C, which is every language the runtime is written in.
+public const ulong LanguageC89 = 0x01u;
+public const ulong LanguageC = 0x02u;
+public const ulong LanguageC99 = 0x0Cu;
+public const ulong LanguageC11 = 0x1Du;
+public const ulong LanguageC17 = 0x2Cu;
 public const uint AtDiscr           = 0x15u;
 public const uint AtDiscrValue      = 0x16u;
 public const uint AtCompDir         = 0x1Bu;

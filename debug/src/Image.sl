@@ -74,7 +74,7 @@ public class Section
 /// What kind of container it turned out to be. Worth reporting rather than
 /// hiding, because "this is an ELF" is a useful thing for a tool to print when
 /// somebody points it at the wrong file.
-public enum ImageKind { Unknown, Pe, Elf }
+public enum ImageKind { Unknown, Pe, Elf, MachO }
 
 public class Image
 {
@@ -95,6 +95,10 @@ public class Image
     /// The entry point, as linked.
     public nuint Entry;
 
+    /// A Mach-O's `LC_UUID`, which is what matches it to its dSYM. Empty for
+    /// the other formats.
+    public byte[] Uuid;
+
     List<Section> _sections;
 
     public Image(String path, ImageKind kind)
@@ -104,10 +108,50 @@ public class Image
         Is64 = true;
         PreferredBase = 0u;
         Entry = 0u;
+        Uuid = new byte[0u];
         _sections = new List<Section>();
     }
 
     public List<Section> Sections => _sections;
+
+    /// The container's name, for printing.
+    public String KindName
+    {
+        get
+        {
+            switch (Kind)
+            {
+                case ImageKind.Pe:
+                    return "PE";
+                case ImageKind.Elf:
+                    return "ELF";
+                case ImageKind.MachO:
+                    return "Mach-O";
+                default:
+                    return "unknown";
+            }
+        }
+    }
+
+    /// How to get DWARF into a build of this kind, for a message saying there
+    /// is none.
+    public String DwarfAdvice
+    {
+        get
+        {
+            switch (Kind)
+            {
+                case ImageKind.Pe:
+                    return "a -g build on Windows writes CodeView to a .pdb;"
+                         + " build with --debug-format dwarf";
+                case ImageKind.MachO:
+                    return "a -g build writes its DWARF to " + DsymPathFor(Path)
+                         + ", and there is none";
+                default:
+                    return "build it with -g";
+            }
+        }
+    }
 
     public void Add(Section section) => _sections.Add(section);
 
@@ -144,7 +188,8 @@ public class Image
     /// Reads an executable, deciding what it is from its first bytes.
     ///
     /// The error says what was wrong in words a person can act on, because the
-    /// usual cause of one is a path that points at the wrong thing.
+    /// usual cause of one is a path that points at the wrong thing. A Mach-O
+    /// gets the DWARF of the dSYM beside it.
     public static Result<Image, String> FromFile(String path)
     {
         var read = Standard.File.ReadAllBytes(path);
@@ -163,7 +208,21 @@ public class Image
             && data[2u] == (byte)0x4C && data[3u] == (byte)0x46)
             return ReadElf(path, data);
 
-        return Fail(path + " is neither a PE nor an ELF");
+        uint magic = *(uint*)&data[0u];
+        if (magic == MachMagic64)
+        {
+            var parsed = ReadMachO(path, data);
+            if (!parsed.Ok)
+                return parsed;
+            return AttachDsym(parsed.Value);
+        }
+
+        // `FAT_MAGIC`, stored big-endian.
+        if (magic == 0xBEBAFECAu)
+            return Fail(path + " is a universal binary; name the one architecture"
+                        + " (lipo -thin arm64)");
+
+        return Fail(path + " is not a PE, an ELF or a 64-bit Mach-O");
     }
 }
 
@@ -209,7 +268,22 @@ public String HeaderSizeProblem()
     bad = ReportWrongSize("Elf64ProgramHeader", (nuint)sizeof(Elf64ProgramHeader), 56u);
     if (!bad.IsEmpty) return bad;
 
-    return ReportWrongSize("Elf32ProgramHeader", (nuint)sizeof(Elf32ProgramHeader), 32u);
+    bad = ReportWrongSize("Elf32ProgramHeader", (nuint)sizeof(Elf32ProgramHeader), 32u);
+    if (!bad.IsEmpty) return bad;
+
+    bad = ReportWrongSize("MachHeader64", (nuint)sizeof(MachHeader64), 32u);
+    if (!bad.IsEmpty) return bad;
+
+    bad = ReportWrongSize("MachLoadCommand", (nuint)sizeof(MachLoadCommand), 8u);
+    if (!bad.IsEmpty) return bad;
+
+    bad = ReportWrongSize("MachSegmentCommand64", (nuint)sizeof(MachSegmentCommand64), 72u);
+    if (!bad.IsEmpty) return bad;
+
+    bad = ReportWrongSize("MachSection64", (nuint)sizeof(MachSection64), 80u);
+    if (!bad.IsEmpty) return bad;
+
+    return ReportWrongSize("MachEntryPointCommand", (nuint)sizeof(MachEntryPointCommand), 24u);
 }
 
 String ReportWrongSize(String name, nuint got, nuint wanted)

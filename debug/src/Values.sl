@@ -65,10 +65,6 @@ const uint OpCallFrameCfa = 0x9Cu;
 const uint OpDeref        = 0x06u;
 const uint OpPlusUconst   = 0x23u;
 
-/// DWARF's numbering of the x86-64 registers, which is not the instruction
-/// encoding's: 6 is RBP and 7 is RSP.
-const ulong DwarfRegisterFramePointer = 6u;
-const ulong DwarfRegisterStackPointer = 7u;
 
 // `DW_ATE_*`: what a base type's bytes mean.
 const ulong EncodingBoolean       = 0x02u;
@@ -186,7 +182,7 @@ bool FirstPlace(Engine engine, Unit unit, Die owner, Registers frame, Cursor rea
                 ulong which = (ulong)(operation - OpBreg0);
                 long offset = reader.SLeb();
                 nuint holding = 0u;
-                if (!RegisterValue(frame, which, &holding))
+                if (!ReadDwarfRegister(frame, which, &holding))
                     return false;
                 *address = (nuint)((long)holding + offset);
                 return true;
@@ -198,11 +194,11 @@ bool FirstPlace(Engine engine, Unit unit, Die owner, Registers frame, Cursor rea
 /// What `DW_AT_fbreg` is relative to, from the function's own
 /// `DW_AT_frame_base`.
 ///
-/// **Under `-g` this is `DW_OP_reg6 RBP`**, because the compiler emits
-/// `"frame-pointer"="all"` there; see `docs/dwarf.md`. `DW_OP_call_frame_cfa`
-/// is what the C runtime's own units use and is answered from the frame
-/// pointer as well, which is right wherever there is one: the canonical frame
-/// address on x86-64 is the frame pointer plus sixteen -- the saved pointer and
+/// **Under `-g` this is the frame pointer register**, because the compiler
+/// emits `"frame-pointer"="all"` there; see `docs/dwarf.md`.
+/// `DW_OP_call_frame_cfa` is what the C runtime's own units use and is answered
+/// from the frame pointer as well: on x86-64 and arm64 alike the canonical
+/// frame address is the frame pointer plus sixteen, past the saved pointer and
 /// the return address.
 bool FrameBaseOf(Die owner, Registers frame, nuint* base2)
 {
@@ -227,37 +223,20 @@ bool FrameBaseOf(Die owner, Registers frame, nuint* base2)
     }
 
     if (operation >= OpReg0 && operation <= OpReg31)
-        return RegisterValue(frame, (ulong)(operation - OpReg0), base2);
+        return ReadDwarfRegister(frame, (ulong)(operation - OpReg0), base2);
 
     if (operation >= OpBreg0 && operation <= OpBreg31)
     {
         ulong which = (ulong)(operation - OpBreg0);
         long offset = reader.SLeb();
         nuint holding = 0u;
-        if (!RegisterValue(frame, which, &holding))
+        if (!ReadDwarfRegister(frame, which, &holding))
             return false;
         *base2 = (nuint)((long)holding + offset);
         return true;
     }
 
     return false;
-}
-
-/// One of the three registers this engine carries. Anything else is refused
-/// rather than guessed -- see `Registers`, which explains why there are three.
-bool RegisterValue(Registers frame, ulong which, nuint* value)
-{
-    switch (which)
-    {
-        case DwarfRegisterFramePointer:
-            *value = frame.FramePointer;
-            return true;
-        case DwarfRegisterStackPointer:
-            *value = frame.StackPointer;
-            return true;
-        default:
-            return false;
-    }
 }
 
 /// What a variable's type is, with the wrappers taken off.
@@ -1017,10 +996,16 @@ public List<Die> ChildrenOf(Unit unit, Die parent)
 {
     var found = new List<Die>();
 
+    // The parent may live in another unit, reached by `DW_FORM_ref_addr`.
+    var holding = unit.UnitHolding(parent.Offset);
+    if (holding == null)
+        return found;
+    var dies = ((Unit)holding).Dies;
+
     int index = -1;
-    for (nuint i = 0u; i < unit.Dies.Count; i++)
+    for (nuint i = 0u; i < dies.Count; i++)
     {
-        if (unit.Dies[i].Offset == parent.Offset)
+        if (dies[i].Offset == parent.Offset)
         {
             index = (int)i;
             break;
@@ -1029,9 +1014,9 @@ public List<Die> ChildrenOf(Unit unit, Die parent)
     if (index < 0)
         return found;
 
-    for (nuint i = (nuint)index + 1u; i < unit.Dies.Count; i++)
+    for (nuint i = (nuint)index + 1u; i < dies.Count; i++)
     {
-        var die = unit.Dies[i];
+        var die = dies[i];
         if (die.Depth <= parent.Depth)
             break;
         if (die.Parent == index)

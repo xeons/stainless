@@ -178,6 +178,15 @@ public class Unit
     /// file had them.
     public List<Die> Dies;
 
+    /// One past the unit's last byte, or zero when it was not read from a
+    /// section.
+    public nuint End;
+
+    /// The units beside this one, which a `DW_FORM_ref_addr` may point into.
+    /// dsymutil moves every type into one unit of its own and refers to it
+    /// from all the others.
+    public weak DwarfInfo? Owner;
+
     public Unit(nuint offset)
     {
         Offset = offset;
@@ -185,6 +194,8 @@ public class Unit
         AddressSize = 8u;
         OffsetSize = 4u;
         Dies = new List<Die>();
+        End = 0u;
+        Owner = null;
     }
 
     public Die? Root => Dies.Count != 0u ? Dies[0u] : null;
@@ -192,13 +203,60 @@ public class Unit
     public String Name => Dies.Count != 0u ? Dies[0u].Name : "";
     public String CompDir => Dies.Count != 0u ? Dies[0u].TextOf(AtCompDir) : "";
 
-    /// The entry at a section-relative offset, or null.
+    /// Whether the unit is written in C, which in a Stainless program means
+    /// the runtime. The compiler's own units say C++.
+    public bool IsC
+    {
+        get
+        {
+            if (Dies.Count == 0u)
+                return false;
+            switch (Dies[0u].NumberOf(AtLanguage, 0u))
+            {
+                case LanguageC89:
+                case LanguageC:
+                case LanguageC99:
+                case LanguageC11:
+                case LanguageC17:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+
+    /// The entry at a section-relative offset, in this unit or another, or
+    /// null.
     public Die? At(nuint offset)
     {
-        for (nuint i = 0u; i < Dies.Count; i++)
+        var home = UnitHolding(offset);
+        if (home == null)
+            return null;
+
+        var dies = ((Unit)home).Dies;
+        for (nuint i = 0u; i < dies.Count; i++)
         {
-            if (Dies[i].Offset == offset)
-                return Dies[i];
+            if (dies[i].Offset == offset)
+                return dies[i];
+        }
+        return null;
+    }
+
+    /// The unit whose bytes hold a section offset: this one, or the one a
+    /// cross-unit reference points into.
+    public Unit? UnitHolding(nuint offset)
+    {
+        if (End == 0u || (offset >= Offset && offset < End))
+            return this;
+
+        DwarfInfo? owner = Owner;
+        if (owner == null)
+            return null;
+        var units = ((DwarfInfo)owner).Units;
+        for (nuint i = 0u; i < units.Count; i++)
+        {
+            if (offset >= units[i].Offset && offset < units[i].End)
+                return units[i];
         }
         return null;
     }
@@ -270,6 +328,8 @@ public class DwarfInfo
             unit.OffsetSize = 8u;
         }
         *next = reader.Offset + (nuint)length;
+        unit.End = *next;
+        unit.Owner = this;
 
         unit.Version = (uint)reader.U16();
 

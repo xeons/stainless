@@ -363,5 +363,10 @@ Rosetta is installed too, and `-- --target=x64-macos` runs the whole
 end-to-end suite as Intel code under it: every case without a `target.txt` of
 its own is built for that target. Intel Macs are built for and not shipped,
 so the CI lane that runs this is switched off and nothing publishes `osx-x64`.
-`lldb` cannot launch a process over ssh, which has no way to grant debugging
-permission; it reads a `.dSYM` and sets breakpoints there all the same.
+
+**A debugger over ssh works, because `system.privilege.taskport` is set to
+`allow` on the mini.** The default rule asks for a password in a window, which
+ssh has none of, and authd refuses with "session has no ui access". A debugger
+MUST still be signed with `com.apple.security.cs.debugger`: sldb and the IDE
+are, through `entitlements` in their project files, and lldb is. See
+[debug/README.md](debug/README.md#macos).

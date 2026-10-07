@@ -22,10 +22,10 @@
 // Where a frame's caller is, read from what the linker already wrote down.
 //
 // Every binary this compiler produces carries it: `.eh_frame` on ELF,
-// `.pdata` and its `UNWIND_INFO` on PE. Neither is debug information -- both
-// are there so that an exception can be thrown through a frame, which is why
-// they cover the C runtime and the system's own libraries as well, and why
-// they survive `-O2` where a frame pointer does not.
+// `.pdata` and its `UNWIND_INFO` on PE, `__unwind_info` on Mach-O. None is
+// debug information -- each is there so that an exception can be thrown
+// through a frame, which is why they cover the C runtime and the system's own
+// libraries as well, and why they survive `-O2` where a frame pointer does not.
 //
 // **The two formats answer the same question in opposite directions.** DWARF
 // CFI is a bytecode that builds a table: run it to the address in question and
@@ -44,14 +44,6 @@ module Debugger;
 import Standard.Collections;
 import Standard.Text;
 
-/// The x86-64 register numbers DWARF uses, which are not the instruction
-/// encoding's.
-const ulong CfiRegisterRsp = 7u;
-const ulong CfiRegisterRbp = 6u;
-
-/// Where the return address lives, as far as DWARF's table is concerned: a
-/// register number past the real ones.
-const ulong CfiReturnAddress = 16u;
 
 /// What one frame's unwind information said.
 public class Caller
@@ -86,6 +78,12 @@ public class Unwinder
     byte[] _pdata;
     nuint _pdataAddress;
 
+    /// Mach-O's `__unwind_info`, its entries read once, and where the text it
+    /// describes ends.
+    byte[] _compact;
+    List<CompactEntry> _compactEntries;
+    nuint _compactEnd;
+
     /// One past the last byte any section reaches.
     nuint _top;
 
@@ -101,6 +99,10 @@ public class Unwinder
         _pdata = pdata == null ? new byte[0u] : ((Section)pdata).Data;
         _pdataAddress = pdata == null ? 0u : ((Section)pdata).Address;
 
+        _compact = image.BytesOf(".unwind_info");
+        _compactEntries = ReadCompactEntries(_compact);
+        _compactEnd = ReadCompactEnd(_compact);
+
         _top = image.PreferredBase;
         var sections = image.Sections;
         for (nuint i = 0u; i < sections.Count; i++)
@@ -112,17 +114,20 @@ public class Unwinder
     }
 
     /// Whether this binary describes its frames at all.
-    public bool IsEmpty => _ehFrame.Length == 0u && _pdata.Length == 0u;
+    public bool IsEmpty
+        => _ehFrame.Length == 0u && _pdata.Length == 0u && _compactEntries.Count == 0u;
 
-    /// Which of the two this image carries, for a reader that wants to say.
+    /// Which format answers for this image, for a reader that wants to say.
     public String Format
     {
         get
         {
-            if (_ehFrame.Length != 0u)
-                return ".eh_frame";
             if (_pdata.Length != 0u)
                 return ".pdata";
+            if (_compactEntries.Count != 0u)
+                return "__unwind_info";
+            if (_ehFrame.Length != 0u)
+                return ".eh_frame";
             return "none";
         }
     }
@@ -144,6 +149,9 @@ public class Unwinder
 
         if (_pdata.Length != 0u)
             return CallerByXdata(this, target, frame, linked, slide);
+
+        if (_compactEntries.Count != 0u)
+            return CallerByCompact(this, target, frame, linked, slide);
 
         if (_ehFrame.Length != 0u)
             return CallerByCfi(this, target, frame, linked, slide);
@@ -171,6 +179,11 @@ public class Unwinder
     {
         if (_pdata.Length != 0u)
             return FunctionCovering(this, linked) != null;
+        if (_compactEntries.Count != 0u)
+        {
+            uint encoding = 0u;
+            return FindCompactEncoding(this, linked, &encoding);
+        }
         if (_ehFrame.Length != 0u)
             return RowAt(this, linked) != null;
         return false;
@@ -201,6 +214,8 @@ public class Unwinder
     public nuint EhFrameAddress => _ehFrameAddress;
     public byte[] Pdata => _pdata;
     public nuint PdataAddress => _pdataAddress;
+    public List<CompactEntry> CompactEntries => _compactEntries;
+    public nuint CompactEnd => _compactEnd;
 }
 
 /// One word out of a stopped process.

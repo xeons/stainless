@@ -21,11 +21,11 @@
 
 // Which target this build controls processes through.
 //
-// The same four-line shape as
+// The same shape as
 // [forms/src/Platform/Select.sl](../../../forms/src/Platform/Select.sl): one
-// `#if`, in one place, so that no other file in the engine contains one. A
-// branch that is not taken is never lexed, which is why the Windows target can
-// name `DEBUG_EVENT` and the Linux build still compiles.
+// `#if`, in one place. `Architecture.sl` is the only other file in the engine
+// with one. A branch that is not taken is never lexed, which is why the Windows
+// target can name `DEBUG_EVENT` and the Linux build still compiles.
 module Debugger;
 
 import Standard.Text;
@@ -42,6 +42,11 @@ public Result<ITarget, String> MakeTarget()
     return Ok((ITarget)new Win32Target());
 #elif LINUX
     return Ok((ITarget)new LinuxTarget());
+#elif MACOS && ARM64
+    return Ok((ITarget)new MachTarget());
+#elif MACOS
+    return Fail("controlling a process on Intel macOS is not implemented; Intel Macs are"
+                + " built for and not shipped");
 #else
     return Fail("controlling a process is not implemented on this platform yet");
 #endif
@@ -56,6 +61,8 @@ public uint BreakpointExceptionCode()
 {
 #if WINDOWS
     return Win32.Kernel32.ExceptionBreakpoint;
+#elif MACOS
+    return 6u;                                  // EXC_BREAKPOINT
 #else
     return 5u;                                  // SIGTRAP
 #endif
@@ -70,6 +77,10 @@ public uint StepExceptionCode()
 {
 #if WINDOWS
     return Win32.Kernel32.ExceptionSingleStep;
+#elif MACOS
+    // Not an exception number. Mach reports a step as `EXC_BREAKPOINT`, and
+    // this only has to differ from it.
+    return 0x10006u;
 #else
     // Not a signal number. `SIGTRAP` is 5 and this only has to be different
     // from it; the engine compares against these two functions and never

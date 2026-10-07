@@ -46,14 +46,17 @@ import Standard.Text;
 
 /// The registers a debugger reads before it reads anything else.
 ///
-/// Three, not sixteen, and deliberately named for what they mean rather than
-/// what they are called on one architecture: `Pc` is `Rip` on x86-64 and `PC`
-/// on ARM64, and a stack walk written against the general names ports.
+/// Named for what they mean rather than what one architecture calls them:
+/// `Pc` is `Rip` on x86-64 and `pc` on arm64.
 public struct Registers
 {
     public nuint Pc;
     public nuint StackPointer;
     public nuint FramePointer;
+
+    /// x30 on arm64, where a call leaves its return address. Always zero on
+    /// x86-64, and zero above frame zero, where it is not known.
+    public nuint LinkRegister;
 }
 
 /// What the operating system reported.

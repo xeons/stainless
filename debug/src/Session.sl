@@ -293,10 +293,7 @@ void FillLocals(Snapshot into, Engine engine, ITarget target, uint thread,
 
     var where = (Subprogram)found;
 
-    Registers frame;
-    frame.Pc = 0u;
-    frame.StackPointer = 0u;
-    frame.FramePointer = 0u;
+    Registers frame = default;
     if (!target.ReadRegisters(thread, &frame))
         return;
 
@@ -325,11 +322,7 @@ void FillWatches(Snapshot into, Engine engine, ITarget target, uint thread,
 
     var found = engine.SubprogramAt(pc);
 
-    Registers frame;
-    frame.Pc = 0u;
-    frame.StackPointer = 0u;
-    frame.FramePointer = 0u;
-
+    Registers frame = default;
     if (found == null || !target.ReadRegisters(thread, &frame))
     {
         for (nuint i = 0u; i < watches.Count; i++)
@@ -364,10 +357,7 @@ void FillThreads(Snapshot into, Engine engine, ITarget target, uint current)
             continue;
         }
 
-        Registers registers;
-        registers.Pc = 0u;
-        registers.StackPointer = 0u;
-        registers.FramePointer = 0u;
+        Registers registers = default;
         if (!target.ReadRegisters(id, &registers))
         {
             // Listed and readable a moment ago, and gone now. A thread may end

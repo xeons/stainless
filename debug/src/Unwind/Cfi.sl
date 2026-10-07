@@ -137,7 +137,7 @@ class CfiRow
 
     public CfiRow()
     {
-        CfaRegister = CfiRegisterRsp;
+        CfaRegister = DwarfRegisterStackPointer;
         CfaOffset = 0;
         CfaIsExpression = false;
         ReturnRule = CfiRule.Unset;
@@ -184,7 +184,7 @@ class Cie
     {
         CodeAlignment = 1;
         DataAlignment = 1;
-        ReturnRegister = CfiReturnAddress;
+        ReturnRegister = DwarfReturnAddressColumn;
         PointerEncoding = PeAbsptr;
         InstructionsAt = 0u;
         InstructionsEnd = 0u;
@@ -204,7 +204,7 @@ Caller? CallerByCfi(Unwinder table, ITarget target, Registers frame,
         return null;
 
     nuint cfa = 0u;
-    if (!RegisterOf(rules.CfaRegister, frame, &cfa))
+    if (!ReadDwarfRegister(frame, rules.CfaRegister, &cfa))
         return null;
     cfa = (nuint)((long)cfa + rules.CfaOffset);
 
@@ -222,12 +222,16 @@ Caller? CallerByCfi(Unwinder table, ITarget target, Registers frame,
     }
     else if (rules.ReturnRule == CfiRule.InRegister)
     {
-        if (!RegisterOf(rules.ReturnRegister, frame, &returnTo))
+        if (!ReadDwarfRegister(frame, rules.ReturnRegister, &returnTo))
             return null;
     }
     else
     {
-        return null;
+        // An untouched column still holds the return address where it is a
+        // real register: arm64's x30. On x86-64 it is not one, and this
+        // refuses.
+        if (!ReadDwarfRegister(frame, DwarfReturnAddressColumn, &returnTo))
+            return null;
     }
 
     // The caller's frame pointer, which its own CFA rule may be written
@@ -242,7 +246,7 @@ Caller? CallerByCfi(Unwinder table, ITarget target, Registers frame,
     }
     else if (rules.FramePointerRule == CfiRule.InRegister)
     {
-        if (!RegisterOf(rules.FramePointerRegister, frame, &framePointer))
+        if (!ReadDwarfRegister(frame, rules.FramePointerRegister, &framePointer))
             return null;
     }
 
@@ -252,21 +256,6 @@ Caller? CallerByCfi(Unwinder table, ITarget target, Registers frame,
     return new Caller(returnTo, cfa, framePointer);
 }
 
-/// One of the three registers this engine carries.
-bool RegisterOf(ulong which, Registers frame, nuint* value)
-{
-    switch (which)
-    {
-        case CfiRegisterRsp:
-            *value = frame.StackPointer;
-            return true;
-        case CfiRegisterRbp:
-            *value = frame.FramePointer;
-            return true;
-        default:
-            return false;
-    }
-}
 
 /// One entry of `.eh_frame`, as far as naming what it covers.
 public class UnwindEntry
@@ -765,19 +754,17 @@ void Remember(CfiRow row, ulong which, CfiRule rule, long offset,
         row.ReturnRule = rule;
         row.ReturnOffset = offset;
         row.ReturnRegister = holding;
-        if (rule == CfiRule.InRegister && holding != CfiRegisterRsp
-            && holding != CfiRegisterRbp)
+        if (rule == CfiRule.InRegister && !IsCarriedDwarfRegister(holding))
             row.Unreadable = true;
         return;
     }
 
-    if (which == CfiRegisterRbp)
+    if (which == DwarfRegisterFramePointer)
     {
         row.FramePointerRule = rule;
         row.FramePointerOffset = offset;
         row.FramePointerRegister = holding;
-        if (rule == CfiRule.InRegister && holding != CfiRegisterRsp
-            && holding != CfiRegisterRbp)
+        if (rule == CfiRule.InRegister && !IsCarriedDwarfRegister(holding))
             row.Unreadable = true;
         return;
     }

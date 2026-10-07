@@ -95,10 +95,7 @@ public List<Frame> WalkStack(ITarget target, uint thread, Unwinder? table,
 {
     var frames = new List<Frame>();
 
-    Registers registers;
-    registers.Pc = 0u;
-    registers.StackPointer = 0u;
-    registers.FramePointer = 0u;
+    Registers registers = default;
     if (!target.ReadRegisters(thread, &registers))
         return frames;
 
@@ -115,6 +112,7 @@ public List<Frame> WalkStack(ITarget target, uint thread, Unwinder? table,
 
         var caller = (Frame)next;
         caller.Depth = depth;
+        caller.Pc = StripPointerSignature(caller.Pc);
 
         // **The chain must climb.** The stack grows downwards, so a caller's
         // stack is always at a higher address than its callee's. A value that
@@ -135,6 +133,7 @@ public List<Frame> WalkStack(ITarget target, uint thread, Unwinder? table,
         registers.Pc = caller.Pc;
         registers.StackPointer = caller.StackPointer;
         registers.FramePointer = caller.FramePointer;
+        registers.LinkRegister = 0u;
     }
 
     return frames;

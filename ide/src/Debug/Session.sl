@@ -311,12 +311,10 @@ public class DebugSession
         Application.Post(() => OnEngineCreated(engine));
 
         // A program with no DWARF still runs, stopping at addresses rather
-        // than lines. On Windows an ordinary `-g` build writes CodeView into a
-        // .pdb and carries no DWARF, which is a misconfigured build rather
-        // than a broken debugger.
+        // than lines.
         if (info.IsEmpty)
-            PostOutput("this binary carries no DWARF, so there are no lines."
-                + " Build it with --debug-format dwarf.");
+            PostOutput("this binary carries no DWARF, so there are no lines: "
+                + image.DwarfAdvice + ".");
 
         PlantBreakpoints(engine, tables, files, lines, conditions);
 

@@ -11,6 +11,7 @@ bindings/macos/
   unanswered.txt               what the headers declare and the runtime does not answer
   api/Termios.sl               module MacOS.Termios;       hand-written, below
   api/Events.sl                module MacOS.Events;
+  api/Mach.sl                  module MacOS.Mach;          tasks, threads, exception ports
   Terminal.sl                  module MacOS.Terminal;
 ```
 

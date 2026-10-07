@@ -42,6 +42,7 @@
 //   sldb unwind <binary> f:n    the stack both ways, for comparing them
 //   sldb cfi <binary>           what the unwind information covers
 //   sldb threads <binary> f:n   every thread, and where each of them is
+//   sldb pause <binary> ms      Break All after ms, the stack there, then on
 //   sldb --selftest            the checks that need no binary
 module Sldb;
 
@@ -49,6 +50,7 @@ import Standard.Collections;
 import Standard.Console;
 import Standard.Env;
 import Standard.Text;
+import Standard.Threading;
 import Debugger;
 
 /// FormatHexadecimal, with a fixed width, because a column of addresses that do not
@@ -90,8 +92,7 @@ int PrintSections(String path)
 
     var image = read.Value;
     Console.WriteLine(image.Path);
-    Console.WriteLine("  format    " + (image.Kind == ImageKind.Pe ? "PE" : "ELF")
-                      + (image.Is64 ? " 64-bit" : " 32-bit"));
+    Console.WriteLine("  format    " + image.KindName + (image.Is64 ? " 64-bit" : " 32-bit"));
     Console.WriteLine("  base      0x" + FormatHexPadded(image.PreferredBase, 16));
     Console.WriteLine("  entry     0x" + FormatHexPadded(image.Entry, 16));
     Console.WriteLine("  dwarf     " + (image.HasDwarf ? "yes" : "no"));
@@ -433,6 +434,26 @@ int RunSelfTest()
     if (!sizes.IsEmpty)
         Console.WriteLine("       " + sizes);
 
+    ok = ReportCheck(ok, "a Mach-O section is named the way ELF names it",
+               MapMachSectionName("__debug_info") == ".debug_info");
+    ok = ReportCheck(ok, "and the one cut short at sixteen bytes is restored",
+               MapMachSectionName("__debug_str_offs") == ".debug_str_offsets");
+    ok = ReportCheck(ok, "while one exactly sixteen long is left whole",
+               MapMachSectionName("__debug_line_str") == ".debug_line_str");
+    ok = ReportCheck(ok, "the dSYM sits beside the program",
+               DsymPathFor("/a/b/hello")
+               == "/a/b/hello.dSYM/Contents/Resources/DWARF/hello");
+
+    byte[] uuid = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+    byte[] same = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+    byte[] other = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17];
+    ok = ReportCheck(ok, "a dSYM with the program's LC_UUID belongs to it",
+               AreSameUuid(uuid, same));
+    ok = ReportCheck(ok, "and one that differs in a byte does not",
+               !AreSameUuid(uuid, other));
+    ok = ReportCheck(ok, "and neither does a program with no LC_UUID",
+               !AreSameUuid(new byte[0u], new byte[0u]));
+
     Console.WriteLine(ok ? "all checks passed" : "FAILED");
     return ok ? 0 : 1;
 }
@@ -451,8 +472,7 @@ DwarfInfo? LoadDwarfOrComplain(String path)
     if (info.IsEmpty)
     {
         Console.WriteLine("sldb: " + path + " carries no DWARF");
-        Console.WriteLine("      on Windows a -g build writes CodeView to a .pdb;");
-        Console.WriteLine("      see docs/dwarf.md for how to force DWARF instead");
+        Console.WriteLine("      " + read.Value.DwarfAdvice);
         return null;
     }
 
@@ -770,13 +790,10 @@ int RunProgram(String path, String where)
     var tables = ReadEveryLineTable(info);
     var engine = new Engine(made.Value, image, info, tables);
 
-    // Running without DWARF works and reports addresses rather than lines,
-    // which is a fair thing to do and a confusing thing to be given without
-    // warning -- a default `-g` build on Windows writes CodeView to a .pdb and
-    // carries no DWARF at all.
+    // Running without DWARF works and reports addresses rather than lines.
     if (info.IsEmpty)
-        Console.WriteLine("note: no DWARF here, so stops are addresses only"
-                          + " (see docs/dwarf.md)");
+        Console.WriteLine("note: no DWARF here, so stops are addresses only; "
+                          + image.DwarfAdvice);
 
     if (where.ByteLength() != 0u)
     {
@@ -824,13 +841,11 @@ int RunProgram(String path, String where)
                 break;
             }
 
+            // Reported, then handed back to the program by the next resume.
             case StopKind.Fault:
-            {
                 Console.WriteLine("fault 0x" + FormatHexadecimal((ulong)stop.Code)
                                   + " at " + engine.Describe(stop.Address));
-                engine.Terminate();
-                return 1;
-            }
+                break;
 
             case StopKind.Exited:
             {
@@ -845,6 +860,72 @@ int RunProgram(String path, String where)
 
         stop = engine.Continue();
     }
+}
+
+/// Runs a program, asks it to stop from a second thread after a delay, prints
+/// the stack where it stopped, and lets it run to its end.
+///
+/// What Break All in the IDE does, from a console.
+int PauseProgram(String path, ulong milliseconds)
+{
+    var made = MakeTarget();
+    if (!made.Ok)
+    {
+        Console.WriteLine("sldb: " + made.Error);
+        return 1;
+    }
+
+    var read = Image.FromFile(path);
+    if (!read.Ok)
+    {
+        Console.WriteLine("sldb: " + read.Error);
+        return 1;
+    }
+
+    var image = read.Value;
+    var info = new DwarfInfo(image);
+    String bad = info.Read();
+    if (bad.ByteLength() != 0u)
+    {
+        Console.WriteLine("sldb: " + bad);
+        return 1;
+    }
+
+    var target = made.Value;
+    var engine = new Engine(target, image, info, ReadEveryLineTable(info));
+
+    // Started first: `Start` runs the program to its first stop, which is
+    // the one this asks for.
+    var asker = new Thread(() =>
+    {
+        Standard.Threading.Sleep(milliseconds);
+        if (!engine.RequestBreak())
+            Console.WriteLine("the program was not running to be paused");
+    });
+
+    var started = engine.Start(path, "");
+    if (!started.Ok)
+    {
+        Console.WriteLine("sldb: " + started.Error);
+        asker.Join();
+        return 1;
+    }
+
+    var stop = started.Value;
+    while (stop.Kind != StopKind.Exited && stop.Kind != StopKind.NotRunning)
+    {
+        if (stop.Kind == StopKind.Paused)
+        {
+            Console.WriteLine("paused at " + engine.Describe(stop.Address));
+            PrintWalk(engine, WalkStack(target, stop.Thread, engine.Unwinder,
+                                        engine.Slide));
+        }
+        stop = engine.Continue();
+    }
+
+    asker.Join();
+    Console.WriteLine("exited with " + Standard.Text.FromInteger((long)stop.ExitCode));
+    return 0;
 }
 
 /// The address a `file:line` names, in link-time terms.
@@ -1069,6 +1150,23 @@ int PrintUnwindTable(String path)
                                   (nuint)LittleEndianAt(table.Pdata, at + 4u, 4u), 8)
                               + "  info 0x" + FormatHexPadded(
                                   (nuint)LittleEndianAt(table.Pdata, at + 8u, 4u), 8));
+        }
+        return 0;
+    }
+
+    // In the words `llvm-objdump --macho --unwind-info` uses, to diff against.
+    if (table.Format == "__unwind_info")
+    {
+        var compact = table.CompactEntries;
+        Console.WriteLine("  " + FormatNumber(compact.Count) + " entries, text ending at"
+                          + " offset 0x" + FormatHexPadded(table.CompactEnd, 8));
+        Console.WriteLine("");
+        for (nuint i = 0u; i < compact.Count; i++)
+        {
+            Console.WriteLine("  function offset=0x"
+                              + FormatHexPadded(compact[i].FunctionOffset, 8)
+                              + ", encoding=0x"
+                              + FormatHexPadded((nuint)compact[i].Encoding, 8));
         }
         return 0;
     }
@@ -1364,6 +1462,7 @@ int PrintUsage()
     Console.WriteLine("  sldb unwind <binary> f:n   the stack both ways");
     Console.WriteLine("  sldb cfi <binary>          what the unwind info covers");
     Console.WriteLine("  sldb threads <binary> f:n  every thread, and where it is");
+    Console.WriteLine("  sldb pause <binary> ms     Break All after ms, then on");
     Console.WriteLine("  sldb snapshot <binary> f:n everything a window is given");
     Console.WriteLine("  sldb --selftest            the checks that need no binary");
     return 2;
@@ -1398,6 +1497,9 @@ int Main()
 
     if (args[0u] == "run" && args.Length >= 2u)
         return RunProgram(args[1u], args.Length >= 3u ? args[2u] : "");
+
+    if (args[0u] == "pause" && args.Length >= 3u)
+        return PauseProgram(args[1u], (ulong)ParseNumber(args[2u]));
 
     String[] none = new String[0];
 
