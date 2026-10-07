@@ -163,6 +163,8 @@ public extern "C"
     GtkWidget* gtk_tool_button_new(GtkWidget* icon, gchar* label);
     void gtk_tool_button_set_label(GtkWidget* button, gchar* label);
     void gtk_tool_button_set_icon_widget(GtkWidget* button, GtkWidget* icon);
+    /// The picture, **borrowed**, or null for a text-only button.
+    GtkWidget* gtk_tool_button_get_icon_widget(GtkWidget* button);
 
     GtkWidget* gtk_toggle_tool_button_new();
     void     gtk_toggle_tool_button_set_active(GtkWidget* button, gboolean active);

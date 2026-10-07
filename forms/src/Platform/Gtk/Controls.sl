@@ -2072,6 +2072,17 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         }
         gtk_tool_button_set_icon_widget(_items[(nuint)index], icon);
         gtk_widget_show_all(_items[(nuint)index]);
+        FadeDisabledIcon(_items[(nuint)index]);
+    }
+
+    /// **A theme need not dim a picture**, and Yaru does not: an insensitive
+    /// button with an image of its own looks as pressable as any other. So
+    /// the picture is faded here, as Win32 greys a disabled button's.
+    static void FadeDisabledIcon(GtkWidget* item)
+    {
+        GtkWidget* icon = gtk_tool_button_get_icon_widget(item);
+        if (icon != null)
+            gtk_widget_set_opacity(icon, gtk_widget_get_sensitive(item) != 0 ? 1.0 : 0.4);
     }
 
     public void SetButtonEnabled(int index, bool enabled)
@@ -2079,6 +2090,8 @@ public class GtkToolBarPeer : GtkPeer, IToolBarPeer
         if (index < 0 || (nuint)index >= _items.Count)
             return;
         gtk_widget_set_sensitive(_items[(nuint)index], enabled ? 1 : 0);
+        if (!_separators[(nuint)index])
+            FadeDisabledIcon(_items[(nuint)index]);
     }
 
     public void SetButtonChecked(int index, bool checked)

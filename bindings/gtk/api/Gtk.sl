@@ -227,6 +227,8 @@ public extern "C"
 
     void     gtk_widget_set_sensitive(GtkWidget* widget, gboolean sensitive);
     gboolean gtk_widget_get_sensitive(GtkWidget* widget);
+    /// From 0, invisible, to 1, as drawn.
+    void     gtk_widget_set_opacity(GtkWidget* widget, double opacity);
     void     gtk_widget_set_visible(GtkWidget* widget, gboolean visible);
     gboolean gtk_widget_get_visible(GtkWidget* widget);
 
