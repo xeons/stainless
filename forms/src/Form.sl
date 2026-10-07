@@ -86,6 +86,7 @@ public class Form : WindowedControl, IWindowNotify
 {
     late IWindowPeer _windowPeer;
     MainMenu? _menu;
+    List<CommandList> _commandLists;
     WindowBorder _border;
     /// Set while `Closing` is being raised, so a handler calling `Close` does
     /// not ask the question a second time inside the first.
@@ -108,6 +109,7 @@ public class Form : WindowedControl, IWindowNotify
     {
         _border = border;
         _menu = null;
+        _commandLists = new List<CommandList>();
         _isAskingToClose = false;
         _isClosed = false;
         _isRegistered = false;
@@ -348,8 +350,20 @@ public class Form : WindowedControl, IWindowNotify
     protected virtual void OnShown() => Shown(this);
     protected virtual void OnIdle() => Idle(this);
 
-    /// Raises `Idle`. Called by `Application.RaiseIdle`.
-    public void RaiseIdle() => OnIdle();
+    /// Brings every command of this form up to date, then raises `Idle`.
+    /// Called by `Application.RaiseIdle`.
+    public void RaiseIdle()
+    {
+        foreach (var list in _commandLists)
+            list.UpdateCommands();
+        OnIdle();
+    }
+
+    /// The command lists made with this form, which is what `CommandList`'s
+    /// constructor calls. The form holds them from then on.
+    public void AddCommandList(CommandList list) => _commandLists.Add(list);
+
+    public IReadOnlyList<CommandList> CommandLists => _commandLists;
 
     /// Runs the command `key` names, if anything in this form has it as a
     /// shortcut. Asked before the focused control hears the key; true stops
@@ -360,13 +374,22 @@ public class Form : WindowedControl, IWindowNotify
     protected virtual bool ProcessShortcut(KeyEventArgs args)
     {
         var menu = _menu;
-        if (menu == null)
-            return false;
-        var item = ((MainMenu)menu).FindItemForShortcut(args.Key, args.Modifiers);
-        if (item == null)
-            return false;
-        ((MenuItem)item).PerformClick();
-        return true;
+        if (menu != null)
+        {
+            var item = ((MainMenu)menu).FindItemForShortcut(args.Key, args.Modifiers);
+            if (item != null)
+            {
+                ((MenuItem)item).PerformClick();
+                return true;
+            }
+        }
+        foreach (var list in _commandLists)
+        {
+            var command = list.FindCommandForShortcut(args.Key, args.Modifiers);
+            if (command != null)
+                return ((Command)command).PerformExecute();
+        }
+        return false;
     }
 
     // --------------------------------------------- what the platform says

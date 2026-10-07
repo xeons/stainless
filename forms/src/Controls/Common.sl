@@ -148,6 +148,7 @@ public class ToolButton
     /// Held until the button is on a bar, which is where a checked state
     /// lives once it is.
     bool _checked;
+    Command? _command;
 
     /// A button on no bar yet.
     public ToolButton(String text)
@@ -159,6 +160,37 @@ public class ToolButton
         _kind = ToolButtonKind.Button;
         _enabled = true;
         _checked = false;
+        _command = null;
+    }
+
+    /// What pressing this button does, and where its caption, picture,
+    /// enabled state and pressed state come from while it is set.
+    public Command? Command
+    {
+        get => _command;
+        set
+        {
+            Command? old = _command;
+            if (old != null)
+                ((Command)old).Changed -= this.OnCommandChanged;
+            _command = value;
+            if (value != null)
+            {
+                ((Command)value).Changed += this.OnCommandChanged;
+                OnCommandChanged((Command)value);
+            }
+        }
+    }
+
+    /// The caption without its `&`: a toolbar has no mnemonics, and the
+    /// marker would be drawn.
+    void OnCommandChanged(Command command)
+    {
+        Text = RemoveMnemonicMarkers(command.Text);
+        Enabled = command.Enabled && command.Visible;
+        Checked = command.Checked;
+        if (command.ImageIndex >= 0)
+            Image = command.ImageIndex;
     }
 
     /// A button with no caption yet, which is how a form file makes one before
@@ -307,8 +339,15 @@ public class ToolButton
     /// The button was pressed.
     public event EventHandler Click;
 
-    /// Raised by the bar, which is what the platform reports to.
-    public void RaiseClick(Control sender) => Click(sender);
+    /// Raised by the bar, which is what the platform reports to. Carries out
+    /// the command first, if there is one.
+    public void RaiseClick(Control sender)
+    {
+        Command? command = _command;
+        if (command != null)
+            ((Command)command).PerformExecute();
+        Click(sender);
+    }
 
     /// What the platform calls this button, on the same terms as
     /// `MenuItem.PlatformId`.

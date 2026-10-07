@@ -24,6 +24,7 @@ module Ide.Designing;
 
 import Standard.Collections;
 import Standard.Math;
+import Standard.Reflection;
 import Standard.Text;
 import Forms;
 import Forms.Drawing;
@@ -45,6 +46,8 @@ public class DesignedItem
     public MainMenu? HeldMenu;
     public MenuItem? HeldMenuItem;
     public ToolButton? HeldButton;
+    public CommandList? HeldCommandList;
+    public Command? HeldCommand;
 
     public DesignedItem(FormComponent component, Control live)
     {
@@ -54,14 +57,20 @@ public class DesignedItem
         HeldMenu = null;
         HeldMenuItem = null;
         HeldButton = null;
+        HeldCommandList = null;
+        HeldCommand = null;
     }
 
     public bool IsNonVisual =>
-        HeldTimer != null || HeldMenu != null || HeldMenuItem != null || HeldButton != null;
+        HeldTimer != null || HeldMenu != null || HeldMenuItem != null || HeldButton != null
+        || HeldCommandList != null || HeldCommand != null;
 
-    /// Whether it has an entry of its own in the tray: a timer or a menu, and
-    /// not one of a menu's or a toolbar's items.
-    public bool IsInTray => HeldTimer != null || HeldMenu != null;
+    /// Whether it has an entry of its own in the tray: a timer, a menu or a
+    /// command list, and not one of the items they hold.
+    public bool IsInTray => HeldTimer != null || HeldMenu != null || HeldCommandList != null;
+
+    /// Whether double-clicking it opens the items editor.
+    public bool HoldsItems => HeldMenu != null || HeldCommandList != null;
 
     /// What reflection reads and writes: the control, or the component.
     public byte* Target
@@ -80,6 +89,12 @@ public class DesignedItem
             ToolButton? button = HeldButton;
             if (button != null)
                 return (byte*)((ToolButton)button);
+            CommandList? list = HeldCommandList;
+            if (list != null)
+                return (byte*)((CommandList)list);
+            Command? command = HeldCommand;
+            if (command != null)
+                return (byte*)((Command)command);
             return (byte*)Live;
         }
     }
@@ -220,9 +235,6 @@ public class DesignSurface : Panel
     /// or empty for a click that selects.
     public String PendingType;
 
-    /// A key the surface has no use for, passed on -- F12, F5 -- as the
-    /// editor passes on the ones it has none for.
-    public event KeyEventHandler KeyNotHandled;
 
     /// Gives the surface the keyboard, which is where Delete and the arrows
     /// act on the selection.
@@ -315,6 +327,37 @@ public class DesignSurface : Panel
 
     public nuint ItemCount => _items.Count;
 
+    private DesignedItem? FindItemNamed(String name)
+    {
+        foreach (var item in _items)
+        {
+            if (item.Component.Name == name)
+                return item;
+        }
+        return null;
+    }
+
+    /// The names of the document's components of one type, in the file's
+    /// order: what a property naming one may be set to.
+    public List<String> ListComponentNames(String typeName)
+    {
+        var names = new List<String>();
+        foreach (var item in _items)
+        {
+            if (item.Component.TypeName == typeName)
+                names.Add(item.Component.Name);
+        }
+        return names;
+    }
+
+    /// What reflection reads and writes for a component: its control, or the
+    /// object a component with no window was made as. Null for no such name.
+    public byte* FindDesignedTarget(String name)
+    {
+        var found = FindItemNamed(name);
+        return found == null ? null : ((DesignedItem)found).Target;
+    }
+
     // ------------------------------------------------------------ loading
 
     /// Shows a document, replacing whatever was shown. Answers the names of
@@ -340,6 +383,7 @@ public class DesignSurface : Panel
         var unknown = new List<String>();
         ApplyFormProperties();
         CreateDesignedChildren(document.Form, _client, unknown);
+        ApplyReferenceProperties();
         _overlay = CreateOverlay();
         LayOutTray();
         return unknown;
@@ -425,11 +469,12 @@ public class DesignSurface : Panel
         RefreshSelection();
     }
 
-    /// A menu's entry, double-clicked: its items want editing.
+    /// A menu's or a command list's entry, double-clicked: its items want
+    /// editing.
     private void OnTrayEntryDoubleClick(Control sender)
     {
         var found = FindTrayItem(sender);
-        if (found != null && ((DesignedItem)found).HeldMenu != null)
+        if (found != null && ((DesignedItem)found).HoldsItems)
             ItemsRequested(((DesignedItem)found).Component.Name);
     }
 
@@ -666,6 +711,17 @@ public class DesignSurface : Panel
             CreateMenuItems(component, item.Live, menu, null, unknown);
             return;
         }
+        if (component.TypeName == "CommandList")
+        {
+            // No form owns it, so nothing the designer shows can carry out a
+            // command or press its shortcut.
+            var list = new CommandList();
+            item.HeldCommandList = list;
+            ApplyHeldProperties(item);
+            _items.Add(item);
+            CreateCommands(component, item.Live, list, unknown);
+            return;
+        }
 
         item.HeldTimer = new Timer();
         ApplyHeldProperties(item);
@@ -679,6 +735,51 @@ public class DesignSurface : Panel
         {
             if (item.Component.Members[i] is FormProperty property)
                 ApplyReflectedProperty(item.Target, type, property, BaseDirectory);
+        }
+    }
+
+    /// A command list's commands, made and added as the generated half adds
+    /// them. Each is shown by its list's entry in the tray.
+    private void CreateCommands(FormComponent component, Control shownBy, CommandList list,
+                                List<String> unknown)
+    {
+        foreach (var child in component.ListChildren())
+        {
+            if (child.TypeName != "Command")
+            {
+                unknown.Add(child.Name);
+                continue;
+            }
+            var made = CreateDesignedCommand(child);
+            var item = new DesignedItem(child, shownBy);
+            item.HeldCommand = made;
+            ApplyHeldProperties(item);
+            list.Add(made);
+            _items.Add(item);
+        }
+    }
+
+    /// Properties naming another component -- a control's `Command` -- set
+    /// once everything they could name exists, as the generated half sets
+    /// them last.
+    private void ApplyReferenceProperties()
+    {
+        foreach (var item in _items)
+        {
+            var type = FindDesignedType(item.Component.TypeName);
+            if (!type.Exists)
+                continue;
+            foreach (var member in item.Component.Members)
+            {
+                if (!(member is FormProperty property) || property.Value.IsList)
+                    continue;
+                byte* named = FindDesignedTarget(property.Value.Items[0u]);
+                if (named == null)
+                    continue;
+                var target = type.FindProperty(property.Name);
+                if (target.Exists && target.IsSetterPublic && target.Kind == KindClass)
+                    SetAggregate(item.Target, target, named);
+            }
         }
     }
 
@@ -1044,10 +1145,7 @@ public class DesignSurface : Panel
         bool moves = args.Key == Key.Delete || args.Key == Key.Escape || args.Key == Key.Left
                      || args.Key == Key.Right || args.Key == Key.Up || args.Key == Key.Down;
         if (!moves)
-        {
-            KeyNotHandled(this, args);
             return;
-        }
         if (_selection.IsEmpty)
             return;
 
@@ -1205,6 +1303,9 @@ public class DesignSurface : Panel
         if (itemType == "")
             return "";
 
+        // A command list holds commands, and nothing comes between them.
+        if (itemType == "Command")
+            kind = DesignedItemKind.Item;
         bool gap = kind == DesignedItemKind.Separator;
         String name = CreateComponentName(gap ? "Separator" : itemType);
         var made = new FormComponent(itemType, name);
@@ -1406,7 +1507,8 @@ public class DesignSurface : Panel
         bool editsItems = false;
         if (IsNonVisualType(typeName))
         {
-            made.Initializer = "new " + typeName + "()";
+            made.Initializer = CreateNonVisualInitializer(typeName);
+            editsItems = typeName == "CommandList";
 
             // A form has one menu bar, and the first menu put on it is that.
             if (typeName == "MainMenu" && _document.Form.FindProperty("Menu") == null)

@@ -271,6 +271,7 @@ public abstract class Control : IControlNotify
     CursorKind _cursor;
     String _toolTip;
     bool _isDesigning;
+    Command? _command;
 
     protected Control()
     {
@@ -295,6 +296,7 @@ public abstract class Control : IControlNotify
         _isEchoing = false;
         _cursor = CursorKind.Default;
         _toolTip = "";
+        _command = null;
         Name = "";
     }
 
@@ -886,6 +888,36 @@ public abstract class Control : IControlNotify
 
     protected virtual void ApplyToolTip() { }
 
+    /// What clicking this control does, and where its caption, enabled
+    /// state, visibility and tool tip come from while it is set. Null for
+    /// none, which leaves them the control's own.
+    public Command? Command
+    {
+        get => _command;
+        set
+        {
+            Command? old = _command;
+            if (old != null)
+                ((Command)old).Changed -= this.OnCommandChanged;
+            _command = value;
+            if (value != null)
+            {
+                ((Command)value).Changed += this.OnCommandChanged;
+                OnCommandChanged((Command)value);
+            }
+        }
+    }
+
+    /// Takes the command's state. A control with a state of its own to show
+    /// -- a tick, a pressed button -- overrides it and calls `base`.
+    protected virtual void OnCommandChanged(Command command)
+    {
+        Text = command.Text;
+        Enabled = command.Enabled;
+        Visible = command.Visible;
+        ToolTip = command.Hint;
+    }
+
     /// Takes the mouse, so that a drag keeps being reported after the pointer
     /// has left this control -- which is what every drag needs and nothing else
     /// does.
@@ -963,7 +995,14 @@ public abstract class Control : IControlNotify
     // base's event has to come through one of these. Overriding one and not
     // calling `base` is how a derived control suppresses an event entirely.
 
-    protected virtual void OnClick() => Click(this);
+    /// Carries out the command, if there is one, and raises `Click`.
+    protected virtual void OnClick()
+    {
+        Command? command = _command;
+        if (command != null)
+            ((Command)command).PerformExecute();
+        Click(this);
+    }
     protected virtual void OnDoubleClick() => DoubleClick(this);
     protected virtual void OnResize() => Resize(this);
     protected virtual void OnMove() => Move(this);

@@ -412,6 +412,18 @@ which runs before the focused widget's; and from a local event monitor on a
 Mac. An item answers only while it and every heading above it are enabled.
 `Control` is Command on a Mac, because the backend reports both as one.
 
+**A command is the LCL's action, under another name.** `Action` is the
+standard library's closure type, imported into every file, so `Forms.Action`
+would be ambiguous wherever both were in scope. A `CommandList` is made with
+its form, which holds it; the form updates its commands every time it goes
+idle and asks its lists for a key after its menu has declined it. A control, a
+menu item or a toolbar button given a `Command` takes its caption, enabled
+state, tick and shortcut from it, and choosing any of them runs it. The LCL
+keeps an `ActionLink` per client to push changes; here each client subscribes
+to the command's `Changed` with a method of its own, which the language makes
+weak, so a command never keeps a freed button alive and needs no list of
+clients to prune.
+
 **`Idle` is on the form, not the application.** It is raised for every open
 form each time the loop is about to wait -- an empty queue before
 `GetMessageW`, a low-priority GLib idle source re-armed by each event, a run
@@ -614,6 +626,7 @@ grouped by how much work it is rather than by where it lives.
 | `Form`, `Application`, `Screen` | `forms.pp` |
 | `Button`, `CheckBox`, `RadioButton`, `ToggleButton`, `Label`, `TextBox`, `ListBox`, `ComboBox`, `Panel`, `GroupBox`, `ScrollBar` | `stdctrls.pp` |
 | `MainMenu`, `PopupMenu`, `MenuItem`, `Shortcut` | `menus.pp`, `ShortCut` in `lcltype.pp` |
+| `CommandList`, `Command` | `TActionList`, `TAction` in `actnlist.pas` |
 | `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView`, `CoolBar` | `comctrls.pp` |
 | `ImageList` | `imglist.pp` |
 | `PaintBox`, `Shape`, `Bevel`, `Splitter`, `Notebook` | `extctrls.pp` |
@@ -735,8 +748,9 @@ not turned back into them.
   Possible here through `Standard.Reflection`, and the control tree is shaped
   so it stays possible, but it is a parser, a type registry and a property
   writer.
-- **Actions** (`actnlist.pas`, `stdactns.pas`) — one command behind a menu item,
-  a toolbar button and a shortcut, with enabled state shared.
+- **Standard actions** (`stdactns.pas`) -- Cut, Copy and Paste commands that
+  act on whichever control has the focus. `CommandList` is here; these are not,
+  which is why a program here gives its edit commands no shortcut.
 - **Docking** (`ldocktree.pas`, 2,192 lines) and drag-and-drop.
 - **Themes** (`themes.pas`, `tmschema.pas`) — drawing *with* the theme rather
   than letting each control do it, which is what any owner-drawn control needs

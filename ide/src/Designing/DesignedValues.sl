@@ -22,8 +22,10 @@ module Ide.Designing;
 
 import Standard.Collections;
 import Standard.Convert;
+import Standard.Reflection;
 import Standard.Text;
 import Forms.Drawing;
+import Forms.Platform;
 import Ide.Designer;
 
 /// The type a colour property is, by its reflected name.
@@ -37,6 +39,93 @@ public const String DesignedBitmapType = "Forms.Drawing.Bitmap";
 
 /// The module the generated half needs for either.
 public const String DesignedDrawingModule = "Forms.Drawing";
+
+/// The type a shortcut property is.
+public const String DesignedShortcutType = "Forms.Platform.Shortcut";
+
+/// The module the generated half needs for a shortcut's `Key` and modifiers.
+public const String DesignedPlatformModule = "Forms.Platform";
+
+/// The type a command property is, which names a command of the form's.
+public const String DesignedCommandType = "Forms.Command";
+
+// ------------------------------------------------------------ shortcuts
+
+/// A shortcut as the generated half writes it:
+/// `Shortcut.FromKey(Key.S, ModifierKeys.Control | ModifierKeys.Shift)`, or
+/// `Shortcut.Empty`.
+public String SpellDesignedShortcut(Shortcut shortcut)
+{
+    if (shortcut.IsEmpty)
+        return "Shortcut.Empty";
+    var held = new List<String>();
+    if (shortcut.Modifiers.HasFlag(ModifierKeys.Control))
+        held.Add("ModifierKeys.Control");
+    if (shortcut.Modifiers.HasFlag(ModifierKeys.Shift))
+        held.Add("ModifierKeys.Shift");
+    if (shortcut.Modifiers.HasFlag(ModifierKeys.Alt))
+        held.Add("ModifierKeys.Alt");
+    String modifiers = held.IsEmpty ? "ModifierKeys.None" : " | ".Join(held.ToArray());
+    return "Shortcut.FromKey(Key." + FindKeyMemberName(shortcut.Key) + ", " + modifiers + ")";
+}
+
+/// A shortcut from what the file says, or from what a person typed into the
+/// Properties grid: `Shortcut.FromKey(...)`, `Shortcut.Empty`, `Ctrl+S`, or
+/// nothing at all for none.
+public Result<Shortcut, String> ReadDesignedShortcut(String item)
+{
+    String text = item.Trim();
+    if (text == "" || text == "Shortcut.Empty")
+        return Ok(Shortcut.Empty);
+    if (!text.StartsWith("Shortcut.FromKey(") || !text.EndsWith(")"))
+    {
+        var typed = Shortcut.Parse(text);
+        if (typed.Some)
+            return Ok(typed.Value);
+        return Fail("'" + text + "' is not a shortcut; write it as Ctrl+Shift+S");
+    }
+
+    String inside = text.Substring(17u, text.ByteLength() - 18u);
+    String keyPart = inside.SubstringBefore(",").Trim();
+    String modifierPart = inside.SubstringAfter(",").Trim();
+    if (!keyPart.StartsWith("Key."))
+        return Fail("'" + keyPart + "' is not a key");
+    var keyType = FindType("Forms.Platform.Key");
+    long key = -1;
+    for (nuint i = 0u; i < keyType.EnumMemberCount; i++)
+    {
+        if (keyType.GetEnumMemberName(i) == keyPart.Substring(4u))
+            key = keyType.GetEnumMemberValue(i);
+    }
+    if (key < 0)
+        return Fail("'" + keyPart + "' is not a key");
+
+    var modifiers = ModifierKeys.None;
+    foreach (var part in modifierPart.Split("|"))
+    {
+        switch (part.Trim())
+        {
+            case "ModifierKeys.None": break;
+            case "ModifierKeys.Control": modifiers = modifiers | ModifierKeys.Control; break;
+            case "ModifierKeys.Shift": modifiers = modifiers | ModifierKeys.Shift; break;
+            case "ModifierKeys.Alt": modifiers = modifiers | ModifierKeys.Alt; break;
+            default: return Fail("'" + part.Trim() + "' is not a modifier");
+        }
+    }
+    return Ok(Shortcut.FromKey((Key)(int)key, modifiers));
+}
+
+/// A key's member name in `Key`, which is what the generated half writes.
+String FindKeyMemberName(Key key)
+{
+    var keyType = FindType("Forms.Platform.Key");
+    for (nuint i = 0u; i < keyType.EnumMemberCount; i++)
+    {
+        if (keyType.GetEnumMemberValue(i) == (long)(int)key)
+            return keyType.GetEnumMemberName(i);
+    }
+    return "None";
+}
 
 // ------------------------------------------------------------ colours
 

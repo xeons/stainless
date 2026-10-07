@@ -183,6 +183,30 @@ public class Shell : Form
     late ToolButton _stepIntoButton;
     late ToolButton _stepOverButton;
     late ToolButton _stepOutButton;
+
+    /// What the menu, the toolbars and the keyboard share. A command's
+    /// shortcut works from anywhere in the window.
+    late CommandList _commands;
+    late Command _newCommand;
+    late Command _openCommand;
+    late Command _saveCommand;
+    late Command _saveAsCommand;
+    late Command _findCommand;
+    late Command _findNextCommand;
+    late Command _buildCommand;
+    late Command _rebuildCommand;
+    late Command _cleanCommand;
+    late Command _runCommand;
+    late Command _stopBuildCommand;
+    late Command _startCommand;
+    late Command _breakCommand;
+    late Command _stopDebugCommand;
+    late Command _restartCommand;
+    late Command _stepIntoCommand;
+    late Command _stepOverCommand;
+    late Command _stepOutCommand;
+    late Command _breakpointCommand;
+    late Command _designerCommand;
     late StatusBar _statusBar;
     late MainMenu _menuBar;
 
@@ -403,6 +427,7 @@ public class Shell : Form
         chosen.Control = _configuration;
         chosen.Width = 230;
 
+        BuildCommands();
         _tools = new ToolBar(_coolBar);
         _tools.Height = 26;
         _tools.Renderer = _chrome;
@@ -414,17 +439,17 @@ public class Shell : Form
         if (_icons != null)
             _tools.Images = _icons;
 
-        _tools.Add("New", IconNew).Click += (sender) => this.NewDocument();
-        _tools.Add("Open", IconOpen).Click += (sender) => this.ChooseFileToOpen();
-        _tools.Add("Save", IconSave).Click += (sender) => this.SaveCurrent();
+        _tools.Add("", IconNew).Command = _newCommand;
+        _tools.Add("", IconOpen).Command = _openCommand;
+        _tools.Add("", IconSave).Command = _saveCommand;
         _tools.AddSeparator();
-        _tools.Add("Build", IconBuild).Click += this.OnBuild;
-        _tools.Add("Rebuild", IconRebuild).Click += this.OnRebuild;
-        _tools.Add("Clean", IconClean).Click += this.OnClean;
+        _tools.Add("", IconBuild).Command = _buildCommand;
+        _tools.Add("", IconRebuild).Command = _rebuildCommand;
+        _tools.Add("", IconClean).Command = _cleanCommand;
         _tools.AddSeparator();
-        _tools.Add("Run", IconRun).Click += this.OnRun;
-        _stopButton = _tools.Add("Stop", IconStop);
-        _stopButton.Click += this.OnStop;
+        _tools.Add("", IconRun).Command = _runCommand;
+        _stopButton = _tools.Add("", IconStop);
+        _stopButton.Command = _stopBuildCommand;
 
         // No caption: the buttons already say what they do, and a band reading
         // "Build" beside a button reading "Build" is twice the width for none
@@ -444,20 +469,20 @@ public class Shell : Form
         if (_icons != null)
             _debugTools.Images = _icons;
 
-        _startButton = _debugTools.Add("Start", IconStart);
-        _startButton.Click += this.OnStartDebugging;
-        _pauseButton = _debugTools.Add("Break", IconPause);
-        _pauseButton.Click += this.OnBreakAll;
-        _stopDebugButton = _debugTools.Add("Stop", IconStopDebug);
-        _stopDebugButton.Click += this.OnStopDebugging;
-        _debugTools.Add("Restart", IconRestart).Click += this.OnRestartDebugging;
+        _startButton = _debugTools.Add("", IconStart);
+        _startButton.Command = _startCommand;
+        _pauseButton = _debugTools.Add("", IconPause);
+        _pauseButton.Command = _breakCommand;
+        _stopDebugButton = _debugTools.Add("", IconStopDebug);
+        _stopDebugButton.Command = _stopDebugCommand;
+        _debugTools.Add("", IconRestart).Command = _restartCommand;
         _debugTools.AddSeparator();
-        _stepIntoButton = _debugTools.Add("Into", IconStepInto);
-        _stepIntoButton.Click += this.OnStepInto;
-        _stepOverButton = _debugTools.Add("Over", IconStepOver);
-        _stepOverButton.Click += this.OnStepOver;
-        _stepOutButton = _debugTools.Add("Out", IconStepOut);
-        _stepOutButton.Click += this.OnStepOut;
+        _stepIntoButton = _debugTools.Add("", IconStepInto);
+        _stepIntoButton.Command = _stepIntoCommand;
+        _stepOverButton = _debugTools.Add("", IconStepOver);
+        _stepOverButton.Command = _stepOverCommand;
+        _stepOutButton = _debugTools.Add("", IconStepOut);
+        _stepOutButton.Command = _stepOutCommand;
 
         var debugging = new CoolBand(_coolBar);
         debugging.Text = "Debug";
@@ -647,7 +672,6 @@ public class Shell : Form
         editor.Palette = _isDark ? Theme.CreateDark() : Theme.CreateLight();
         editor.CaretMoved += this.OnCaretMoved;
         editor.Edited += this.OnEdited;
-        editor.KeyDown += this.OnEditorKey;
 
         // The margin asks per painted line rather than being handed a list, so
         // one store answers for every tab and nothing is copied.
@@ -807,6 +831,68 @@ public class Shell : Form
         }
     }
 
+    // ---------------------------------------------------------- the commands
+
+    /// Every command the menu and the toolbars share, with its key.
+    ///
+    /// **No edit command has a shortcut here.** A shortcut is the window's
+    /// before it is any control's, so Ctrl+C here would copy from the editor
+    /// while the focus was in the Properties grid's box. The editor and each
+    /// box keep their own.
+    void BuildCommands()
+    {
+        _commands = new CommandList(this);
+        _newCommand = AddCommand("&New", Key.N, ModifierKeys.Control);
+        _newCommand.Execute += (sender) => this.NewDocument();
+        _openCommand = AddCommand("&Open...", Key.O, ModifierKeys.Control);
+        _openCommand.Execute += (sender) => this.ChooseFileToOpen();
+        _saveCommand = AddCommand("&Save", Key.S, ModifierKeys.Control);
+        _saveCommand.Execute += (sender) => this.SaveCurrent();
+        _saveAsCommand = AddCommand("Save &As...", Key.S, ModifierKeys.Control | ModifierKeys.Shift);
+        _saveAsCommand.Execute += (sender) => this.SaveCurrentAs();
+        _findCommand = AddCommand("&Find and replace...", Key.F, ModifierKeys.Control);
+        _findCommand.Execute += (sender) => this.ShowFind();
+        _findNextCommand = AddCommand("Find &next", Key.F3, ModifierKeys.None);
+        _findNextCommand.Execute += (sender) => this.FindNextMatch();
+
+        _buildCommand = AddCommand("&Build", Key.B, ModifierKeys.Control | ModifierKeys.Shift);
+        _buildCommand.Execute += (sender) => this.BuildProgram(false);
+        _rebuildCommand = AddCommand("Re&build", Key.None, ModifierKeys.None);
+        _rebuildCommand.Execute += (sender) => this.RebuildProgram();
+        _cleanCommand = AddCommand("&Clean", Key.None, ModifierKeys.None);
+        _cleanCommand.Execute += (sender) => this.CleanProject();
+        _runCommand = AddCommand("&Run", Key.F5, ModifierKeys.Control);
+        _runCommand.Execute += (sender) => this.BuildProgram(true);
+        _stopBuildCommand = AddCommand("&Stop", Key.None, ModifierKeys.None);
+        _stopBuildCommand.Execute += (sender) => this.StopBuild();
+
+        _startCommand = AddCommand("&Start debugging", Key.F5, ModifierKeys.None);
+        _startCommand.Execute += (sender) => this.StartOrContinue();
+        _breakCommand = AddCommand("Break &all", Key.None, ModifierKeys.None);
+        _breakCommand.Execute += (sender) => this.BreakAll();
+        _stopDebugCommand = AddCommand("Stop &debugging", Key.F5, ModifierKeys.Shift);
+        _stopDebugCommand.Execute += (sender) => this.StopDebugging();
+        _restartCommand = AddCommand("&Restart", Key.F5, ModifierKeys.Control | ModifierKeys.Shift);
+        _restartCommand.Execute += (sender) => this.RestartDebugging();
+        _stepIntoCommand = AddCommand("Step &into", Key.F11, ModifierKeys.None);
+        _stepIntoCommand.Execute += (sender) => this.StepDebuggee(DebugCommand.StepIn);
+        _stepOverCommand = AddCommand("Step &over", Key.F10, ModifierKeys.None);
+        _stepOverCommand.Execute += (sender) => this.StepDebuggee(DebugCommand.StepOver);
+        _stepOutCommand = AddCommand("Step o&ut", Key.F11, ModifierKeys.Shift);
+        _stepOutCommand.Execute += (sender) => this.StepDebuggee(DebugCommand.StepOut);
+        _breakpointCommand = AddCommand("Toggle &breakpoint", Key.F9, ModifierKeys.None);
+        _breakpointCommand.Execute += (sender) => this.ToggleBreakpointAtCaret();
+        _designerCommand = AddCommand("Form or &Code", Key.F12, ModifierKeys.None);
+        _designerCommand.Execute += (sender) => this.ToggleDesigner();
+    }
+
+    Command AddCommand(String text, Key key, ModifierKeys modifiers)
+    {
+        var made = _commands.Add(text);
+        made.Shortcut = Shortcut.FromKey(key, modifiers);
+        return made;
+    }
+
     // ------------------------------------------------------------- the menu
 
     void BuildMenuBar()
@@ -822,13 +908,13 @@ public class Shell : Form
         _menuBar.Renderer = _chrome;
 
         var file = _menuBar.Add("&File");
-        file.Add("&New").Click += this.OnNew;
-        file.Add("&Open...").Click += this.OnOpen;
+        file.Add("").Command = _newCommand;
+        file.Add("").Command = _openCommand;
         file.Add("Open &project...").Click += this.OnOpenProject;
         file.Add("C&lose project").Click += this.OnCloseProject;
         file.Add("P&roperties...").Click += this.OnProjectProperties;
-        file.Add("&Save").Click += this.OnSave;
-        file.Add("Save &As...").Click += this.OnSaveAs;
+        file.Add("").Command = _saveCommand;
+        file.Add("").Command = _saveAsCommand;
         file.Add(MenuItem.CreateSeparator());
         _recentFilesMenu = file.Add("Recent &files");
         _recentProjectsMenu = file.Add("Recent pro&jects");
@@ -848,33 +934,33 @@ public class Shell : Form
         edit.Add(MenuItem.CreateSeparator());
         edit.Add("Select &all").Click += this.OnSelectAll;
         edit.Add(MenuItem.CreateSeparator());
-        edit.Add("&Find and replace...").Click += this.OnFind;
-        edit.Add("Find &next").Click += this.OnFindNext;
+        edit.Add("").Command = _findCommand;
+        edit.Add("").Command = _findNextCommand;
 
         var build = _menuBar.Add("&Build");
-        build.Add("&Build").Click += this.OnBuild;
-        build.Add("Re&build").Click += this.OnRebuild;
-        build.Add("&Run").Click += this.OnRun;
-        build.Add("&Stop").Click += this.OnStop;
+        build.Add("").Command = _buildCommand;
+        build.Add("").Command = _rebuildCommand;
+        build.Add("").Command = _runCommand;
+        build.Add("").Command = _stopBuildCommand;
         build.Add(MenuItem.CreateSeparator());
-        build.Add("&Clean").Click += this.OnClean;
+        build.Add("").Command = _cleanCommand;
         build.Add(MenuItem.CreateSeparator());
         build.Add("&Clear output").Click += this.OnClearOutput;
 
         var debug = _menuBar.Add("&Debug");
-        debug.Add("&Start debugging\tF5").Click += this.OnStartDebugging;
-        debug.Add("Start &without debugging\tCtrl+F5").Click += this.OnRun;
-        debug.Add("&Restart\tCtrl+Shift+F5").Click += this.OnRestartDebugging;
-        debug.Add("Stop &debugging\tShift+F5").Click += this.OnStopDebugging;
+        debug.Add("").Command = _startCommand;
+        debug.Add("Start &without debugging").Click += this.OnRun;
+        debug.Add("").Command = _restartCommand;
+        debug.Add("").Command = _stopDebugCommand;
         debug.Add(MenuItem.CreateSeparator());
-        debug.Add("Break &all").Click += this.OnBreakAll;
-        debug.Add("&Continue\tF5").Click += this.OnContinue;
+        debug.Add("").Command = _breakCommand;
+        debug.Add("&Continue").Click += this.OnContinue;
         debug.Add(MenuItem.CreateSeparator());
-        debug.Add("Step &into\tF11").Click += this.OnStepInto;
-        debug.Add("Step &over\tF10").Click += this.OnStepOver;
-        debug.Add("Step o&ut\tShift+F11").Click += this.OnStepOut;
+        debug.Add("").Command = _stepIntoCommand;
+        debug.Add("").Command = _stepOverCommand;
+        debug.Add("").Command = _stepOutCommand;
         debug.Add(MenuItem.CreateSeparator());
-        debug.Add("Toggle &breakpoint\tF9").Click += this.OnToggleBreakpoint;
+        debug.Add("").Command = _breakpointCommand;
         debug.Add("Brea&kpoint condition...").Click += this.OnBreakpointCondition;
         debug.Add("Delete all brea&kpoints").Click += this.OnClearBreakpoints;
         debug.Add(MenuItem.CreateSeparator());
@@ -886,7 +972,7 @@ public class Shell : Form
         // rather than destroyed, so this brings back the same tree with the
         // same project already in it.
         view.Add("&Solution Explorer").Click += this.OnShowSolution;
-        view.Add("Form or &Code\tF12").Click += this.OnToggleDesigner;
+        view.Add("").Command = _designerCommand;
         view.Add("&Error List").Click += this.OnShowErrors;
         view.Add("&Output").Click += this.OnShowOutput;
         view.Add("&Locals").Click += this.OnShowLocals;
@@ -1008,9 +1094,6 @@ public class Shell : Form
         dialog.ShowModal();
     }
 
-    void OnNew(MenuItem sender) => NewDocument();
-    void OnOpen(MenuItem sender) => ChooseFileToOpen();
-    void OnSave(MenuItem sender) => SaveCurrent();
 
     void NewDocument()
     {
@@ -1039,7 +1122,7 @@ public class Shell : Form
             SaveEditorTo((CodeEditor)now, ((CodeEditor)now).Contents.Location);
     }
 
-    void OnSaveAs(MenuItem sender)
+    void SaveCurrentAs()
     {
         var now = Current;
         if (now != null)
@@ -1438,10 +1521,7 @@ public class Shell : Form
         }
     }
 
-    void OnBuild(MenuItem sender) => BuildProgram(false);
-    void OnBuild(Control sender) => BuildProgram(false);
     void OnRun(MenuItem sender) => BuildProgram(true);
-    void OnRun(Control sender) => BuildProgram(true);
 
     // ------------------------------------------------------------ the project
 
@@ -1584,8 +1664,6 @@ public class Shell : Form
         StartCompiler(arguments, thenRun ? "Ran." : "Built.");
     }
 
-    void OnClean(MenuItem sender) => CleanProject();
-    void OnClean(Control sender) => CleanProject();
 
     void CleanProject()
     {
@@ -1648,9 +1726,6 @@ public class Shell : Form
     ///
     /// **Not `Clean` followed by `Build` from the menu**, which would clear the
     /// output pane twice and lose what the clean said.
-    void OnRebuild(MenuItem sender) => RebuildProgram();
-
-    void OnRebuild(Control sender) => RebuildProgram();
 
     void RebuildProgram()
     {
@@ -1679,8 +1754,6 @@ public class Shell : Form
     /// halfway through writing an object file has nothing to tidy that a
     /// rebuild will not do better. What this leaves behind is a partial object
     /// directory, which is what Clean is for.
-    void OnStop(MenuItem sender) => StopBuild();
-    void OnStop(Control sender) => StopBuild();
 
     void StopBuild()
     {
@@ -1891,7 +1964,7 @@ public class Shell : Form
     /// looks to find out whether anything is happening.
     void EnableBuildCommands()
     {
-        _stopButton.Enabled = _isBuilding;
+        _stopBuildCommand.Enabled = _isBuilding;
     }
 
     /// Runs the compiler on a thread and reports back on the UI one, in
@@ -2203,7 +2276,7 @@ public class Shell : Form
     /// selection is on one line, since a multi-line selection is not something
     /// a line-oriented search can look for and putting it in the box would
     /// promise otherwise.
-    void OnFind(MenuItem sender)
+    void ShowFind()
     {
         var dialog = GetFindDialog();
 
@@ -2222,7 +2295,7 @@ public class Shell : Form
     /// Find Next without opening the window, which is what the menu item next
     /// to it is for: once a search is set up, repeating it should not need the
     /// dialog in front of the thing being searched.
-    void OnFindNext(MenuItem sender)
+    void FindNextMatch()
     {
         var now = Current;
         if (now == null)
@@ -2231,7 +2304,7 @@ public class Shell : Form
         var dialog = GetFindDialog();
         if (dialog.Needle == "")
         {
-            OnFind(sender);
+            ShowFind();
             return;
         }
 
@@ -2859,50 +2932,6 @@ public class Shell : Form
 
     // --------------------------------------------------------- debugging
 
-    /// The function keys, which reach here because the editor passes on
-    /// everything it does not use itself.
-    ///
-    /// `forms/` has no menu shortcuts, so this is where they live. They work
-    /// while an editor has the focus, which is where a person pressing F10
-    /// nearly always is.
-    void OnEditorKey(Control sender, KeyEventArgs args)
-    {
-        switch (args.Key)
-        {
-            case Key.F5:
-            {
-                if (args.Control && args.Shift)
-                    RestartDebugging();
-                else if (args.Control)
-                    BuildProgram(true);
-                else if (args.Shift)
-                    StopDebugging();
-                else
-                    StartOrContinue();
-                break;
-            }
-
-            case Key.F9:
-                ToggleBreakpointAtCaret();
-                break;
-
-            case Key.F10:
-                StepDebuggee(DebugCommand.StepOver);
-                break;
-
-            case Key.F11:
-                StepDebuggee(args.Shift ? DebugCommand.StepOut : DebugCommand.StepIn);
-                break;
-
-            case Key.F12:
-                ToggleDesigner();
-                break;
-
-            default:
-                break;
-        }
-    }
-
     // ------------------------------------------------------------ designing
 
     /// Puts a designer over a form file's tab, and shows it.
@@ -2922,7 +2951,6 @@ public class Shell : Form
         };
         surface.SelectionChanged += () => this.ShowActiveDesign();
         surface.Message += (message) => this.ShowStatus(message);
-        surface.KeyNotHandled += this.OnEditorKey;
         surface.ItemsRequested += (owner) => this.OpenItemsEditor(owner);
         tab.Designer = surface;
         ShowDesigner(tab);
@@ -2990,7 +3018,6 @@ public class Shell : Form
         _grid.ShowSurface(null);
     }
 
-    void OnToggleDesigner(MenuItem sender) => ToggleDesigner();
 
     /// Between a form file's designer and its text.
     void ToggleDesigner()
@@ -3321,7 +3348,6 @@ public class Shell : Form
         return StartDebugging();
     }
 
-    void OnToggleBreakpoint(MenuItem sender) => ToggleBreakpointAtCaret();
 
     void ToggleBreakpointAtCaret()
     {
@@ -3568,8 +3594,6 @@ public class Shell : Form
 
     // --------------------------------------------------------- run control
 
-    void OnStartDebugging(MenuItem sender) => StartOrContinue();
-    void OnStartDebugging(Control sender) => StartOrContinue();
 
     /// F5: start if nothing is running, continue if something is stopped.
     void StartOrContinue()
@@ -3603,12 +3627,6 @@ public class Shell : Form
         ShowRunning("Running...");
     }
 
-    void OnStepInto(MenuItem sender) => StepDebuggee(DebugCommand.StepIn);
-    void OnStepInto(Control sender) => StepDebuggee(DebugCommand.StepIn);
-    void OnStepOver(MenuItem sender) => StepDebuggee(DebugCommand.StepOver);
-    void OnStepOver(Control sender) => StepDebuggee(DebugCommand.StepOver);
-    void OnStepOut(MenuItem sender) => StepDebuggee(DebugCommand.StepOut);
-    void OnStepOut(Control sender) => StepDebuggee(DebugCommand.StepOut);
 
     void StepDebuggee(DebugCommand how)
     {
@@ -3631,8 +3649,6 @@ public class Shell : Form
         ShowRunning("Stepping...");
     }
 
-    void OnBreakAll(MenuItem sender) => BreakAll();
-    void OnBreakAll(Control sender) => BreakAll();
 
     void BreakAll()
     {
@@ -3648,8 +3664,6 @@ public class Shell : Form
             ShowStatus("It could not be interrupted.");
     }
 
-    void OnStopDebugging(MenuItem sender) => StopDebugging();
-    void OnStopDebugging(Control sender) => StopDebugging();
 
     void StopDebugging()
     {
@@ -3667,8 +3681,6 @@ public class Shell : Form
     ///
     /// The breakpoints survive because they live in the store rather than in
     /// the session. So do the open tabs and the layout.
-    void OnRestartDebugging(MenuItem sender) => RestartDebugging();
-    void OnRestartDebugging(Control sender) => RestartDebugging();
 
     void RestartDebugging()
     {
@@ -4235,12 +4247,12 @@ public class Shell : Form
         bool live = running != null;
         bool stopped = live && ((DebugSession)running).IsStopped;
 
-        _startButton.Enabled = !live || stopped;
-        _pauseButton.Enabled = live && !stopped;
-        _stopDebugButton.Enabled = live;
-        _stepIntoButton.Enabled = stopped;
-        _stepOverButton.Enabled = stopped;
-        _stepOutButton.Enabled = stopped;
+        _startCommand.Enabled = !live || stopped;
+        _breakCommand.Enabled = live && !stopped;
+        _stopDebugCommand.Enabled = live;
+        _stepIntoCommand.Enabled = stopped;
+        _stepOverCommand.Enabled = stopped;
+        _stepOutCommand.Enabled = stopped;
     }
 
     /// The program is on the move, so nothing may be read from it.
@@ -5308,6 +5320,7 @@ public class Shell : Form
         ok = TestDesigner() && ok;
         ok = TestToolboxAndGrid() && ok;
         ok = TestMenusAndToolBars() && ok;
+        ok = TestCommands() && ok;
         ok = TestTabClosingAndRecent() && ok;
 
         if (ok)
@@ -5475,6 +5488,75 @@ public class Shell : Form
         if (text.Contains("Menu = ") || text.Contains("_menuItem1") || !text.Contains("_toolButton1"))
         {
             Console.WriteLine("FAIL: deleting a menu left its items, or the form's Menu, behind");
+            ok = false;
+        }
+
+        if (editor != null)
+            ((ItemsEditor)editor).Hide();
+        CloseTab(pad);
+        return ok;
+    }
+
+    /// A command list placed from the Toolbox, a command added in the items
+    /// editor and given a shortcut in the grid, and a button pointed at it --
+    /// and the generated half making the list with its form and setting the
+    /// button's command last.
+    bool TestCommands()
+    {
+        bool ok = true;
+        var pad = AddTab(new Document());
+        pad.Editor.Contents.Location = "selftest-commands.slfm";
+        pad.Editor.TypeText("module Test;" + Newline + Newline
+            + "form Probe : Form" + Newline + "{" + Newline
+            + "    Bounds = 0, 0, 320, 240;" + Newline + "}" + Newline);
+        AttachDesigner(pad);
+        var surface = (DesignSurface)pad.Designer;
+
+        surface.PlaceComponent("CommandList", Point.FromXY(4, 4));
+        String save = surface.AddDesignedItem("_commandList1", DesignedItemKind.Item);
+        var editor = _itemsEditor;
+        if (save != "_command1" || editor == null || ((ItemsEditor)editor).OwnerName != "_commandList1")
+        {
+            Console.WriteLine("FAIL: placing a command list did not open the items editor on it");
+            ok = false;
+        }
+
+        surface.SelectComponent(save);
+        _grid.SelectProperty("Shortcut");
+        _grid.ApplyText("Ctrl+S");
+        String text = pad.Editor.Contents.GetText();
+        if (!text.Contains("CommandList _commandList1 = new CommandList(this)")
+            || !text.Contains("Shortcut = Shortcut.FromKey(Key.S, ModifierKeys.Control);"))
+        {
+            Console.WriteLine("FAIL: a command's shortcut typed in the grid did not reach the file");
+            ok = false;
+        }
+
+        surface.PlaceComponent("Button", Point.FromXY(40, 60));
+        _grid.SelectProperty("Command");
+        _grid.ApplyText(save);
+        var live = surface.FindLiveControl("_button1");
+        if (!pad.Editor.Contents.GetText().Contains("Command = _command1;") || live == null
+            || ((Control)live).Command == null || ((Control)live).Text != "command1")
+        {
+            Console.WriteLine("FAIL: a button pointed at a command in the grid did not take it");
+            ok = false;
+        }
+
+        String generated = GenerateFormSource(surface.Document, "selftest-commands.slfm");
+        if (!generated.Contains("_commandList1.Add(_command1);")
+            || generated.IndexOf("_button1.Command = _command1;") < generated.IndexOf("_commandList1.Add(_command1);"))
+        {
+            Console.WriteLine("FAIL: the generated half did not add the command before the button named it");
+            ok = false;
+        }
+
+        // Deleting the command takes the button's Command with it.
+        surface.SelectComponent(save);
+        surface.DeleteSelectedComponent();
+        if (pad.Editor.Contents.GetText().Contains("Command = "))
+        {
+            Console.WriteLine("FAIL: deleting a command left a button naming it");
             ok = false;
         }
 

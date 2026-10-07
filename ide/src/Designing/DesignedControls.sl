@@ -27,6 +27,7 @@ import Standard.Reflection;
 import Standard.Text;
 import Forms;
 import Forms.Drawing;
+import Forms.Platform;
 import Ide.Designer;
 
 /// The types the designer can make, in the order a Toolbox lists them.
@@ -34,7 +35,7 @@ public String[] ListDesignableTypes() =>
     ["Button", "Label", "TextBox", "CheckBox", "RadioButton", "ToggleButton",
      "ListBox", "ComboBox", "CheckListBox", "SpinEdit", "ProgressBar", "TrackBar",
      "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Image", "PaintBox",
-     "Shape", "Bevel", "ToolBar", "MainMenu", "Timer"];
+     "Shape", "Bevel", "ToolBar", "MainMenu", "Timer", "CommandList"];
 
 /// Whether controls may be put inside one of these. A `TabControl` holds
 /// pages and nothing else, so it is not one.
@@ -43,12 +44,14 @@ public bool IsDesignableContainer(String typeName) =>
 
 /// Whether a type has no window, and so is shown in the tray under the form
 /// and made by the expression its declaration gives, `new Timer()`.
-public bool IsNonVisualType(String typeName) => typeName == "Timer" || typeName == "MainMenu";
+public bool IsNonVisualType(String typeName) =>
+    typeName == "Timer" || typeName == "MainMenu" || typeName == "CommandList";
 
-/// Whether a type is an item of something else -- a menu's or a toolbar's --
-/// made as its declaration says and added to what it is inside. It is shown
-/// by what holds it, and edited in the items editor.
-public bool IsDesignedItemType(String typeName) => typeName == "MenuItem" || typeName == "ToolButton";
+/// Whether a type is an item of something else -- a menu's, a toolbar's or a
+/// command list's -- made as its declaration says and added to what it is
+/// inside. It is shown by what holds it, and edited in the items editor.
+public bool IsDesignedItemType(String typeName) =>
+    typeName == "MenuItem" || typeName == "ToolButton" || typeName == "Command";
 
 /// Whether a type holds items the items editor edits, and which type they
 /// are; "" for one that holds none.
@@ -61,10 +64,17 @@ public String FindItemTypeOf(String typeName)
             return "MenuItem";
         case "ToolBar":
             return "ToolButton";
+        case "CommandList":
+            return "Command";
         default:
             return "";
     }
 }
+
+/// What a non-visual component's declaration makes it with. A command list
+/// is made with its form, which is what gives its commands their shortcuts.
+public String CreateNonVisualInitializer(String typeName) =>
+    typeName == "CommandList" ? "new CommandList(this)" : "new " + typeName + "()";
 
 /// The text a declaration's initializer passes, `new MenuItem("&File")`, or
 /// "" for one that passes no string.
@@ -96,6 +106,11 @@ public ToolButton CreateDesignedToolButton(FormComponent component)
         return ToolButton.CreateSeparator();
     return new ToolButton(ReadInitializerText(component.Initializer));
 }
+
+/// A command as its declaration makes it, before its properties are set and
+/// before it is added to its list.
+public Command CreateDesignedCommand(FormComponent component) =>
+    new Command(ReadInitializerText(component.Initializer));
 
 /// A control of the named type inside `parent`, or null for a name the
 /// designer does not know. An `Image` has no window and is drawn by its
@@ -185,6 +200,15 @@ public bool ApplyReflectedProperty(byte* raw, Type type, FormProperty property, 
     }
 
     int kind = target.Kind;
+    if (kind == KindStruct && enumeration.Exists && enumeration.Name == DesignedShortcutType)
+    {
+        var shortcut = ReadDesignedShortcut(item);
+        if (!shortcut.Ok)
+            return false;
+        Shortcut value = shortcut.Value;
+        SetStruct(raw, target, (byte*)&value);
+        return true;
+    }
     if (kind == KindStruct && enumeration.Exists && enumeration.Name == DesignedColorType)
     {
         var colour = ReadDesignedColour(item);

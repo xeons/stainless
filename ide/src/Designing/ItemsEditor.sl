@@ -136,8 +136,22 @@ public class ItemsEditor : Form
             return;
         }
         var owner = (FormComponent)found;
-        bool isMenu = owner.TypeName != "ToolBar";
-        Title = (isMenu ? "Menu items -- " : "Toolbar buttons -- ") + _owner;
+        bool isMenu = false;
+        bool isToolBar = false;
+        switch (owner.TypeName)
+        {
+            case "ToolBar":
+                isToolBar = true;
+                Title = "Toolbar buttons -- " + _owner;
+                break;
+            case "CommandList":
+                Title = "Commands -- " + _owner;
+                break;
+            default:
+                isMenu = true;
+                Title = "Menu items -- " + _owner;
+                break;
+        }
 
         _filling = true;
         _tree.Clear();
@@ -153,8 +167,11 @@ public class ItemsEditor : Form
         }
         _filling = false;
 
+        // A command list's commands are a flat list with nothing between
+        // them.
         _addChild.Visible = isMenu;
-        _addToggle.Visible = !isMenu;
+        _addToggle.Visible = isToolBar;
+        _addSeparator.Visible = isMenu || isToolBar;
         UpdateButtons();
     }
 

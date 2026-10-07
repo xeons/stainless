@@ -24,6 +24,9 @@
 module Forms.Platform;
 
 import Standard.Text;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 /// A key and its modifiers, as a menu item or a command names them.
 ///
@@ -35,6 +38,9 @@ import Standard.Text;
 /// **`Control` is Command on a Mac.** The backends report both keys as
 /// `ModifierKeys.Control`, so Ctrl+S in a program is Cmd+S there, which is
 /// what a Mac user presses.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public struct Shortcut
 {
     public Key Key;

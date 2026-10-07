@@ -23,8 +23,9 @@
 // setter being what re-lays the control out. An enum property offers its
 // members, a `[Flags]` one a box per member. A colour and a font are typed or
 // chosen from the platform's dialog, and a list of strings is edited a line
-// to an item. What reflection cannot say is which properties a person should
-// see; `IsHiddenProperty` is that list.
+// to an item. A shortcut is typed as `Ctrl+S`, and a property naming one of
+// the form's commands is chosen from them. What reflection cannot say is which
+// properties a person should see; `IsHiddenProperty` is that list.
 module Ide.Designing;
 
 import Standard.Collections;
@@ -39,7 +40,11 @@ import Ide.Designer;
 public closure void HandlerChosenHandler(String method, String handlerType);
 public closure void GridMessageHandler(String message);
 
-enum GridRowKind { Name, Text, Boolean, Integer, Floating, Choice, Flags, Colour, Typeface, Lines, Picture }
+enum GridRowKind
+{
+    Name, Text, Boolean, Integer, Floating, Choice, Flags, Colour, Typeface, Lines, Picture,
+    Shortcut, Reference,
+}
 
 class GridRow
 {
@@ -284,6 +289,10 @@ public class PropertyGrid : Panel
             GridRowKind shown;
             if (enumeration.Exists && enumeration.IsEnum)
                 shown = enumeration.HasAttribute("Flags") ? GridRowKind.Flags : GridRowKind.Choice;
+            else if (kind == KindStruct && enumeration.Exists && enumeration.Name == DesignedShortcutType)
+                shown = GridRowKind.Shortcut;
+            else if (kind == KindClass && enumeration.Exists && enumeration.Name == DesignedCommandType)
+                shown = GridRowKind.Reference;
             else if (kind == KindStruct && enumeration.Exists && enumeration.Name == DesignedColorType)
                 shown = GridRowKind.Colour;
             else if (kind == KindClass && property.Name == "Font" && enumeration.Exists
@@ -333,6 +342,7 @@ public class PropertyGrid : Panel
             case "SelectionLength":
             case "Caption":
             case "Title":
+            case "List":
                 return true;
             default:
                 return false;
@@ -394,6 +404,19 @@ public class PropertyGrid : Panel
             }
             case GridRowKind.Typeface:
                 return FindLive() is Control control ? DescribeDesignedFont(control.Font) : "";
+            case GridRowKind.Shortcut:
+            {
+                Shortcut shortcut;
+                GetStruct(raw, row.Reflected, (byte*)&shortcut);
+                return shortcut.ToText();
+            }
+            case GridRowKind.Reference:
+            {
+                // The file says which component; the live object is only
+                // the object.
+                FormProperty? written = component.FindProperty(row.Name);
+                return written == null ? "" : ((FormProperty)written).Value.Items[0u];
+            }
             case GridRowKind.Lines:
                 return SpellDesignedTextArray(GetTextArray(raw, row.Reflected));
             case GridRowKind.Picture:
@@ -561,6 +584,25 @@ public class PropertyGrid : Panel
                     if (member == value)
                         at = (int)i;
                     names.Add(member);
+                }
+                _choice.Items = names.ToArray();
+                _choice.SelectedIndex = at;
+                _choice.Visible = true;
+                break;
+            }
+
+            case GridRowKind.Reference:
+            {
+                // Nothing, or one of the form's components of the right type.
+                var names = new List<String>();
+                names.Add(NoComponent);
+                int at = 0;
+                String wanted = row.Enumeration.Name.SubstringAfterLast(".");
+                foreach (var name in ((DesignSurface)_surface).ListComponentNames(wanted))
+                {
+                    if (name == value)
+                        at = (int)names.Count;
+                    names.Add(name);
                 }
                 _choice.Items = names.ToArray();
                 _choice.SelectedIndex = at;
@@ -768,6 +810,14 @@ public class PropertyGrid : Panel
                 ApplyColour(row, typed);
                 break;
 
+            case GridRowKind.Shortcut:
+                ApplyShortcut(row, typed);
+                break;
+
+            case GridRowKind.Reference:
+                ApplyReference(row, typed);
+                break;
+
             case GridRowKind.Picture:
                 ApplyPicture(row, typed.Trim());
                 break;
@@ -817,6 +867,57 @@ public class PropertyGrid : Panel
                 break;
         }
         ShowSurface(_surface);
+    }
+
+    /// What the list of components offers for none.
+    const String NoComponent = "(none)";
+
+    /// Sets a shortcut from `Ctrl+S`; nothing at all takes it away.
+    private void ApplyShortcut(GridRow row, String typed)
+    {
+        var designer = (DesignSurface)_surface;
+        var component = (FormComponent)_component;
+        var read = ReadDesignedShortcut(typed);
+        if (!read.Ok)
+        {
+            Message(read.Error + ".");
+            return;
+        }
+        Shortcut value = read.Value;
+        if (FindTarget() != null)
+            SetStruct(FindTarget(), row.Reflected, (byte*)&value);
+        if (value.IsEmpty)
+        {
+            designer.RemoveComponentProperty(component, row.Name);
+            return;
+        }
+        designer.RequireImport(DesignedPlatformModule);
+        designer.StoreComponentProperty(component, row.Name, FormValue.FromName(SpellDesignedShortcut(value)));
+    }
+
+    /// Points a property at one of the form's components, by name, or at
+    /// nothing.
+    private void ApplyReference(GridRow row, String name)
+    {
+        var designer = (DesignSurface)_surface;
+        var component = (FormComponent)_component;
+        byte* target = FindTarget();
+        if (name == NoComponent || name == "")
+        {
+            if (target != null)
+                SetAggregate(target, row.Reflected, null);
+            designer.RemoveComponentProperty(component, row.Name);
+            return;
+        }
+        byte* named = designer.FindDesignedTarget(name);
+        if (named == null)
+        {
+            Message("'" + name + "' is not one of this form's components.");
+            return;
+        }
+        if (target != null)
+            SetAggregate(target, row.Reflected, named);
+        designer.StoreComponentProperty(component, row.Name, FormValue.FromName(name));
     }
 
     /// Sets a picture from a path relative to the form file, which the

@@ -58,6 +58,9 @@ module Forms.Platform;
 
 import Standard.Collections;
 import Forms.Drawing;
+#if FORMS_REFLECT
+import Standard.Reflection;
+#endif
 
 /// Aborts with a message, for a mistake in the calling program rather than a
 /// value to hand back. The same one `Standard.Collections` uses.
@@ -101,6 +104,9 @@ public enum ModifierKeys
 /// virtual-key codes because one backend must own the numbering and Windows'
 /// is the one with names for everything; the GTK backend maps `GDK_KEY_*` on to
 /// this on the way in.
+#if FORMS_REFLECT
+[Reflect]
+#endif
 public enum Key
 {
     None = 0,

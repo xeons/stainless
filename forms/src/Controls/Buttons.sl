@@ -257,6 +257,13 @@ public class CheckBox : ButtonBase
     /// has more to do around it.
     protected void SetCheckedOnly(bool ticked) => _native.SetChecked(ticked);
 
+    /// The tick is the command's `Checked`.
+    protected override void OnCommandChanged(Command command)
+    {
+        base.OnCommandChanged(command);
+        Checked = command.Checked;
+    }
+
     /// The user changed the tick. Setting `Checked` raises nothing.
     public event EventHandler CheckedChanged;
 
@@ -587,6 +594,15 @@ public class SpeedButton : GraphicControl
                 other.SetDownOnly(false);
             }
         }
+    }
+
+    /// A command's `Checked` is this button's `Down`, for a button in a group;
+    /// a button in none is never down, as `Down` says.
+    protected override void OnCommandChanged(Command command)
+    {
+        base.OnCommandChanged(command);
+        if (_groupIndex != 0)
+            SetDownOnly(command.Checked);
     }
 
     /// Raises or presses without touching the group, for a sibling being raised

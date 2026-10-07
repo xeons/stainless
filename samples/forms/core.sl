@@ -64,6 +64,19 @@ public class KeyLog
     }
 }
 
+/// What the command checks counted.
+public class CommandLog
+{
+    public int Runs;
+    public bool Allowed;
+
+    public CommandLog()
+    {
+        Runs = 0;
+        Allowed = true;
+    }
+}
+
 /// A graphic control that counts what reached it.
 public class Spot : GraphicControl
 {
@@ -416,6 +429,7 @@ public class CoreForm : Form
         ok = WindowChecks(ok);
         ok = ModalChecks(ok);
         ok = KeyboardChecks(ok);
+        ok = CommandChecks(ok);
 
         var squeezed = Rectangle.FromBounds(0, 0, 10, 10).DeflateBy(6);
         ok = Check(ok, "deflating past nothing gives an empty rectangle",
@@ -551,6 +565,91 @@ public class CoreForm : Form
         keys.Close();
         Settle();
         return ok;
+    }
+
+    /// One command behind a menu item, a button and a toolbar button.
+    bool CommandChecks(bool ok)
+    {
+        var log = new CommandLog();
+        var host = new Form(WindowBorder.Sizable);
+        host.Text = "Commands";
+        host.SetBounds(0, 0, 360, 200);
+        var commands = new CommandList(host);
+        var save = commands.Add("&Save");
+        save.Shortcut = Shortcut.FromKey(Key.S, ModifierKeys.Control);
+        save.Hint = "Write it to disk";
+        save.Execute += (sender) => { log.Runs++; };
+        save.Update += (sender) => { sender.Enabled = log.Allowed; };
+
+        var bar = new MainMenu();
+        var item = bar.Add("&File").Add(new MenuItem());
+        item.Command = save;
+        host.Menu = bar;
+        var tools = new ToolBar(host);
+        var tool = tools.Add(new ToolButton());
+        tool.Command = save;
+        var button = new Button(host);
+        button.SetBounds(10, 40, 100, 28);
+        button.Command = save;
+        host.Show();
+        Settle();
+
+        ok = Check(ok, "a command's caption reaches every client",
+                   item.Text == "&Save" && tool.Text == "Save" && button.Text == "&Save");
+        ok = Check(ok, "and its shortcut the menu item", item.Shortcut.Equals(save.Shortcut));
+        ok = Check(ok, "and its hint the button's tool tip", button.ToolTip == "Write it to disk");
+
+        var notify = (IWindowNotify)host;
+        ok = Check(ok, "its shortcut carries it out",
+                   notify.OnPlatformShortcut(Key.S, ModifierKeys.Control) && log.Runs == 1);
+        item.PerformClick();
+        ok = Check(ok, "and so does its menu item", log.Runs == 2);
+        ((IControlNotify)button).OnPlatformActivated();
+        ok = Check(ok, "and its button", log.Runs == 3);
+        tool.RaiseClick(tools);
+        ok = Check(ok, "and its toolbar button", log.Runs == 4);
+
+        log.Allowed = false;
+        Application.RaiseIdle();
+        ok = Check(ok, "going idle runs its Update",
+                   !save.Enabled && !item.Enabled && !button.Enabled && !tool.Enabled);
+        ok = Check(ok, "and a disabled command's shortcut does nothing",
+                   !notify.OnPlatformShortcut(Key.S, ModifierKeys.Control) && log.Runs == 4);
+        log.Allowed = true;
+        Application.RaiseIdle();
+        ok = Check(ok, "nor does it stay disabled", button.Enabled && item.Enabled);
+
+        var left = commands.Add("Left");
+        var right = commands.Add("Right");
+        left.AutoCheck = true;
+        right.AutoCheck = true;
+        left.GroupIndex = 1;
+        right.GroupIndex = 1;
+        var leftItem = bar.Items[0u].Add(new MenuItem());
+        leftItem.Command = left;
+        left.PerformExecute();
+        right.PerformExecute();
+        ok = Check(ok, "commands in a group are checked one at a time",
+                   right.Checked && !left.Checked && !leftItem.Checked);
+
+        var watch = new Watch();
+        MakeCommandedButton(host, save, watch);
+        Settle();
+        ok = Check(ok, "a command does not keep a removed button alive", watch.IsGone);
+        save.Text = "Save &All";
+        ok = Check(ok, "and goes on telling the clients it still has", button.Text == "Save &All");
+
+        host.Close();
+        Settle();
+        return ok;
+    }
+
+    static void MakeCommandedButton(Form host, Command command, Watch watch)
+    {
+        var made = new Button(host);
+        made.Command = command;
+        watch.Target = (Control)made;
+        host.RemoveControl(made);
     }
 
     bool LifetimeChecks(bool ok)

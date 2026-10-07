@@ -101,6 +101,7 @@ public class MenuItem : IMenuItemNotify
     bool _checked;
     bool _isSeparator;
     Shortcut _shortcut;
+    Command? _command;
 
     public MenuItem(String text)
     {
@@ -109,6 +110,7 @@ public class MenuItem : IMenuItemNotify
         _checked = false;
         _isSeparator = false;
         _shortcut = Shortcut.Empty;
+        _command = null;
         _builds = new List<MenuItemBuild>();
         _children = new List<MenuItem>();
     }
@@ -199,6 +201,33 @@ public class MenuItem : IMenuItemNotify
         }
     }
 
+    /// What choosing this item does, and where its caption, enabled state,
+    /// tick and shortcut come from while it is set.
+    public Command? Command
+    {
+        get => _command;
+        set
+        {
+            Command? old = _command;
+            if (old != null)
+                ((Command)old).Changed -= this.OnCommandChanged;
+            _command = value;
+            if (value != null)
+            {
+                ((Command)value).Changed += this.OnCommandChanged;
+                OnCommandChanged((Command)value);
+            }
+        }
+    }
+
+    void OnCommandChanged(Command command)
+    {
+        Text = command.Text;
+        Enabled = command.Enabled && command.Visible;
+        Checked = command.Checked;
+        Shortcut = command.Shortcut;
+    }
+
     /// The items under this one. Adding any makes it a heading rather than a
     /// command, and a heading raises nothing when chosen.
     public List<MenuItem> Items => _children;
@@ -219,7 +248,14 @@ public class MenuItem : IMenuItemNotify
     /// The item was chosen.
     public event MenuEventHandler Click;
 
-    protected virtual void OnClick() => Click(this);
+    /// Carries out the command, if there is one, and raises `Click`.
+    protected virtual void OnClick()
+    {
+        Command? command = _command;
+        if (command != null)
+            ((Command)command).PerformExecute();
+        Click(this);
+    }
 
     /// What the platform calls when the user picks this item.
     public void OnPlatformMenuClicked() => OnClick();

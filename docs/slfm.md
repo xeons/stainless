@@ -170,6 +170,34 @@ only order in which `_mainMenu` exists to be named. A separator is
 `MenuItem.CreateSeparator()` or `ToolButton.CreateSeparator()`, and a button
 that stays pressed sets `Kind = ToolButtonKind.Toggle;`.
 
+**A command list is made with its form**, `new CommandList(this)`, because the
+form is what presses a command's shortcut and brings its state up to date
+while idle. Its commands are its items, added with `CommandList.Add` like a
+menu's, and a control, a menu item or a toolbar button names one with
+`Command = _save;`, which is a component's name and so is set last. A shortcut
+is written as the generated half writes it, which needs `import
+Forms.Platform;`:
+
+```
+CommandList _commands = new CommandList(this)
+{
+    Command _save = new Command()
+    {
+        Text = "&Save";
+        Shortcut = Shortcut.FromKey(Key.S, ModifierKeys.Control);
+        Execute += OnSave;
+    }
+}
+
+Button _saveButton
+{
+    Command = _save;
+}
+```
+
+The designer makes the list with no form, so a command being designed cannot
+be carried out and its shortcut presses nothing.
+
 Comments are `//` to the end of a line. One above a member belongs to that
 member and moves with it; one after a member's `;` stays on its line; one before
 a `}` stays at the end of the block. A comment among the imports, or between

@@ -217,7 +217,7 @@ public class OfficeXpRenderer : ChromeRenderer
         if (item.IsSeparator)
             return Size.FromDimensions(GutterWidth + 32, 3 + Padding);
 
-        String plain = RemoveMnemonics(item.Text);
+        String plain = RemoveMnemonicMarkers(item.Text);
         var text = surface.MeasureString(plain.SubstringBefore("\t"), Font);
 
         // A word on the bar, and **nothing added to it**.
@@ -277,7 +277,7 @@ public class OfficeXpRenderer : ChromeRenderer
         // is measured with, which is also why the width does not move when the
         // underline appears.
         String caption = state.HasFlag(MenuItemState.NoAccelerators)
-                       ? RemoveMnemonics(item.Text) : item.Text;
+                       ? RemoveMnemonicMarkers(item.Text) : item.Text;
 
         if (item.IsOnMenuBar)
         {
@@ -327,7 +327,7 @@ public class OfficeXpRenderer : ChromeRenderer
         if (keys != "")
         {
             format.Horizontal = HorizontalAlignment.Right;
-            surface.DrawString(RemoveMnemonics(keys), Font, ink, text, format);
+            surface.DrawString(RemoveMnemonicMarkers(keys), Font, ink, text, format);
         }
 
         if (item.HasItems)
@@ -488,7 +488,7 @@ public class OfficeXpRenderer : ChromeRenderer
 
         String caption = button.ShowsText ? button.Text : "";
         var text = caption.IsEmpty ? Size.FromDimensions(0, 0)
-                                   : surface.MeasureString(RemoveMnemonics(caption), Font);
+                                   : surface.MeasureString(RemoveMnemonicMarkers(caption), Font);
 
         int gap = pictureWidth > 0 && text.Width > 0 ? ToolGap : 0;
         int at = bounds.X + (bounds.Width - (pictureWidth + gap + text.Width)) / 2;
@@ -511,7 +511,7 @@ public class OfficeXpRenderer : ChromeRenderer
         format.Wrap = false;
 
         // The caption as written, not as measured: `DrawTextW` eats the
-        // ampersand, and `RemoveMnemonics` above is what keeps the two in step.
+        // ampersand, and `RemoveMnemonicMarkers` below is what keeps the two in step.
         surface.DrawString(caption, Font, disabled ? DisabledText : TextColor,
                            Rectangle.FromBounds(at, bounds.Y, text.Width, bounds.Height),
                            format);
@@ -548,7 +548,7 @@ public class OfficeXpRenderer : ChromeRenderer
     void DrawMnemonicText(Graphics surface, String caption, Color ink, Rectangle bounds,
                           TextFormat format)
     {
-        String plain = RemoveMnemonics(caption);
+        String plain = RemoveMnemonicMarkers(caption);
         surface.DrawString(plain, Font, ink, bounds, format);
 
         long marked = FindMnemonic(caption);
@@ -598,37 +598,6 @@ public class OfficeXpRenderer : ChromeRenderer
         return -1;
     }
 
-    static String RemoveMnemonics(String caption)
-    {
-        if (!caption.Contains("&"))
-            return caption;
-
-        var plain = new StringBuilder();
-        nuint at = 0u;
-        nuint length = caption.ByteLength();
-
-        while (at < length)
-        {
-            byte here = caption.GetByteAt(at);
-            if (here != (byte)38)                    // '&'
-            {
-                plain.AppendByte(here);
-                at++;
-                continue;
-            }
-
-            // A doubled one is a real ampersand; a single one marks the letter
-            // after it and is not drawn.
-            at++;
-            if (at < length && caption.GetByteAt(at) == (byte)38)
-            {
-                plain.AppendByte((byte)38);
-                at++;
-            }
-        }
-        return plain.ToText();
-    }
-
     /// `percent` of `a` over `b`.
     ///
     /// Here rather than on `Color`, which has no blending and does not need
@@ -647,4 +616,37 @@ public class OfficeXpRenderer : ChromeRenderer
             (byte)(((int)a.G * percent + (int)b.G * rest) / 100),
             (byte)(((int)a.B * percent + (int)b.B * rest) / 100));
     }
+}
+
+/// A caption as it reads with its mnemonic markers taken out: `&File` is
+/// `File`, and `&&` is one `&`.
+public String RemoveMnemonicMarkers(String caption)
+{
+    if (!caption.Contains("&"))
+        return caption;
+
+    var plain = new StringBuilder();
+    nuint at = 0u;
+    nuint length = caption.ByteLength();
+
+    while (at < length)
+    {
+        byte here = caption.GetByteAt(at);
+        if (here != (byte)38)                    // '&'
+        {
+            plain.AppendByte(here);
+            at++;
+            continue;
+        }
+
+        // A doubled one is a real ampersand; a single one marks the letter
+        // after it and is not drawn.
+        at++;
+        if (at < length && caption.GetByteAt(at) == (byte)38)
+        {
+            plain.AppendByte((byte)38);
+            at++;
+        }
+    }
+    return plain.ToText();
 }

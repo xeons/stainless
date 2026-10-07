@@ -182,6 +182,9 @@ public static class ToolboxIconFiles
 
     [Embed("icons/16/timer.png")]
     public static readonly byte[] Timer;
+
+    [Embed("icons/16/commandlist.png")]
+    public static readonly byte[] CommandList;
 }
 
 /// Every toolbar icon as one list, or null if they could not be decoded.
@@ -256,6 +259,7 @@ byte[] FindToolboxIconFile(String typeName)
         case "ToolBar": return ToolboxIconFiles.ToolBar;
         case "MainMenu": return ToolboxIconFiles.MainMenu;
         case "Timer": return ToolboxIconFiles.Timer;
+        case "CommandList": return ToolboxIconFiles.CommandList;
         default: return ToolboxIconFiles.Button;
     }
 }
