@@ -101,6 +101,7 @@ public class SampleTests
         new("shapes", ["samples/shapes.sl"]),
         new("stress", ["samples/stress.sl"]),
         new("strings", ["samples/strings.sl"]),
+        new("terrain", ["samples/terrain.sl"]),
         new("wc", ["samples/wc.sl"]),
         new("http-get", ["samples/http-get.sl"]),
         new("audio", ["samples/audio/audio.sl"]),
