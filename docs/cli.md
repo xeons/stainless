@@ -19,6 +19,8 @@ stainless restore              resolve dependencies and lock them
   --def <path>           a module definition file for the linker, to name
                          exports the declarations cannot. The compiler's
                          own renames are kept as well
+  --entitlements <plist> (macOS) sign the program ad hoc with these
+                         entitlements
   --metadata <path>      write module metadata for a Stainless consumer
   -r, --reference <path> bind against a library's module metadata, and link
                          the library beside it

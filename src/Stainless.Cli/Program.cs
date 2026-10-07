@@ -136,6 +136,9 @@ internal static class Program
               --def <path>         a module definition file for the linker, to
                                    name exports the declarations do not. The
                                    compiler's own renames are kept as well
+              --entitlements <plist>
+                                   (macOS) sign the program ad hoc with these
+                                   entitlements
               --stdlib             (doc) document the standard library itself
               --metadata <path>    write module metadata for a Stainless consumer
               -r, --reference <path>
@@ -782,6 +785,7 @@ internal static class Program
         public string? ObjectDirectory { get; set; }
         public string? Header { get; set; }
         public string? ModuleDefinition { get; set; }
+        public string? Entitlements { get; set; }
         public string? Metadata { get; set; }
         public string? Project { get; set; }
         public string? ProjectError { get; set; }
@@ -838,6 +842,7 @@ internal static class Program
             SharedRuntime = SharedRuntime,
             HeaderPath = Header,
             ModuleDefinitionPath = ModuleDefinition,
+            EntitlementsPath = Entitlements,
             ExtraPaths = Paths,
             Target = Target,
             DocumentationPath = Documentation,
@@ -908,6 +913,7 @@ internal static class Program
                 Shared = Shared,
                 HeaderPath = Header,
                 ModuleDefinitionPath = ModuleDefinition,
+                EntitlementsPath = Entitlements,
                 MetadataPath = Metadata,
                 References = References,
                 SharedRuntime = SharedRuntime,
@@ -1104,6 +1110,11 @@ internal static class Program
                 case "--def":
                     if (++i >= args.Length) { Error("'--def' needs a path"); return false; }
                     arguments.ModuleDefinition = args[i];
+                    continue;
+
+                case "--entitlements":
+                    if (++i >= args.Length) { Error("'--entitlements' needs a path"); return false; }
+                    arguments.Entitlements = args[i];
                     continue;
 
                 case "--":

@@ -91,7 +91,14 @@ perfectly well and answers no questions about it.
 }
 ```
 
-A section holds `sources`, `libraries` and `defines` and nothing else.
+A section holds `sources`, `libraries` and `defines`, and `macos` may also name
+`entitlements`: a property list, relative to the project, that the program is
+signed with ad hoc once it is linked. A debugger needs one, because macOS hands
+another process's task port only to a program signed with
+`com.apple.security.cs.debugger` ([debug/README.md](../debug/README.md)).
+Entitlements are part of a Mach-O signature, so the other two sections refuse
+the field.
+
 `optimize`, `abi` and `runtime` are answers about *how* a program is built
 rather than about what it is made of, and a project wanting one of those per
 platform is asking for two builds rather than one file — which `--target` and a

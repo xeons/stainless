@@ -114,10 +114,11 @@ public class Dependency
 
 /// What one platform adds to a project.
 ///
-/// Three lists and nothing else, which is the compiler's shape: `optimize`,
-/// `abi` and `runtime` are answers about how a program is built rather than
-/// about what it is made of, and a project wanting one of them per platform is
-/// asking for two builds rather than one file.
+/// Three lists, and on macOS the entitlements the program is signed with,
+/// which is the compiler's shape: `optimize`, `abi` and `runtime` are answers
+/// about how a program is built rather than about what it is made of, and a
+/// project wanting one of them per platform is asking for two builds rather
+/// than one file.
 [Reflect]
 public class PlatformOverlay
 {
@@ -128,15 +129,21 @@ public class PlatformOverlay
     [JsonName("defines")]
     public String[] Defines;
 
+    /// A property list, relative to the project, or "" for none.
+    [JsonName("entitlements")]
+    public String Entitlements;
+
     public PlatformOverlay()
     {
         Sources = [];
         Libraries = [];
         Defines = [];
+        Entitlements = "";
     }
 
     public bool IsEmpty =>
-        Sources.Length == 0u && Libraries.Length == 0u && Defines.Length == 0u;
+        Sources.Length == 0u && Libraries.Length == 0u && Defines.Length == 0u
+        && Entitlements == "";
 }
 
 /// A project, as the file says it is.
@@ -547,6 +554,22 @@ Result<PlatformOverlay, String> ReadPlatformOverlay(JsonObject members, String p
         if (!defines.Ok)
             return Fail(defines.Error);
         made.Defines = defines.Value;
+
+        // Part of a Mach-O signature, so the other sections refuse it, as
+        // the compiler does.
+        if (inside.IndexOf("entitlements") is Some named)
+        {
+            var entitlements = inside.GetValueAt(named.Value);
+            if (platform != "macos")
+            {
+                return Fail("'" + path + "': '" + platform + ".entitlements' means nothing "
+                            + "there; entitlements are part of a macOS signature and "
+                            + "belong in 'macos'");
+            }
+            if (!entitlements.Text || entitlements.Value == "")
+                return Fail("'" + path + "': 'macos.entitlements' names a property list");
+            made.Entitlements = entitlements.Value;
+        }
     }
 
     return Ok(made);
@@ -730,6 +753,7 @@ List<String> ListKnownOverlayFields()
     names.Add("sources");
     names.Add("libraries");
     names.Add("defines");
+    names.Add("entitlements");
     return names;
 }
 
@@ -832,6 +856,8 @@ void AddOverlayMember(JsonObject members, String name, PlatformOverlay overlay)
         inside.Add("libraries", CreateTextArray(overlay.Libraries));
     if (overlay.Defines.Length > 0u)
         inside.Add("defines", CreateTextArray(overlay.Defines));
+    if (overlay.Entitlements != "")
+        inside.Add("entitlements", JsonValue.Text(overlay.Entitlements));
 
     members.Add(name, JsonValue.Object(inside));
 }

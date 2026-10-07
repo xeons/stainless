@@ -73,6 +73,12 @@ public sealed record CompilationOptions
     public string? ModuleDefinitionPath { get; init; }
 
     /// <summary>
+    /// A property list of entitlements to sign a macOS binary with, ad hoc,
+    /// once it is linked. Null leaves the linker's own ad hoc signature.
+    /// </summary>
+    public string? EntitlementsPath { get; init; }
+
+    /// <summary>
     /// Where to write the module metadata another Stainless compilation binds
     /// against. The C header and this describe the same library to two
     /// different audiences.
@@ -1101,6 +1107,17 @@ public sealed class Compilation
         // binary would go out undebuggable with nothing said.
         if (IrFault.StrippedDebugInfo(link.StandardError))
             return Failure(IrFault.FromVerifier(link.StandardError, ir).Explain(irPath));
+
+        if (options.EntitlementsPath is { } entitlements)
+        {
+            if (!target.IsDarwin)
+                return Failure($"entitlements sign a macOS program, and this one is for {target.Triple}");
+
+            var signed = toolchain.SignWithEntitlements(output, Path.GetFullPath(entitlements));
+            if (!signed.Success)
+                return Failure($"codesign could not sign {output} with {entitlements}: " +
+                               signed.StandardError.Trim());
+        }
 
         // The loader looks beside the binary, so that is where the runtime and
         // every referenced library go. Both a program and a Stainless library

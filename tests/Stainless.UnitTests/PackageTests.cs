@@ -614,6 +614,35 @@ public class ProjectFileTests
     }
 
     /// <summary>
+    /// Entitlements are part of a Mach-O signature, so only the macOS section
+    /// may name them, and a project build resolves them against the project.
+    /// </summary>
+    [Fact]
+    public void OnlyMacOSNamesEntitlements()
+    {
+        var project = ProjectFile.Read(Write("""
+            {
+              "name": "app", "version": "1.0.0",
+              "macos": { "entitlements": "app.entitlements" }
+            }
+            """), out string error)!;
+
+        Assert.Equal("", error);
+        Assert.Equal("app.entitlements", project.OverlayFor(TargetPlatform.Arm64MacOS)!.Entitlements);
+        Assert.Null(project.OverlayFor(TargetPlatform.X64Linux));
+
+        var refused = ProjectFile.Read(Write("""
+            {
+              "name": "app", "version": "1.0.0",
+              "linux": { "entitlements": "app.entitlements" }
+            }
+            """), out string refusal);
+
+        Assert.Null(refused);
+        Assert.Contains("'linux.entitlements' means nothing there", refusal);
+    }
+
+    /// <summary>
     /// With no target named the host still answers, and it has to: there is no
     /// FreeBSD triple, so deriving the symbols from
     /// <see cref="TargetPlatform.Host"/> would take <c>FREEBSD</c> away from a

@@ -736,6 +736,14 @@ public sealed class Toolchain
             program, runtimeObjects, nativeInputs, outputPath, optimizationLevel, shared,
             debug, libraries, sharedRuntime, moduleDefinition, loadsLibrariesBeside));
 
+    /// <summary>
+    /// Replaces a macOS binary's signature with an ad hoc one carrying
+    /// entitlements. The linker signs every arm64 binary ad hoc already; this
+    /// is the same signature with the property list added.
+    /// </summary>
+    public ToolResult SignWithEntitlements(string binary, string entitlements) =>
+        Run("codesign", ["--force", "--sign", "-", "--entitlements", entitlements, binary]);
+
     /// <summary>The clang command line <see cref="Link"/> runs, for the current target.</summary>
     public IReadOnlyList<string> LinkArguments(
         IReadOnlyList<string> program,

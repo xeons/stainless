@@ -53,6 +53,9 @@ public sealed record BuildOverrides
     /// <summary>A module definition file to hand the linker, or null.</summary>
     public string? ModuleDefinitionPath { get; init; }
 
+    /// <summary>Entitlements to sign a macOS program with, or null.</summary>
+    public string? EntitlementsPath { get; init; }
+
     /// <summary>Where to write reference documentation, or null for none.</summary>
     public string? DocumentationPath { get; init; }
 
@@ -635,6 +638,10 @@ public sealed class ProjectBuilder(
             MetadataPath = metadata,
             HeaderPath = isRoot ? overrides.HeaderPath ?? Resolved(project, project.Header) : null,
             ModuleDefinitionPath = isRoot ? overrides.ModuleDefinitionPath : null,
+            EntitlementsPath = isRoot
+                ? overrides.EntitlementsPath ??
+                  Resolved(project, project.OverlayFor(_target)?.Entitlements)
+                : null,
             PackageName = project.Name,
             PackageVersion = project.Version,
         };

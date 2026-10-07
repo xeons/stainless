@@ -394,7 +394,22 @@ void TestPlatforms(Harness harness)
         harness.Check("and neither carries the other's",
                       !ContainsName(mine.Value.GetSourcesFor("windows"), "../bindings/gtk")
                       && !ContainsName(mine.Value.GetSourcesFor("linux"), "../bindings/win32"));
+
+        // The debugger inside it needs a task port, which macOS gives only to
+        // a program signed with the debugger entitlement.
+        harness.Check("and signs itself with the debugger entitlement on macOS",
+                      mine.Value.Macos.Entitlements == "../debug/debugger.entitlements");
+
+        var again = Project.ParseProjectFile(Project.SerializeProjectFile(mine.Value),
+                                             "again.json");
+        harness.Check("which survives a round trip",
+                      again.Ok && again.Value.Macos.Entitlements == mine.Value.Macos.Entitlements);
     }
+
+    var misplaced = Project.ParseProjectFile(
+        "{ \"name\": \"a\", \"version\": \"1.0.0\","
+        + " \"linux\": { \"entitlements\": \"a.plist\" } }", "misplaced.json");
+    harness.Check("entitlements outside 'macos' are refused", !misplaced.Ok);
 }
 
 /// Whether a list holds exactly this entry.

@@ -654,11 +654,11 @@ public enum ProjectKind
 /// <summary>
 /// What one platform adds to a project.
 ///
-/// Three lists and nothing else, deliberately. <c>optimize</c>, <c>abi</c> and
-/// <c>runtime</c> are answers about how a program is built rather than about
-/// what it is made of, and a project wanting one of them per platform is
-/// asking for two builds rather than one file -- which is what
-/// <c>--target</c> and a second invocation already are.
+/// Three lists, and on macOS the entitlements the program is signed with.
+/// <c>optimize</c>, <c>abi</c> and <c>runtime</c> are answers about how a
+/// program is built rather than about what it is made of, and a project wanting
+/// one of them per platform is asking for two builds rather than one file --
+/// which is what <c>--target</c> and a second invocation already are.
 /// </summary>
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record PlatformOverlay
@@ -672,9 +672,29 @@ public sealed record PlatformOverlay
     /// <summary>Extra symbols <c>#if</c> can test.</summary>
     public List<string> Defines { get; init; } = [];
 
+    /// <summary>
+    /// A property list of entitlements, relative to the project, that the
+    /// program is signed with. macOS only: it is part of a Mach-O signature.
+    /// </summary>
+    public string? Entitlements { get; init; }
+
     public bool Validate(string platform, string path, out string error)
     {
         error = "";
+
+        if (Entitlements is not null && platform != "macos")
+        {
+            error = $"'{path}': '{platform}.entitlements' means nothing there; entitlements " +
+                    "are part of a macOS signature and belong in 'macos'";
+            return false;
+        }
+
+        if (Entitlements is not null && Entitlements.Trim().Length == 0)
+        {
+            error = $"'{path}': '{platform}.entitlements' is empty; leave it out, or name a " +
+                    "property list";
+            return false;
+        }
 
         foreach (var (field, values) in new[]
                  {
