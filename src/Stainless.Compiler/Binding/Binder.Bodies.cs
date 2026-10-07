@@ -1645,6 +1645,16 @@ public sealed partial class Binder
                         "cannot infer a type from an expression of type 'void'");
                     type = ErrorTypeSymbol.Instance;
                 }
+                else if (type is LambdaType && initializer is not BoundLambda)
+                {
+                    // Lambdas chosen between -- a switch's arms, a conditional's
+                    // -- have a lambda's type and are not one lambda whose
+                    // parameters could be read.
+                    diagnostics.Report(Codes.VarCannotInfer, syntax.Initializer.Span,
+                        $"'{syntax.Name}' cannot be a 'var': this chooses between lambdas, and " +
+                        "a lambda takes its type from where it is going. Write the type out");
+                    type = ErrorTypeSymbol.Instance;
+                }
                 else if (type is LambdaType)
                 {
                     // A lambda that wrote its parameter types out has said

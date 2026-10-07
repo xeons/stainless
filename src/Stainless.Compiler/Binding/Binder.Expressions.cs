@@ -317,8 +317,9 @@ public sealed partial class Binder
     /// </summary>
     private BoundExpression? AsFormattable(BoundExpression value, string format, SourceSpan span)
     {
-        var formattable = _builtins.Formattable;
-        var toText = formattable.FindMethod("ToText")!;
+        if (_builtins.Formattable is not { } formattable ||
+            formattable.FindMethod("ToText") is not { } toText)
+            return null;
 
         // A struct is never a reference to the interface, so its own method is
         // called, on the value where it is.

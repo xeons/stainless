@@ -207,10 +207,13 @@ public sealed class Builtins
 
     /// <summary>
     /// <c>Standard.Text.IFormattable</c>: what a class implements to be written
-    /// into an interpolation.
+    /// into an interpolation. Null when the standard library being compiled
+    /// declares no such interface, which leaves an interpolation without it.
     /// </summary>
-    public InterfaceTypeSymbol Formattable =>
-        _formattable ??= (InterfaceTypeSymbol)Text.Types["IFormattable"];
+    public InterfaceTypeSymbol? Formattable =>
+        _formattable ??= Text.Types.TryGetValue("IFormattable", out var found)
+            ? found as InterfaceTypeSymbol
+            : null;
 
     private FunctionSymbol? _textFormatLong;
     private FunctionSymbol? _textFormatULong;
