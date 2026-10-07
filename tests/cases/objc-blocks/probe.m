@@ -54,6 +54,10 @@ static long (^s_kept)(long);
     return wide.a + wide.b + wide.c + wide.d;
 }
 
+long SLCallSure(long (^transform)(long), long value) { return transform(value); }
+
+long SLCallMaybe(long (^transform)(long), long value) { return transform ? transform(value) : -1; }
+
 // The block lives on this frame's stack; the keeper has to copy it.
 + (long)handTo:(id)keeper
 {

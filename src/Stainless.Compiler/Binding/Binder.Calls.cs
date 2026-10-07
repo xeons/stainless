@@ -1616,6 +1616,18 @@ public sealed partial class Binder
     /// </summary>
     private bool IsImplicitlyConvertible(BoundExpression argument, TypeSymbol target)
     {
+        // A block, or one that may be null, takes a lambda or a method on the
+        // terms of the closure it holds, which is what `BindAsBlock` makes.
+        if (argument is BoundFunctionGroup or BoundLambda)
+        {
+            target = target switch
+            {
+                ObjCBlockTypeSymbol block => block.Closure,
+                OptionalTypeSymbol { Element: ObjCBlockTypeSymbol block } => block.Closure,
+                _ => target,
+            };
+        }
+
         // A bare function name fits a delegate when one of its overloads has
         // that exact signature. The delegate is the only context a bare name
         // has, which is also how the overload gets chosen.

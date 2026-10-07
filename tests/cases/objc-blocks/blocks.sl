@@ -142,6 +142,17 @@ Wide MakeWide(double value)
     return wide;
 }
 
+// Written in probe.m: C functions, so the lambda goes through overload
+// resolution against a block parameter, and one that may be null.
+public extern "C" long SLCallSure(Transform transform, long value);
+public extern "C" long SLCallMaybe(Transform? transform, long value);
+
+void Plain()
+{
+    Console.WriteLine($"to a C function: {SLCallSure((value) => value * 3, 4)} " +
+                      $"{SLCallMaybe((value) => value + 1, 4)} {SLCallMaybe(null, 4)}");
+}
+
 void Handed()
 {
     var keeper = new Keeper();
@@ -155,6 +166,7 @@ int Main()
     WithAutoreleasePool(() => Made());
     WithAutoreleasePool(() => Results());
     WithAutoreleasePool(() => Handed());
+    WithAutoreleasePool(() => Plain());
     Console.WriteLine($"tallies alive: {Tally.Alive}");
     return 0;
 }

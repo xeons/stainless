@@ -5,4 +5,5 @@ BOOL: true false
 object: 5
 struct: 15
 a stack block kept: 1000 1001
+to a C function: 12 5 -1
 tallies alive: 0
