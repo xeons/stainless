@@ -197,6 +197,9 @@ public sealed partial class Binder
     /// </summary>
     private bool CheckLateField(NamedTypeSymbol type, Syntax.FieldDeclSyntax field, TypeSymbol fieldType, bool required)
     {
+        // A type that did not resolve has said so where it is written.
+        if (fieldType.IsError()) return false;
+
         string? refused =
             type is not ClassTypeSymbol ? $"'{type.Name}' is a struct, whose fields are its constructor's alone"
             : required ? "a 'required' field is given its value by every 'new', so it is never late"

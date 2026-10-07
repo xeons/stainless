@@ -236,6 +236,9 @@ public sealed partial class Binder
                 var plain => (plain, InjectionKind.Required),
             };
 
+            // A type that did not resolve has said so where it is written.
+            if (service.IsError()) return false;
+
             bool askable = service is ClassTypeSymbol or InterfaceTypeSymbol &&
                            !ReferenceEquals(service, _builtins.String) &&
                            !parameter.IsParams && !parameter.IsByReference && !parameter.IsOptional;
