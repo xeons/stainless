@@ -40,3 +40,6 @@ stainless-io/
 
 # Release builds: tools/publish.ps1 and tools/publish.sh
 artifacts/
+
+# The terrain sample writes its picture here when run from the repo root.
+/terrain.ppm

@@ -15,6 +15,7 @@ samples/json	0
 samples/shapes	0
 samples/stress	0
 samples/strings	0
+samples/terrain	0
 samples/wc	0
 samples/forms/backend	5
 samples/forms/background	5
