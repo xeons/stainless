@@ -147,7 +147,7 @@ public class LinuxTarget : ITarget
             return Fail("cannot open " + memoryPath
                         + " -- the process is traced but unreadable");
 
-        _imageBase = MappedBaseOf(_pid, path);
+        _imageBase = MappedBaseOf(_pid, ExecutablePathOf(_pid, path));
         return Ok(true);
     }
 
@@ -392,6 +392,23 @@ void TraceMeAndExec(byte* program, byte** argv)
     ptrace(PtraceTraceMe, 0, null, null);
     execv(program, argv);
     _exit(127);
+}
+
+/// The executable's path as the kernel spells it, which is how `maps` names
+/// it: absolute, with every link resolved. `path` itself when that cannot be
+/// read.
+String ExecutablePathOf(int pid, String path)
+{
+    String link = "/proc/" + Standard.Text.FromInteger((long)pid) + "/exe";
+    byte[] into = new byte[4096];
+    long length = readlink(link.ToPointer(), &into[0u], into.Length);
+    if (length <= 0 || (nuint)length >= into.Length)
+        return path;
+
+    var made = new StringBuilder();
+    for (nuint i = 0u; i < (nuint)length; i++)
+        made.AppendByte(into[i]);
+    return made.ToText();
 }
 
 /// Where the loader actually put the executable, from `/proc/<pid>/maps`.

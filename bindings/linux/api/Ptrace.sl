@@ -131,6 +131,10 @@ public extern "C"
     int open(byte* path, int flags, int mode);
     int close(int handle);
 
+    /// The target of a symbolic link, with no terminator. Answers its length,
+    /// or -1.
+    long readlink(byte* path, byte* into, nuint size);
+
     /// Positional reads, which is what makes `/proc/<pid>/mem` usable as
     /// memory rather than as a stream.
     long pread64(int handle, void* into, nuint count, long at);
