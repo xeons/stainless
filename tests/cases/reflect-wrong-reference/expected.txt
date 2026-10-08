@@ -1,0 +1,4 @@
+motor 100
+label plain
+spare 50
+label fast, motor 500

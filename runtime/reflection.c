@@ -260,16 +260,45 @@ void sl_write_bool(void *instance, const void *field, _Bool value)
 }
 
 /*
+ * Whether `value` may be stored where a reference of `kind` and `type` goes.
+ *
+ * Every argument here is untyped, so nothing else stops a String going into a
+ * field of some class, where the next call through it would read the text as
+ * a dispatch table. A String MUST go where a String goes and nowhere else, and
+ * an object into a class slot MUST be that class or derive from it. An
+ * interface or an array slot is checked only against a String: what else would
+ * fit is not described here.
+ */
+static _Bool sl_reference_fits(uint32_t kind, const SlTypeInfo *type, const void *value)
+{
+    if (value == NULL) return 1;
+
+    _Bool text = ((const SlObject *)value)->type == &sl_string_type_info;
+
+    switch (kind) {
+        case SL_KIND_STRING:    return text;
+        case SL_KIND_CLASS:     return type != NULL ? sl_is_instance(value, type) != 0 : !text;
+        case SL_KIND_INTERFACE:
+        case SL_KIND_ARRAY:     return !text;
+        default:                return 0;
+    }
+}
+
+/*
  * Retain before release, for the reason every owning store in the emitter does
  * it: writing a field back to itself must not destroy the value on the way.
- * A null for a field that is never null is refused, leaving the field as it was.
+ * A null for a field that is never null is refused, leaving the field as it was,
+ * and so is a value of the wrong type.
  */
 void sl_write_reference(void *instance, const void *field, void *value)
 {
+    const SlFieldInfo *info = sl_field_info(field);
+
     /* Anything else would be retained, released and stored over bytes that
        are not a reference. */
-    if (!sl_kind_is_counted(sl_field_info(field)->kind)) return;
-    if (value == NULL && (sl_field_info(field)->flags & SL_FIELD_NO_ZERO)) return;
+    if (!sl_kind_is_counted(info->kind)) return;
+    if (value == NULL && (info->flags & SL_FIELD_NO_ZERO)) return;
+    if (!sl_reference_fits(info->kind, info->type, value)) return;
 
     sl_write_at_reference(sl_field_slot(instance, field), value);
 }
@@ -768,7 +797,8 @@ void sl_property_set_struct(void *instance, const void *property, const void *va
 
 /*
  * A setter borrows its argument, as every function does, and retains what it
- * stores. So nothing is retained here, and the caller still owns `value`.
+ * stores. So nothing is retained here, and the caller still owns `value`. A
+ * value of the wrong type is refused, as sl_write_reference refuses one.
  */
 void sl_property_set_reference(void *instance, const void *property, void *value)
 {
@@ -776,18 +806,9 @@ void sl_property_set_reference(void *instance, const void *property, void *value
     const void *setter = info->setter;
     if (setter == NULL) return;
     if (value == NULL && (info->flags & SL_PROPERTY_NO_ZERO)) return;
+    if (!sl_reference_fits(info->kind, info->type, value)) return;
 
-    switch (info->kind) {
-        case SL_KIND_STRING:
-        case SL_KIND_CLASS:
-        case SL_KIND_INTERFACE:
-        case SL_KIND_ARRAY:
-            ((void (*)(void *, void *))setter)(instance, value);
-            break;
-
-        default:
-            break;
-    }
+    ((void (*)(void *, void *))setter)(instance, value);
 }
 
 /* ------------------------------------------------------ finding by name */
