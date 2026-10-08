@@ -34,6 +34,7 @@
 
 #include "stainless.h"
 
+#include <locale.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -356,6 +357,36 @@ void *sl_string_from_size(size_t value)
 }
 
 /*
+ * The C library's decimal point, which is the locale's.
+ *
+ * A number is written and read with a '.' whatever the locale is, so text
+ * means the same on every machine. The locale is not always "C": GTK sets it
+ * from the environment as it starts, and under de_DE snprintf would write 3.14
+ * as "3,14" and strtod would stop reading "3.14" at the '.'. So the point is
+ * exchanged on the way through instead.
+ */
+static const char *sl_locale_point(void)
+{
+    const char *point = localeconv()->decimal_point;
+    return point == NULL || point[0] == '\0' ? "." : point;
+}
+
+/* Rewrites the locale's decimal point in NUL-terminated `text` as '.'. */
+static size_t sl_point_to_dot(char *text, size_t length)
+{
+    const char *point = sl_locale_point();
+    if (strcmp(point, ".") == 0) return length;
+
+    char *at = strstr(text, point);
+    if (at == NULL) return length;
+
+    size_t width = strlen(point);
+    *at = '.';
+    memmove(at + 1, at + width, length - (size_t)(at - text) - width + 1);
+    return length - width + 1;
+}
+
+/*
  * The shortest text that reads back as exactly this double.
  *
  * Plain "%g" is six significant digits, which is not a rounding so much as a
@@ -411,11 +442,14 @@ size_t sl_format_double(char *buffer, size_t size, double value)
         best = (size_t)written;
     }
 
-    if (best == 0 || best >= size)
+    if (best == 0)
     {
-        int written = snprintf(buffer, size, "%.17g", value);
-        return (size_t)(written < 0 ? 0 : written);
+        int written = snprintf(shortest, sizeof shortest, "%.17g", value);
+        best = written < 0 ? 0 : (size_t)written;
     }
+
+    best = sl_point_to_dot(shortest, best);
+    if (best > size) best = size;
 
     memcpy(buffer, shortest, best);
     return best;
@@ -687,16 +721,30 @@ void *sl_string_format_double(double value, int32_t letter, int32_t precision)
  */
 double sl_parse_double(const uint8_t *text, size_t count)
 {
+    /* The text's '.' becomes the locale's point, which is what strtod reads. */
+    const char *point = sl_locale_point();
+    size_t width = strlen(point);
+
+    if (count > (SIZE_MAX - 1) / width) sl_fail("out of memory");
+
     char  local[256];
     char *buffer = local;
 
-    if (count >= sizeof local) {
-        buffer = (char *)malloc(count + 1);
+    if (count * width >= sizeof local) {
+        buffer = (char *)malloc(count * width + 1);
         if (buffer == NULL) sl_fail("out of memory");
     }
 
-    memcpy(buffer, text, count);
-    buffer[count] = '\0';
+    size_t used = 0;
+    for (size_t i = 0; i < count; i++) {
+        if (text[i] == '.') {
+            memcpy(buffer + used, point, width);
+            used += width;
+        } else {
+            buffer[used++] = (char)text[i];
+        }
+    }
+    buffer[used] = '\0';
 
     double value = strtod(buffer, NULL);
     if (buffer != local) free(buffer);

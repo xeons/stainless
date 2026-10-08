@@ -1,0 +1,6 @@
+switched
+3.25
+-0.001
+1e+300
+parsed 3.25
+parsed 6.02e-23
