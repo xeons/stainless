@@ -293,6 +293,17 @@ size_t sl_file_read(void *handle, uint8_t *buffer, size_t count, int32_t *error)
 
     size_t read = fread(buffer, 1, count, stream->file);
 
+    /* A signal arriving is not a failure: Signals installs its handler without
+     * SA_RESTART. Before anything was read the read is made again; after, what
+     * arrived is a short read. */
+    while (read == 0 && count > 0 && ferror(stream->file) && errno == EINTR) {
+        clearerr(stream->file);
+        errno = 0;
+        read = fread(buffer, 1, count, stream->file);
+    }
+
+    if (read > 0 && ferror(stream->file) && errno == EINTR) clearerr(stream->file);
+
     if (read < count && ferror(stream->file)) {
         report(error, errno == 0 ? SL_IO_UNKNOWN : from_errno(errno));
         clearerr(stream->file);

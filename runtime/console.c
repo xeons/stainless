@@ -37,6 +37,7 @@
 
 #include "stainless.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,6 +48,12 @@
 #  include <io.h>
 #else
 #  include <unistd.h>
+#endif
+
+#ifdef _WIN32
+/* Standard output and error, each where it is a console, or NULL. */
+static HANDLE console_output;
+static HANDLE console_error;
 #endif
 
 /*
@@ -72,27 +79,79 @@ void sl_console_start(void)
 
         DWORD type = GetFileType(handle);
         if (type == FILE_TYPE_DISK || type == FILE_TYPE_PIPE) _setmode(fd, _O_BINARY);
+
+        DWORD mode;
+        if (type == FILE_TYPE_CHAR && GetConsoleMode(handle, &mode)) {
+            if (fd == 1) console_output = handle;
+            if (fd == 2) console_error = handle;
+        }
     }
 #endif
+}
+
+#ifdef _WIN32
+/*
+ * Writes UTF-8 to a console as UTF-16.
+ *
+ * A console shows bytes in its code page, which is 437 or 1252 rather than
+ * UTF-8 unless someone changed it, so `é` written as bytes arrives as two
+ * wrong characters. WriteConsoleW takes the text itself and leaves the code
+ * page, which belongs to the console and outlives this process, alone.
+ */
+static void console_write_wide(HANDLE console, FILE *stream, const uint8_t *data, size_t length)
+{
+    enum { Chunk = 16384 };
+    wchar_t wide[Chunk];
+
+    /* What the C runtime holds for this stream goes first. */
+    fflush(stream);
+
+    while (length > 0) {
+        size_t take = length < Chunk ? length : Chunk;
+
+        /* A chunk MUST NOT end inside a character. */
+        if (take < length)
+            while (take > 1 && (data[take] & 0xC0) == 0x80) take--;
+
+        int units = MultiByteToWideChar(CP_UTF8, 0, (const char *)data, (int)take, wide, Chunk);
+        DWORD written;
+        if (units > 0) WriteConsoleW(console, wide, (DWORD)units, &written, NULL);
+
+        data += take;
+        length -= take;
+    }
+}
+#endif
+
+static void console_write_to(FILE *stream, const uint8_t *data, size_t length)
+{
+#ifdef _WIN32
+    HANDLE console = stream == stdout ? console_output : stream == stderr ? console_error : NULL;
+    if (console != NULL) {
+        console_write_wide(console, stream, data, length);
+        return;
+    }
+#endif
+    fwrite(data, 1, length, stream);
 }
 
 void sl_console_write(void *pointer)
 {
     SlString *string = (SlString *)pointer;
-    fwrite(sl_string_data(string), 1, string->byteLength, stdout);
+    console_write_to(stdout, sl_string_data(string), string->byteLength);
 }
 
 void sl_console_write_line(void *pointer)
 {
     sl_console_write(pointer);
-    fputc(0x0A, stdout);
+    console_write_to(stdout, (const uint8_t *)"\n", 1);
 }
 
 void sl_console_write_error(void *pointer)
 {
     SlString *string = (SlString *)pointer;
-    fwrite(sl_string_data(string), 1, string->byteLength, stderr);
-    fputc(0x0A, stderr);
+    console_write_to(stderr, sl_string_data(string), string->byteLength);
+    console_write_to(stderr, (const uint8_t *)"\n", 1);
 }
 
 /*
@@ -145,6 +204,27 @@ _Bool sl_console_enable_colors(void)
 /* ----------------------------------------------------------------- input */
 
 /*
+ * True when a read that stopped short was a signal arriving, not the end of
+ * input, and the stream is ready to be read again.
+ *
+ * Signals.Watch installs its handler without SA_RESTART, so Ctrl-C interrupts
+ * a read in progress. The read is resumed: the program learns of the signal
+ * from Signals, and the input MUST NOT be reported as having ended.
+ */
+static _Bool read_was_interrupted(FILE *stream)
+{
+#ifndef _WIN32
+    if (ferror(stream) && errno == EINTR) {
+        clearerr(stream);
+        return 1;
+    }
+#else
+    (void)stream;
+#endif
+    return 0;
+}
+
+/*
  * One line, without its terminator, or NULL at end of input.
  *
  * NULL rather than an empty String, because a blank line and no line at all
@@ -161,7 +241,10 @@ void *sl_console_read_line(void)
     if (buffer == NULL) sl_fail("out of memory");
 
     for (;;) {
+        errno = 0;
         int c = fgetc(stdin);
+
+        if (c == EOF && read_was_interrupted(stdin)) continue;
 
         if (c == EOF) {
             /* End of input with nothing read is the end; with something read,
@@ -207,9 +290,10 @@ void *sl_console_read_all(void)
             buffer = bigger;
         }
 
+        errno = 0;
         size_t got = fread(buffer + length, 1, capacity - length, stdin);
         length += got;
-        if (got == 0) break;
+        if (got == 0 && !read_was_interrupted(stdin)) break;
     }
 
     void *text = sl_string_from_bytes((const uint8_t *)buffer, length);
@@ -220,7 +304,12 @@ void *sl_console_read_all(void)
 /* Whether stdin has reached its end. */
 _Bool sl_console_at_end(void)
 {
-    int c = fgetc(stdin);
+    int c;
+    do {
+        errno = 0;
+        c = fgetc(stdin);
+    } while (c == EOF && read_was_interrupted(stdin));
+
     if (c == EOF) return 1;
 
     ungetc(c, stdin);
