@@ -945,6 +945,344 @@ public class PanelPeer : ControlPeer, IPanelPeer
     }
 }
 
+// =============================================================== scroll box
+
+/// How far one click on a scroll box's arrow, or a third of a wheel notch,
+/// moves it.
+const int ScrollBoxLine = 16;
+
+/// A scroll box: a frame that owns the border and the scroll bars, and inside
+/// it a window as large as the scrolled area, moved to minus the position.
+///
+/// **The inner window is the peer's own `Window`.** The children are parented
+/// to it and it reports paint and the mouse, so they and the windowless
+/// controls drawn on it are all in the scrolled area's coordinates, and
+/// nothing outside this class knows the frame exists. Scrolling is one
+/// `MoveWindow` of the inner window, which carries every child with it.
+public class ScrollBoxPeer : ControlPeer, IScrollBoxPeer
+{
+    HWND _frame;
+    ScrollFramePeer? _framePeer;
+    FSize _content;
+    FPoint _position;
+
+    public ScrollBoxPeer(IControlNotify owner, IContainerPeer parent)
+    {
+        HWND frame = CreateScrollFrame(GetContainerWindow(parent));
+        _frame = frame;
+        _framePeer = null;
+        _content = CreateEmptySize();
+        _position = CreatePoint(0, 0);
+        base(CreateScrollContent(frame), owner, false);
+        _framePeer = new ScrollFramePeer(frame, owner, this);
+        ShowWindow(Window, SwShowNoActivate);
+    }
+
+    ~ScrollBoxPeer() { DestroyHandle(); }
+
+    static HWND CreateScrollFrame(HWND parent)
+    {
+        EnsurePanelClass();
+        return CreateWindowExW(0u, PanelClassName.ToUtf16().ToPointer(), "".ToUtf16().ToPointer(),
+                               (GetChildStyle() & ~WsTabStop) | WsClipChildren
+                               | WsHorizontalScroll | WsVerticalScroll,
+                               0, 0, 0, 0, parent, null, GetModuleHandleW(null), null);
+    }
+
+    static HWND CreateScrollContent(HWND frame)
+    {
+        EnsurePanelClass();
+        return CreateWindowExW(0u, PanelClassName.ToUtf16().ToPointer(), "".ToUtf16().ToPointer(),
+                               (GetChildStyle() & ~WsTabStop) | WsClipChildren,
+                               0, 0, 0, 0, frame, null, GetModuleHandleW(null), null);
+    }
+
+    public void AddChild(IControlPeer child)
+    {
+        SetParent((HWND)(void*)child.Handle, Window);
+    }
+
+    public void RemoveChild(IControlPeer child)
+    {
+        SetParent((HWND)(void*)child.Handle, null);
+    }
+
+    /// The inner window moves whenever the box scrolls, and is not the box:
+    /// its moves are not reported. The frame's are; see `ReportFrame`.
+    public override long WndProc(uint message, ulong wParam, long lParam)
+    {
+        if (message == WmPaint)
+            return PaintOverInherited(message, wParam, lParam);
+        if (message == WmSize || message == WmMove)
+            return DefWndProc(message, wParam, lParam);
+        return base.WndProc(message, wParam, lParam);
+    }
+
+    protected override FRect BoundsInParent => MeasureWindowInParent(_frame);
+
+    public override FPoint ClientCorner => MeasureWindowClientCorner(_frame);
+
+    /// The frame moved or changed size, which is the box doing so.
+    public void ReportFrame(bool sized)
+    {
+        var owner = Owner;
+        if (owner == null)
+            return;
+        if (sized)
+            ((IControlNotify)owner).OnPlatformResized(BoundsInParent.Extent);
+        else
+            ((IControlNotify)owner).OnPlatformMoved(BoundsInParent.Location);
+    }
+
+    // The frame is what the parent places, shows and stacks.
+
+    public override void SetBounds(FRect bounds)
+    {
+        MoveWindow(_frame, bounds.X, bounds.Y, bounds.Width, bounds.Height, 1);
+        ApplyScrollBars();
+    }
+
+    public override void SetVisible(bool visible)
+    {
+        ShowWindow(_frame, visible ? SwShowNoActivate : SwHide);
+    }
+
+    public override void SetEnabled(bool enabled)
+    {
+        EnableWindow(_frame, enabled ? 1 : 0);
+        EnableWindow(Window, enabled ? 1 : 0);
+    }
+
+    public override void BringToFront()
+    {
+        SetWindowPos(_frame, (HWND)(void*)HwndTop, 0, 0, 0, 0,
+                     SwpNoMove | SwpNoSize | SwpNoActivate);
+    }
+
+    /// The visible area: the frame's client, inside its border and its bars.
+    public override FRect ClientBounds
+    {
+        get
+        {
+            Rect r;
+            GetClientRect(_frame, &r);
+            return CreateRectangle(0, 0, r.Right - r.Left, r.Bottom - r.Top);
+        }
+    }
+
+    public override void DestroyHandle()
+    {
+        base.DestroyHandle();
+        ScrollFramePeer? frame = _framePeer;
+        _framePeer = null;
+        if (frame != null)
+            ((ScrollFramePeer)frame).DestroyHandle();
+    }
+
+    public void SetBorder(ControlBorder border)
+    {
+        long extended = Win32.User32.GetWindowLongPtrW(_frame, GwlExtendedStyle);
+        extended = extended & ~(long)(WsExClientEdge | WsExStaticEdge);
+        if (border == ControlBorder.Single)
+            extended = extended | (long)WsExStaticEdge;
+        else if (border == ControlBorder.Sunken)
+            extended = extended | (long)WsExClientEdge;
+        Win32.User32.SetWindowLongPtrW(_frame, GwlExtendedStyle, extended);
+        SetWindowPos(_frame, null, 0, 0, 0, 0,
+                     SwpNoMove | SwpNoSize | SwpNoZOrder | SwpFrameChanged);
+        ApplyScrollBars();
+    }
+
+    public void SetContentSize(FSize extent)
+    {
+        _content = extent;
+        ApplyScrollBars();
+    }
+
+    public FPoint ScrollPosition => _position;
+
+    public void SetScrollPosition(FPoint at)
+    {
+        _position = at;
+        ApplyScrollBars();
+    }
+
+    /// The bars, the position held inside the area, and the inner window put
+    /// where they say.
+    ///
+    /// **Twice**, because a bar shown along one side takes room from the
+    /// other, and that can be what makes the second bar necessary.
+    public void ApplyScrollBars()
+    {
+        for (int pass = 0; pass < 2; pass++)
+        {
+            var view = ClientBounds;
+            SetFrameBar(ScrollBarHorizontal, _content.Width, view.Width, _position.X);
+            SetFrameBar(ScrollBarVertical, _content.Height, view.Height, _position.Y);
+        }
+
+        var visible = ClientBounds;
+        _position = CreatePoint(ClampScroll(_position.X, _content.Width, visible.Width),
+                                ClampScroll(_position.Y, _content.Height, visible.Height));
+        SetFrameBar(ScrollBarHorizontal, _content.Width, visible.Width, _position.X);
+        SetFrameBar(ScrollBarVertical, _content.Height, visible.Height, _position.Y);
+
+        int width = _content.Width > visible.Width ? _content.Width : visible.Width;
+        int height = _content.Height > visible.Height ? _content.Height : visible.Height;
+        MoveWindow(Window, -_position.X, -_position.Y, width, height, 1);
+    }
+
+    static int ClampScroll(int position, int content, int view)
+    {
+        int highest = content - view;
+        if (position > highest)
+            position = highest;
+        if (position < 0)
+            position = 0;
+        return position;
+    }
+
+    void SetFrameBar(int bar, int content, int page, int position)
+    {
+        ScrollInfo info;
+        info.Size = (uint)sizeof(ScrollInfo);
+        info.Mask = SifRange | SifPage | SifPosition;
+        info.Minimum = 0;
+        info.Maximum = content > 0 ? content - 1 : 0;
+        info.Page = page > 0 ? (uint)page : 0u;
+        info.Position = position;
+        info.TrackPosition = 0;
+        SetScrollInfo(_frame, bar, &info, 1);
+    }
+
+    /// A bar of the frame was used.
+    public void OnFrameScroll(int bar, uint action)
+    {
+        ScrollInfo info;
+        info.Size = (uint)sizeof(ScrollInfo);
+        info.Mask = SifAll;
+        info.Minimum = 0;
+        info.Maximum = 0;
+        info.Page = 0u;
+        info.Position = 0;
+        info.TrackPosition = 0;
+        GetScrollInfo(_frame, bar, &info);
+
+        int page = info.Page > 0u ? (int)info.Page : 1;
+        int now = info.Position;
+        switch (action)
+        {
+            case SbLineUp:
+                now -= ScrollBoxLine;
+                break;
+            case SbLineDown:
+                now += ScrollBoxLine;
+                break;
+            case SbPageUp:
+                now -= page;
+                break;
+            case SbPageDown:
+                now += page;
+                break;
+            case SbThumbTrack:
+            case SbThumbPosition:
+                now = info.TrackPosition;
+                break;
+            case SbTop:
+                now = 0;
+                break;
+            case SbBottom:
+                now = info.Maximum;
+                break;
+            default:
+                return;
+        }
+        if (bar == ScrollBarHorizontal)
+            ScrollByUser(CreatePoint(now, _position.Y));
+        else
+            ScrollByUser(CreatePoint(_position.X, now));
+    }
+
+    /// The wheel, which scrolls down the area, or across it when there is
+    /// nothing to scroll down. A notch is 120 and three lines.
+    public void OnFrameWheel(int notches)
+    {
+        int moved = -(notches * 3 * ScrollBoxLine) / 120;
+        var view = ClientBounds;
+        if (_content.Height > view.Height)
+            ScrollByUser(CreatePoint(_position.X, _position.Y + moved));
+        else
+            ScrollByUser(CreatePoint(_position.X + moved, _position.Y));
+    }
+
+    void ScrollByUser(FPoint wanted)
+    {
+        var was = _position;
+        _position = wanted;
+        ApplyScrollBars();
+        if (_position.Equals(was))
+            return;
+        var owner = Owner;
+        if (owner != null)
+            ((IControlNotify)owner).OnPlatformValueChanged();
+    }
+}
+
+/// A scroll box's frame, which hears what only it is sent: its scroll bars,
+/// the wheel the inner window passed up, and its own resizing. Nothing is
+/// reported to the control from here; the box does that.
+public class ScrollFramePeer : ControlPeer
+{
+    weak ScrollBoxPeer? _box;
+
+    public ScrollFramePeer(HWND frame, IControlNotify owner, ScrollBoxPeer box)
+    {
+        _box = box;
+        base(frame, owner, false);
+    }
+
+    public override long WndProc(uint message, ulong wParam, long lParam)
+    {
+        ScrollBoxPeer? held = _box;
+        if (held != null)
+        {
+            var box = (ScrollBoxPeer)held;
+            switch (message)
+            {
+                // A bar of the window's own sends no handle; a child's does,
+                // and has none here.
+                case WmHorizontalScroll:
+                    if (lParam == 0)
+                    {
+                        box.OnFrameScroll(ScrollBarHorizontal, (uint)(wParam & 0xFFFFu));
+                        return 0;
+                    }
+                    break;
+                case WmVerticalScroll:
+                    if (lParam == 0)
+                    {
+                        box.OnFrameScroll(ScrollBarVertical, (uint)(wParam & 0xFFFFu));
+                        return 0;
+                    }
+                    break;
+                case WmMouseWheel:
+                    box.OnFrameWheel((int)(short)((wParam >> 16) & 0xFFFFu));
+                    return 0;
+                case WmSize:
+                    box.ApplyScrollBars();
+                    box.ReportFrame(true);
+                    break;
+                case WmMove:
+                    box.ReportFrame(false);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return DefWindowProcW(Window, message, wParam, lParam);
+    }
+}
+
 // =============================================================== scroll bar
 
 /// A `SCROLLBAR` standing on its own, rather than attached to a window.

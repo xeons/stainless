@@ -252,6 +252,13 @@ public class GtkWidgetSet : IWidgetSet
         return peer;
     }
 
+    public IScrollBoxPeer CreateScrollBox(IControlNotify owner, IContainerPeer parent)
+    {
+        var peer = new GtkScrollBoxPeer(owner);
+        ConnectPeer(peer, parent);
+        return peer;
+    }
+
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
                                           bool vertical)
     {

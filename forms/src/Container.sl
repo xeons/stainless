@@ -405,6 +405,19 @@ public abstract class WindowedControl : Control
         }
     }
 
+    /// How far inside its rectangle the client area starts, which a border
+    /// drawn outside it decides. See `IControlPeer.ClientCorner`.
+    public Point ClientCorner
+    {
+        get
+        {
+            var mine = _peer;
+            if (mine == null)
+                return Point.Empty;
+            return ((IControlPeer)mine).ClientCorner;
+        }
+    }
+
     protected override void ApplyBounds()
     {
         var mine = _peer;
@@ -912,7 +925,26 @@ public abstract class WindowedControl : Control
         }
 
         _isLayingOut = false;
+        OnChildLayoutChanged();
     }
+
+    /// How far the children have been scrolled from where they sit: zero but
+    /// in a `ScrollBox`. Their positions do not change as they scroll, so
+    /// anything working out where one is on the screen subtracts this.
+    public virtual Point ScrollOffset => Point.Empty;
+
+    /// A child moved or changed size outside a layout: the program set its
+    /// bounds. What a layout does is reported once, at its end.
+    internal void NoteChildBoundsChanged()
+    {
+        if (!_isLayingOut)
+            OnChildLayoutChanged();
+    }
+
+    /// Where the children are has changed: after every layout, and after a
+    /// child is moved on its own. What a container that measures its children
+    /// overrides -- a scroll box's range is how far they reach.
+    protected virtual void OnChildLayoutChanged() { }
 
     /// A size, held between zero and what is left.
     ///

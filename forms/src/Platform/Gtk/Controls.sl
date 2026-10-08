@@ -1309,6 +1309,142 @@ public class GtkPanelPeer : GtkContainerPeer, IPanelPeer
     }
 }
 
+// ============================================================= scroll box
+
+/// A scroll box: a `GtkScrolledWindow` around a viewport around a `GtkFixed`
+/// with a window of its own, the fixed as large as the scrolled area.
+///
+/// **A `GtkFixed`, not a `GtkLayout`.** A layout in a scrolled window drew
+/// only the top of what showed, and the LCL's GTK 3 widgetset says the same
+/// of it and builds this instead. The fixed's window moves as the bars do, so
+/// the mouse and the paint arrive in the scrolled area's coordinates with
+/// nothing to add.
+public class GtkScrollBoxPeer : GtkContainerPeer, IScrollBoxPeer
+{
+    /// A position asked for before the area had a size, which GTK would
+    /// clamp to nothing; applied once it has one.
+    FPoint _pending;
+    bool _hasPending;
+    /// The visible area as GTK last allocated it.
+    int _allocatedWidth;
+    int _allocatedHeight;
+
+    public GtkScrollBoxPeer(IControlNotify owner)
+    {
+        _pending = CreatePoint(0, 0);
+        _hasPending = false;
+        _allocatedWidth = 0;
+        _allocatedHeight = 0;
+        base(gtk_scrolled_window_new(null, null), owner, gtk_fixed_new());
+        gtk_widget_set_has_window(Content, 1);
+        gtk_scrolled_window_set_policy(Widget, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+        // A child that does not scroll by itself is put in a viewport.
+        gtk_container_add(Widget, Content);
+        gtk_viewport_set_shadow_type(Viewport, GTK_SHADOW_NONE);
+        gtk_widget_show(Content);
+        ConnectPaintReports();
+
+        ConnectPeerSignal((GtkWidget*)gtk_scrolled_window_get_hadjustment(Widget), "value-changed",
+                          (peer) => { ((GtkScrollBoxPeer)peer).OnScrolled(); });
+        ConnectPeerSignal((GtkWidget*)gtk_scrolled_window_get_vadjustment(Widget), "value-changed",
+                          (peer) => { ((GtkScrollBoxPeer)peer).OnScrolled(); });
+        ConnectPeerEvent(Viewport, "size-allocate", (peer, carried) =>
+        {
+            ((GtkScrollBoxPeer)peer).OnViewportAllocated();
+            return false;
+        });
+    }
+
+    /// The viewport the scrolled window wrapped the fixed in, which is as
+    /// large as what shows.
+    GtkWidget* Viewport => gtk_bin_get_child(Widget);
+
+    /// The mouse is the fixed's, in the scrolled area's coordinates.
+    protected override GtkWidget* Surface => Content;
+
+    /// **The viewport, never the scrolled window.** A scrolled window given a
+    /// background colour paints it over the lower part of its own child: the
+    /// children there were laid out, mapped, and never seen.
+    protected override GtkWidget* StyleTarget => Viewport;
+
+    /// The visible area, which is what the viewport was given.
+    public override FRect ClientBounds
+    {
+        get
+        {
+            int width = gtk_widget_get_allocated_width(Viewport);
+            int height = gtk_widget_get_allocated_height(Viewport);
+            if (width > 1 && height > 1)
+                return CreateRectangle(0, 0, width, height);
+            return base.ClientBounds;
+        }
+    }
+
+    /// **GTK sizes the visible area after the control has laid its children
+    /// out**, against the size it asked for. So a change is reported as the
+    /// box being resized, which lays them out again against the real one.
+    void OnViewportAllocated()
+    {
+        int width = gtk_widget_get_allocated_width(Viewport);
+        int height = gtk_widget_get_allocated_height(Viewport);
+        if (_hasPending && width > 1 && height > 1)
+        {
+            _hasPending = false;
+            SetScrollPosition(_pending);
+        }
+        if (width == _allocatedWidth && height == _allocatedHeight)
+            return;
+        _allocatedWidth = width;
+        _allocatedHeight = height;
+        var owner = Owner;
+        if (owner != null && LastBounds.Width > 0)
+            ((IControlNotify)owner).OnPlatformResized(LastBounds.Extent);
+    }
+
+    void OnScrolled()
+    {
+        if (IsEchoing)
+            return;
+        var owner = Owner;
+        if (owner != null)
+            ((IControlNotify)owner).OnPlatformValueChanged();
+    }
+
+    public void SetBorder(ControlBorder border)
+    {
+        gtk_scrolled_window_set_shadow_type(Widget,
+            border == ControlBorder.None ? GTK_SHADOW_NONE : GTK_SHADOW_IN);
+    }
+
+    /// The fixed asks for the area's size, and the viewport scrolls over it.
+    public void SetContentSize(FSize extent)
+    {
+        gtk_widget_set_size_request(Content, extent.Width > 0 ? extent.Width : 1,
+                                    extent.Height > 0 ? extent.Height : 1);
+    }
+
+    public FPoint ScrollPosition => _hasPending ? _pending :
+        CreatePoint((int)gtk_adjustment_get_value(gtk_scrolled_window_get_hadjustment(Widget)),
+                    (int)gtk_adjustment_get_value(gtk_scrolled_window_get_vadjustment(Widget)));
+
+    /// GTK holds the value inside the area itself, which it can only do once
+    /// the area has a size.
+    public void SetScrollPosition(FPoint at)
+    {
+        if (gtk_widget_get_allocated_width(Viewport) <= 1)
+        {
+            _pending = at;
+            _hasPending = true;
+            return;
+        }
+        RunQuietly(() =>
+        {
+            gtk_adjustment_set_value(gtk_scrolled_window_get_hadjustment(this.Widget), (gdouble)at.X);
+            gtk_adjustment_set_value(gtk_scrolled_window_get_vadjustment(this.Widget), (gdouble)at.Y);
+        });
+    }
+}
+
 // =================================================================== spin
 
 public class GtkSpinPeer : GtkPeer, ISpinPeer

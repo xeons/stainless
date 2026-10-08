@@ -271,6 +271,8 @@ public class AppKitWidgetSet : IWidgetSet
     public IListPeer CreateList(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitListPeer(owner, false));
     public IComboPeer CreateCombo(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitComboPeer(owner));
     public IGroupPeer CreateGroup(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitGroupPeer(owner));
+    public IScrollBoxPeer CreateScrollBox(IControlNotify owner, IContainerPeer parent) =>
+        Adopt(parent, new AppKitScrollBoxPeer(owner));
     public IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent, bool vertical) =>
         Adopt(parent, new AppKitScrollBarPeer(owner, vertical));
     public ISpinPeer CreateSpin(IControlNotify owner, IContainerPeer parent) => Adopt(parent, new AppKitSpinPeer(owner));

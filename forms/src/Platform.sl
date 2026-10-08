@@ -420,6 +420,12 @@ public interface IControlPeer
     /// reports where one ended up.
     Point ClientOrigin { get; }
 
+    /// How far inside the widget's own rectangle its client area starts: the
+    /// width of a border the platform draws outside the client area. Not
+    /// where children are placed, which `ClientOrigin` says; what working out
+    /// where a child is on the screen also needs.
+    Point ClientCorner { get; }
+
     /// What the platform thinks this control ought to be, given its text and
     /// font. What `ResizeToPreferredSize` uses, and the reason a button sized
     /// to its caption looks native rather than merely close.
@@ -616,6 +622,28 @@ public interface IHeaderPeer : IControlPeer
 public interface IPanelPeer : IContainerPeer
 {
     void SetBorder(ControlBorder border);
+}
+
+/// A container larger inside than out, with the platform's own scroll bars.
+///
+/// **Children are placed in the scrolled area's coordinates**, and the peer
+/// moves that area behind the visible one; a child's position never changes
+/// as it scrolls. `ClientBounds` is the visible area, at the origin.
+///
+/// The user scrolling is reported through `OnPlatformValueChanged`. The
+/// program scrolling MUST NOT be.
+public interface IScrollBoxPeer : IContainerPeer
+{
+    void SetBorder(ControlBorder border);
+
+    /// How large the scrolled area is. A bar shows along each side it is
+    /// larger than the visible area on, and the position is held so that the
+    /// visible area stays inside it.
+    void SetContentSize(Size extent);
+
+    /// Which point of the scrolled area is at the visible area's top-left.
+    Point ScrollPosition { get; }
+    void SetScrollPosition(Point at);
 }
 
 /// A control the program draws every pixel of, and that takes the keyboard.
@@ -1232,6 +1260,7 @@ public interface IWidgetSet
     IComboPeer     CreateCombo(IControlNotify owner, IContainerPeer parent);
     IGroupPeer     CreateGroup(IControlNotify owner, IContainerPeer parent);
     IPanelPeer     CreatePanel(IControlNotify owner, IContainerPeer parent);
+    IScrollBoxPeer CreateScrollBox(IControlNotify owner, IContainerPeer parent);
     ICustomPeer    CreateCustom(IControlNotify owner, IContainerPeer parent);
     IScrollBarPeer CreateScrollBar(IControlNotify owner, IContainerPeer parent,
                                    bool vertical);

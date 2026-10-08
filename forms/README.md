@@ -412,6 +412,22 @@ which runs before the focused widget's; and from a local event monitor on a
 Mac. An item answers only while it and every heading above it are enabled.
 `Control` is Command on a Mac, because the backend reports both as one.
 
+**A scroll box moves an area behind its children rather than moving them.**
+A child's position is in the scrolled area's coordinates and never changes
+as it scrolls; `ScrollOffset` is what a sum of positions on the way to the
+screen subtracts. On Windows the box is two windows: a frame that owns the
+border and the bars, and inside it the peer's own window, as large as the
+area and moved to minus the position, so the children and everything drawn
+on it are in the area's coordinates and the frame is known to nothing above
+the peer. On GTK it is a scrolled window around a viewport around a
+`GtkFixed` with a window of its own, which is the LCL's choice -- its source
+says a `GtkLayout` there "is crap under gtk3", and here one drew only the top
+of what showed. **A scrolled window given a background colour paints over
+the lower part of its own child**, so the colours go to the viewport. On a
+Mac it is an `NSScrollView` with a flipped document view; legacy scroll bars
+appear only once the window is shown and take room, so `tile` reports a
+change in what shows as the box being resized.
+
 **A command is the LCL's action, under another name.** `Action` is the
 standard library's closure type, imported into every file, so `Forms.Action`
 would be ambiguous wherever both were in scope. A `CommandList` is made with
@@ -630,6 +646,7 @@ grouped by how much work it is rather than by where it lives.
 | `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView`, `CoolBar` | `comctrls.pp` |
 | `ImageList` | `imglist.pp` |
 | `PaintBox`, `Shape`, `Bevel`, `Splitter`, `Notebook` | `extctrls.pp` |
+| `ScrollBox` | `forms.pp` |
 | `CustomControl` | `customcontrol` in `controls.pp` |
 | `Clipboard`, `ClipboardData`, `ClipboardWatcher`: text, HTML, pictures, files and a program's own formats | `clipbrd.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
@@ -652,9 +669,7 @@ is already bound.
 - **`TTabControl`** — the LCL distinguishes a tabbed control that owns pages
   from one that only shows tabs. Only the first is here; `Notebook` is the
   other half of that family, the one with pages and no tabs at all.
-- **`ScrollBox`** (`forms.pp`) — a container with the platform's own scroll
-  bars, which is a different thing from the standalone `ScrollBar` that is
-  here. Both backends register one already.
+
 - **`UpDown`, `ColorButton`, `PairSplitter`** — each is one widget the GTK 3
   widgetset registers and the Win32 side has bound, and each is an afternoon.
 - **`FloatSpinEdit`** — `SpinEdit` is integers only, and `GtkSpinButton` and

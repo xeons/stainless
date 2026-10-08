@@ -287,6 +287,40 @@ nint StainlessProc(HWND window, uint message, nuint wParam, nint lParam)
     return ((ControlPeer)peer).WndProc(message, wParam, lParam);
 }
 
+/// A window's rectangle, measured from its parent's client corner.
+FRect MeasureWindowInParent(HWND window)
+{
+    Rect frame;
+    GetWindowRect(window, &frame);
+    int width = frame.Right - frame.Left;
+    int height = frame.Bottom - frame.Top;
+
+    // Not `GetParent` alone, which answers a popup's owner: an owned
+    // dialog is still measured from the screen.
+    HWND parent = GetParent(window);
+    long style = GetWindowLongPtrW(window, GwlStyle);
+    if (parent == null || ((ulong)style & (ulong)WsChild) == 0u)
+        return CreateRectangle(frame.Left, frame.Top, width, height);
+
+    Win32.User32.Point corner;
+    corner.X = frame.Left;
+    corner.Y = frame.Top;
+    ScreenToClient(parent, &corner);
+    return CreateRectangle(corner.X, corner.Y, width, height);
+}
+
+/// Where a window's client area starts inside its window rectangle.
+FPoint MeasureWindowClientCorner(HWND window)
+{
+    Rect frame;
+    GetWindowRect(window, &frame);
+    Win32.User32.Point corner;
+    corner.X = 0;
+    corner.Y = 0;
+    ClientToScreen(window, &corner);
+    return CreatePoint(corner.X - frame.Left, corner.Y - frame.Top);
+}
+
 // ================================================================ the base
 
 /// What every Windows peer has: a window, the control it reports to, and the
@@ -851,29 +885,9 @@ public class ControlPeer : IControlPeer
     /// Where this control is, in the coordinates its `Bounds` are expressed in:
     /// the parent's client area for a child, and the screen for a top-level
     /// window -- which is what `Form.Location` means, as it does in C#.
-    protected FRect BoundsInParent
-    {
-        get
-        {
-            Rect frame;
-            GetWindowRect(Window, &frame);
-            int width = frame.Right - frame.Left;
-            int height = frame.Bottom - frame.Top;
-
-            // Not `GetParent` alone, which answers a popup's owner: an owned
-            // dialog is still measured from the screen.
-            HWND parent = GetParent(Window);
-            long style = GetWindowLongPtrW(Window, GwlStyle);
-            if (parent == null || ((ulong)style & (ulong)WsChild) == 0u)
-                return CreateRectangle(frame.Left, frame.Top, width, height);
-
-            Win32.User32.Point corner;
-            corner.X = frame.Left;
-            corner.Y = frame.Top;
-            ScreenToClient(parent, &corner);
-            return CreateRectangle(corner.X, corner.Y, width, height);
-        }
-    }
+    /// Virtual for a peer of more than one window, whose control is the
+    /// outermost.
+    protected virtual FRect BoundsInParent => MeasureWindowInParent(Window);
 
     /// The brush this control's background is painted with.
     ///
@@ -1158,7 +1172,9 @@ public class ControlPeer : IControlPeer
         return CreatePoint(where.X, where.Y);
     }
 
-    public void BringToFront()
+    /// Virtual because a peer may be more than one window, and the one its
+    /// parent stacks is then not `Window`.
+    public virtual void BringToFront()
     {
         // Position and size are the caller's business and are usually being
         // set in the same breath, so this changes the Z-order and nothing
@@ -1209,6 +1225,11 @@ public class ControlPeer : IControlPeer
     /// space overrides this.
     public virtual FPoint ClientOrigin => CreatePoint(0, 0);
 
+    /// The window's client corner against its window corner: what
+    /// `WS_EX_CLIENTEDGE` and its kin cost. Virtual for a peer whose control
+    /// is not `Window`.
+    public virtual FPoint ClientCorner => MeasureWindowClientCorner(Window);
+
     /// What Windows thinks this control should be. The base has no opinion --
     /// only a control that can measure its own content does, and each of those
     /// overrides this.
@@ -1218,7 +1239,10 @@ public class ControlPeer : IControlPeer
 
     /// Releases the window and what this peer made for it. The brush goes
     /// even when the window has already gone with its parent.
-    public void DestroyHandle()
+    ///
+    /// Virtual for a peer of more than one window, which releases the others
+    /// after calling this.
+    public virtual void DestroyHandle()
     {
         if (BackBrush != null)
         {

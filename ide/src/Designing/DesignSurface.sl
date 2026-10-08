@@ -1643,6 +1643,7 @@ public class DesignSurface : Panel
             case "ListView": return Size.FromDimensions(160, 120);
             case "Panel":
             case "GroupBox": return Size.FromDimensions(160, 96);
+            case "ScrollBox": return Size.FromDimensions(160, 120);
             case "TabControl": return Size.FromDimensions(200, 128);
             case "Image":
             case "Shape": return Size.FromDimensions(64, 64);

@@ -228,7 +228,18 @@ public class Form : WindowedControl, IWindowNotify
             walk = here.Parent;
             // A parent's children start at its client origin, which is not its
             // corner under a group box.
-            if (walk != null)
+            // A parent's children start at its client origin, inside any
+            // border it has, and less however far it has scrolled them.
+            if (walk != null && !(walk is Form))
+            {
+                var parent = (WindowedControl)walk;
+                var origin = parent.ClientOrigin;
+                var corner = parent.ClientCorner;
+                var scrolled = parent.ScrollOffset;
+                x = x + origin.X + corner.X - scrolled.X;
+                y = y + origin.Y + corner.Y - scrolled.Y;
+            }
+            else if (walk != null)
             {
                 var origin = ((WindowedControl)walk).ClientOrigin;
                 x = x + origin.X;

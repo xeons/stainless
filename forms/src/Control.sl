@@ -403,6 +403,9 @@ public abstract class Control : IControlNotify
         }
         if (moved)
             OnMove();
+        WindowedControl? parent = _parent;
+        if (parent != null && (sized || moved))
+            ((WindowedControl)parent).NoteChildBoundsChanged();
     }
 
     /// Tells the platform. It reports the change back from inside this call,

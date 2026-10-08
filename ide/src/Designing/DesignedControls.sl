@@ -34,13 +34,13 @@ import Ide.Designer;
 public String[] ListDesignableTypes() =>
     ["Button", "Label", "TextBox", "CheckBox", "RadioButton", "ToggleButton",
      "ListBox", "ComboBox", "CheckListBox", "SpinEdit", "ProgressBar", "TrackBar",
-     "TreeView", "ListView", "Panel", "GroupBox", "TabControl", "TabPage", "Image", "PaintBox",
+     "TreeView", "ListView", "Panel", "GroupBox", "ScrollBox", "TabControl", "TabPage", "Image", "PaintBox",
      "Shape", "Bevel", "ToolBar", "MainMenu", "Timer", "CommandList"];
 
 /// Whether controls may be put inside one of these. A `TabControl` holds
 /// pages and nothing else, so it is not one.
 public bool IsDesignableContainer(String typeName) =>
-    typeName == "Panel" || typeName == "GroupBox" || typeName == "TabPage";
+    typeName == "Panel" || typeName == "GroupBox" || typeName == "TabPage" || typeName == "ScrollBox";
 
 /// Whether a type has no window, and so is shown in the tray under the form
 /// and made by the expression its declaration gives, `new Timer()`.
@@ -135,6 +135,7 @@ public Control? CreateDesignedControl(String typeName, WindowedControl parent)
         case "ListView": return new ListView(parent);
         case "Panel": return new Panel(parent);
         case "GroupBox": return new GroupBox(parent);
+        case "ScrollBox": return new ScrollBox(parent);
         case "TabControl": return new TabControl(parent);
         case "TabPage": return parent is TabControl tabs ? new TabPage(tabs) : null;
         case "Image": return new Image(parent);

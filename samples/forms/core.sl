@@ -430,6 +430,7 @@ public class CoreForm : Form
         ok = ModalChecks(ok);
         ok = KeyboardChecks(ok);
         ok = CommandChecks(ok);
+        ok = ScrollBoxChecks(ok);
 
         var squeezed = Rectangle.FromBounds(0, 0, 10, 10).DeflateBy(6);
         ok = Check(ok, "deflating past nothing gives an empty rectangle",
@@ -638,6 +639,77 @@ public class CoreForm : Form
         ok = Check(ok, "a command does not keep a removed button alive", watch.IsGone);
         save.Text = "Save &All";
         ok = Check(ok, "and goes on telling the clients it still has", button.Text == "Save &All");
+
+        host.Close();
+        Settle();
+        return ok;
+    }
+
+    /// A box larger inside than out: what it measures, where it scrolls, and
+    /// where the platform puts what is in it.
+    bool ScrollBoxChecks(bool ok)
+    {
+        var log = new CommandLog();
+        var host = new Form(WindowBorder.Sizable);
+        host.Text = "Scroll box";
+        host.SetBounds(0, 0, 320, 260);
+        var box = new ScrollBox(host);
+        box.SetBounds(10, 10, 200, 150);
+        box.Scroll += (sender) => { log.Runs++; };
+        var top = new Button(box);
+        top.SetBounds(8, 8, 80, 24);
+        var far = new Button(box);
+        far.SetBounds(300, 600, 80, 24);
+        var docked = new Panel(box);
+        docked.Height = 20;
+        docked.Dock = DockStyle.Top;
+        host.Show();
+        Settle();
+
+        ok = Check(ok, "a scroll box is as large as its children reach",
+                   box.ContentSize.Width == 380 && box.ContentSize.Height == 624);
+        var view = box.ClientBounds.Extent;
+        ok = Check(ok, "and its bars take room from what shows",
+                   view.Width < 200 && view.Height < 150 && view.Width > 0);
+
+        box.ScrollPosition = Drawing.Point.FromXY(0, 5000);
+        // At least the end: GTK keeps a child at its own minimum height, so
+        // the area can reach a little past what was asked for.
+        int scrolledTo = box.ScrollPosition.Y;
+        ok = Check(ok, "a position past the end shows the end",
+                   scrolledTo >= 624 - view.Height && scrolledTo < 624 && box.ScrollPosition.X == 0);
+        ok = Check(ok, "and scrolling from the program raises nothing", log.Runs == 0);
+
+        box.ScrollPosition = Drawing.Point.Empty;
+        box.ScrollIntoView(far);
+        var at = box.ScrollPosition;
+        ok = Check(ok, "ScrollIntoView shows the child whole",
+                   at.X <= far.Left && at.Y <= far.Top
+                   && far.Bounds.Right <= at.X + view.Width && far.Bounds.Bottom <= at.Y + view.Height);
+        ok = Check(ok, "and no child moved", far.Left == 300 && far.Top == 600 && top.Top == 8);
+
+        top.Top = 900;
+        Settle();
+        ok = Check(ok, "moving a child measures the area again", box.ContentSize.Height == 924);
+        ok = Check(ok, "a docked child is laid out against what shows",
+                   docked.Width == view.Width && docked.Top == 0);
+
+#if WINDOWS
+        // Where Windows put the far button, against where the form says.
+        HWND button = (HWND)(void*)far.Handle;
+        Win32.User32.Rect actual;
+        GetWindowRect(button, &actual);
+        var computed = host.PointToScreen(far, Drawing.Point.Empty);
+        ok = Check(ok, "the platform puts a scrolled child where the form says",
+                   actual.Left == computed.X && actual.Top == computed.Y);
+
+        // The bar of the frame the content window sits in, pressed once.
+        HWND frame = GetParent((HWND)(void*)box.Handle);
+        box.ScrollPosition = Drawing.Point.Empty;
+        SendMessageW(frame, WmVerticalScroll, (ulong)SbLineDown, 0);
+        ok = Check(ok, "the user scrolling is reported",
+                   log.Runs == 1 && box.ScrollPosition.Y > 0);
+#endif
 
         host.Close();
         Settle();

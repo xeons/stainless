@@ -73,6 +73,168 @@ public class Panel : WindowedControl
     }
 }
 
+// ================================================================ scroll box
+
+public closure void ScrollEventHandler(ScrollBox sender);
+
+/// A container larger inside than out: its children sit on an area that
+/// scrolls behind the visible one, and the platform's scroll bars appear when
+/// they reach past it. The LCL's `TScrollBox`.
+///
+/// ```
+/// var box = new ScrollBox(form);
+/// box.Dock = DockStyle.Fill;
+/// for (int i = 0; i < 40; i++)
+///     new CheckBox(box).SetBounds(8, 8 + i * 24, 200, 22);
+/// ```
+///
+/// **Children are placed in the scrolled area's coordinates.** A child at
+/// (8, 900) is 900 pixels down the area whatever has been scrolled, and moving
+/// the scroll bars moves no child: the platform moves the area behind them.
+///
+/// **The area is as large as the children reach** while `AutoScroll` is set,
+/// which it is: it is measured again whenever one moves, grows or goes. A
+/// docked child is laid out against the visible area at the area's origin,
+/// as on a panel, and is not counted, since it would only ever reach exactly
+/// as far as the area does. Setting `ContentSize` turns the measuring off.
+#if FORMS_REFLECT
+[Reflect]
+#endif
+public class ScrollBox : WindowedControl
+{
+    late IScrollBoxPeer _native;
+    ControlBorder _border;
+    bool _autoScroll;
+    Size _contentSize;
+    /// Set while the area is being resized, which lays the children out
+    /// again and would otherwise measure them again from inside.
+    bool _measuring;
+
+    public ScrollBox(WindowedControl parent)
+    {
+        base(parent);
+        _border = ControlBorder.Sunken;
+        _autoScroll = true;
+        _contentSize = Size.Empty;
+        _measuring = false;
+        _native = WidgetSet.Current.CreateScrollBox(this, ParentPeer);
+        AttachContainerPeer(_native);
+        _native.SetBorder(_border);
+    }
+
+    /// The frame drawn around it. Sunken, as the LCL's is.
+    public ControlBorder Border
+    {
+        get => _border;
+        set
+        {
+            _border = value;
+            _native.SetBorder(value);
+            PerformLayout();
+        }
+    }
+
+    /// Whether the scrolled area is as large as the children reach. Setting
+    /// `ContentSize` clears it.
+    public bool AutoScroll
+    {
+        get => _autoScroll;
+        set
+        {
+            _autoScroll = value;
+            if (value)
+                MeasureContent();
+        }
+    }
+
+    /// How large the scrolled area is.
+    public Size ContentSize
+    {
+        get => _contentSize;
+        set
+        {
+            _autoScroll = false;
+            ApplyContentSize(value);
+        }
+    }
+
+    /// Which point of the scrolled area shows at the top-left. Held inside
+    /// the area, so a position past its end shows the end.
+    public Point ScrollPosition
+    {
+        get => _native.ScrollPosition;
+        set => _native.SetScrollPosition(value);
+    }
+
+    /// Scrolls as little as shows all of `child`, or as much of it as fits,
+    /// its top-left first.
+    public void ScrollIntoView(Control child)
+    {
+        var at = ScrollPosition;
+        var view = ClientBounds.Extent;
+        var wanted = child.Bounds;
+        int x = at.X;
+        if (wanted.Right > x + view.Width)
+            x = wanted.Right - view.Width;
+        if (wanted.X < x)
+            x = wanted.X;
+        int y = at.Y;
+        if (wanted.Bottom > y + view.Height)
+            y = wanted.Bottom - view.Height;
+        if (wanted.Y < y)
+            y = wanted.Y;
+        ScrollPosition = Point.FromXY(x, y);
+    }
+
+    public override Point ScrollOffset => ScrollPosition;
+
+    /// The user scrolled. Moving `ScrollPosition` raises nothing.
+    public event ScrollEventHandler Scroll;
+
+    protected virtual void OnScroll() => Scroll(this);
+
+    public override void OnPlatformValueChanged() => OnScroll();
+
+    protected override void OnChildLayoutChanged()
+    {
+        if (_autoScroll)
+            MeasureContent();
+    }
+
+    /// The scrolled area as far as the undocked, visible children reach.
+    void MeasureContent()
+    {
+        int width = 0;
+        int height = 0;
+        foreach (var child in Controls)
+        {
+            if (!child.Visible || child.Dock != DockStyle.None)
+                continue;
+            var at = child.Bounds;
+            if (at.Right > width)
+                width = at.Right;
+            if (at.Bottom > height)
+                height = at.Bottom;
+        }
+        ApplyContentSize(Size.FromDimensions(width, height));
+    }
+
+    /// Tells the platform, and lays the children out again when its bars
+    /// took room from the visible area or gave it back.
+    void ApplyContentSize(Size extent)
+    {
+        if (_measuring || extent.Equals(_contentSize))
+            return;
+        _contentSize = extent;
+        _measuring = true;
+        var before = ClientBounds.Extent;
+        _native.SetContentSize(extent);
+        if (!ClientBounds.Extent.Equals(before))
+            PerformLayout();
+        _measuring = false;
+    }
+}
+
 // ================================================================= group box
 
 /// A frame with a caption, that other controls sit inside.
@@ -106,10 +268,10 @@ public class GroupBox : WindowedControl
 
 /// A scroll bar standing on its own.
 ///
-/// **Not what a scrolling container uses.** A `ScrollBox` -- which does not
-/// exist yet -- would use the scroll bars the platform attaches to a window,
-/// which are a different thing with a different API. This is the control you
-/// place on a form when the thing being scrolled is yours.
+/// **Not what a scrolling container uses.** A `ScrollBox` uses the scroll bars
+/// the platform attaches to a window, which are a different thing with a
+/// different API. This is the control you place on a form when the thing
+/// being scrolled is yours.
 public class ScrollBar : WindowedControl
 {
     late IScrollBarPeer _native;

@@ -964,6 +964,11 @@ public class Win32WidgetSet : IWidgetSet
         return new PanelPeer(owner, parent);
     }
 
+    public IScrollBoxPeer CreateScrollBox(IControlNotify owner, IContainerPeer parent)
+    {
+        return new ScrollBoxPeer(owner, parent);
+    }
+
     public ICustomPeer CreateCustom(IControlNotify owner, IContainerPeer parent)
     {
         return new CustomPeer(owner, parent);

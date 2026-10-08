@@ -1215,7 +1215,7 @@ public class GtkPeer : IControlPeer
 
         if (CssProvider != null)
         {
-            gtk_style_context_remove_provider(gtk_widget_get_style_context(Inner), CssProvider);
+            gtk_style_context_remove_provider(gtk_widget_get_style_context(StyleTarget), CssProvider);
             g_object_unref(CssProvider);
             CssProvider = null;
         }
@@ -1231,9 +1231,13 @@ public class GtkPeer : IControlPeer
         if (failed != null)
             g_clear_error(&failed);
 
-        gtk_style_context_add_provider(gtk_widget_get_style_context(Inner), CssProvider,
+        gtk_style_context_add_provider(gtk_widget_get_style_context(StyleTarget), CssProvider,
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     }
+
+    /// The widget the control's colours and font are given to: `Inner`, but
+    /// for a peer where that widget would paint over what it holds.
+    protected virtual GtkWidget* StyleTarget => Inner;
 
     /// Clips a `draw` context to the widget being drawn, and saves the state
     /// so the caller can restore it.
@@ -1589,6 +1593,9 @@ public class GtkPeer : IControlPeer
     /// own corner. Only a peer whose frame eats into that space -- a group
     /// box -- overrides this.
     public virtual FPoint ClientOrigin => CreatePoint(0, 0);
+
+    /// Zero: a GTK container's border is not measured here.
+    public virtual FPoint ClientCorner => CreatePoint(0, 0);
 
     /// What GTK thinks the widget ought to be, which is what
     /// `ResizeToPreferredSize` wants. The natural size rather than the minimum:

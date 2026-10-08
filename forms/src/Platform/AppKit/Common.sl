@@ -812,6 +812,9 @@ public class AppKitPeer : IControlPeer
 
     public virtual FPoint ClientOrigin => CreatePoint(0, 0);
 
+    /// Zero: an AppKit view's border is drawn by its layer, inside it.
+    public virtual FPoint ClientCorner => CreatePoint(0, 0);
+
     public virtual FSize PreferredSize => CreateSize(LastBounds.Width, LastBounds.Height);
 
     public nuint Handle => IsDestroyed ? 0u : (nuint)(byte*)View;
@@ -882,6 +885,182 @@ public class AppKitPanelPeer : AppKitContainerPeer, IPanelPeer
     {
         _border = border;
         ApplyBorder(View, border);
+    }
+}
+
+/// A scroll box's scroll view, which tells its peer when it has scrolled:
+/// AppKit calls this for every scroll, the bars' and the wheel's both.
+public objc class FormsScrollView : NSScrollView
+{
+    public weak AppKitScrollBoxPeer? Peer;
+
+    public override void ReflectScrolledClipView(NSClipView cView)
+    {
+        base.ReflectScrolledClipView(cView);
+        AppKitScrollBoxPeer? held = Peer;
+        if (held != null)
+            ((AppKitScrollBoxPeer)held).ReportScrolled();
+    }
+
+    /// Where AppKit places the bars, and so decides how much shows.
+    public override void Tile()
+    {
+        base.Tile();
+        AppKitScrollBoxPeer? held = Peer;
+        if (held != null)
+            ((AppKitScrollBoxPeer)held).ReportTiled();
+    }
+}
+
+/// A scroll box: a scroll view whose document is a flipped `FormsView` as
+/// large as the scrolled area. The children go in the document, and it
+/// reports paint and the mouse in the scrolled area's coordinates.
+public class AppKitScrollBoxPeer : AppKitContainerPeer, IScrollBoxPeer
+{
+    FormsView _document;
+    FSize _content;
+    /// Set while the program moves the area, which AppKit reports as a
+    /// scroll like any other.
+    bool _quiet;
+    /// Where the area was when last reported or moved, so that a reflection
+    /// that moved nothing is not taken for a scroll.
+    FPoint _lastOrigin;
+    /// The visible area as AppKit last placed the bars around it.
+    FSize _lastVisible;
+
+    public AppKitScrollBoxPeer(IControlNotify owner)
+    {
+        _document = CreateFormsView();
+        _content = Forms.Drawing.Size.Empty;
+        _quiet = false;
+        _lastOrigin = CreatePoint(0, 0);
+        _lastVisible = Forms.Drawing.Size.Empty;
+        base(CreateScrollBoxView(), owner);
+        var scroller = (FormsScrollView)View;
+        scroller.DocumentView = _document;
+        scroller.Peer = this;
+        _document.Peer = this;
+        _document.TrackPointer();
+    }
+
+    static FormsScrollView CreateScrollBoxView()
+    {
+        var made = FormsScrollView.Alloc().InitWithFrame(MakeNSRect(0.0, 0.0, 120.0, 80.0));
+        made.HasVerticalScroller = true;
+        made.HasHorizontalScroller = true;
+        made.AutohidesScrollers = true;
+        made.BorderType = NSBorderType.BezelBorder;
+        return made;
+    }
+
+    protected override NSView Content => _document;
+
+    /// The visible area, inside the border and any bars that take room.
+    public override FRect ClientBounds
+    {
+        get
+        {
+            var visible = ((NSScrollView)View).ContentSize;
+            return CreateRectangle(0, 0, RoundToInt(visible.width), RoundToInt(visible.height));
+        }
+    }
+
+    public override void SetBounds(FRect bounds)
+    {
+        base.SetBounds(bounds);
+        SizeDocument();
+    }
+
+    public void SetBorder(ControlBorder border)
+    {
+        NSBorderType drawn = NSBorderType.NoBorder;
+        if (border == ControlBorder.Single)
+            drawn = NSBorderType.LineBorder;
+        else if (border == ControlBorder.Sunken)
+            drawn = NSBorderType.BezelBorder;
+        ((NSScrollView)View).BorderType = drawn;
+        SizeDocument();
+    }
+
+    public void SetContentSize(FSize extent)
+    {
+        _content = extent;
+        SizeDocument();
+    }
+
+    /// The document as large as the area, and never smaller than what shows,
+    /// so the box's background reaches its edges.
+    void SizeDocument()
+    {
+        bool was = _quiet;
+        _quiet = true;
+        FitDocument();
+        ((NSScrollView)View).Tile();
+        _quiet = was;
+        _lastOrigin = ScrollPosition;
+    }
+
+    void FitDocument()
+    {
+        var visible = ClientBounds;
+        int width = _content.Width > visible.Width ? _content.Width : visible.Width;
+        int height = _content.Height > visible.Height ? _content.Height : visible.Height;
+        _document.Frame = MakeNSRect(0.0, 0.0, (double)width, (double)height);
+    }
+
+    /// AppKit placed the bars. **Legacy bars take room** and appear only
+    /// once the window is shown, after the control laid its children out;
+    /// a change in what shows is reported as the box being resized, which
+    /// lays them out again.
+    public void ReportTiled()
+    {
+        var visible = ClientBounds.Extent;
+        if (visible.Equals(_lastVisible))
+            return;
+        _lastVisible = visible;
+        bool was = _quiet;
+        _quiet = true;
+        FitDocument();
+        _quiet = was;
+        var owner = Owner;
+        if (owner != null && LastBounds.Width > 0)
+            ((IControlNotify)owner).OnPlatformResized(LastBounds.Extent);
+    }
+
+    /// The clip view's origin, which is the scroll position in a flipped
+    /// document's coordinates.
+    public FPoint ScrollPosition
+    {
+        get
+        {
+            var origin = ((NSScrollView)View).ContentView.Bounds.origin;
+            return CreatePoint(RoundToInt(origin.x), RoundToInt(origin.y));
+        }
+    }
+
+    public void SetScrollPosition(FPoint at)
+    {
+        var scroller = (NSScrollView)View;
+        var clip = scroller.ContentView;
+        var wanted = MakeNSRect((double)at.X, (double)at.Y, 0.0, 0.0).origin;
+        _quiet = true;
+        clip.ScrollToPoint(clip.ConstrainScrollPoint(wanted));
+        scroller.ReflectScrolledClipView(clip);
+        _quiet = false;
+        _lastOrigin = ScrollPosition;
+    }
+
+    public void ReportScrolled()
+    {
+        if (_quiet)
+            return;
+        var now = ScrollPosition;
+        if (now.Equals(_lastOrigin))
+            return;
+        _lastOrigin = now;
+        var owner = Owner;
+        if (owner != null)
+            ((IControlNotify)owner).OnPlatformValueChanged();
     }
 }
 

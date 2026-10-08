@@ -541,8 +541,16 @@ public extern "C"
     GtkWidget* gtk_layout_new(gpointer horizontal, gpointer vertical);
     void gtk_layout_put(GtkWidget* layout, GtkWidget* child, gint x, gint y);
     void gtk_layout_move(GtkWidget* layout, GtkWidget* child, gint x, gint y);
+    /// The frame a viewport draws around what it shows, which a scrolled
+    /// window already draws one of.
+    void gtk_viewport_set_shadow_type(GtkWidget* viewport, gint type);
 
     void gtk_scrolled_window_set_policy(GtkWidget* scrolled, gint horizontal, gint vertical);
+    void gtk_scrolled_window_set_shadow_type(GtkWidget* scrolled, gint type);
+
+    /// **Borrowed.** What each bar moves; its value is the scroll position.
+    gpointer gtk_scrolled_window_get_hadjustment(GtkWidget* scrolled);
+    gpointer gtk_scrolled_window_get_vadjustment(GtkWidget* scrolled);
 }
 
 // ================================================================== combo box
