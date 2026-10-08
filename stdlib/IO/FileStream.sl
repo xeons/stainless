@@ -61,8 +61,10 @@ public class FileStream : IStream
     // reports a failure rather than returning a stream that holds nothing.
     FileStream(String path, FileMode mode, FileAccess access)
     {
-        int code = 0;
-        _handle = sl_file_open(path.ToPointer(), (int)mode, (int)access, &code);
+        // A NUL would end the path early in C, so `log\0.txt` would open `log`.
+        int code = (int)IOError.Invalid;
+        if (!path.Contains('\0'))
+            _handle = sl_file_open(path.ToPointer(), (int)mode, (int)access, &code);
         this._access = access;
         _error = (IOError)code;
         _closed = _handle == null;

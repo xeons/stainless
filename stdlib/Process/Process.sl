@@ -98,6 +98,7 @@ ProcessError ToProcessError(int number)
         case 1:  return ProcessError.NotFound;
         case 2:  return ProcessError.Denied;
         case 3:  return ProcessError.NoResource;
+        case 5:  return ProcessError.InvalidArgument;
         default: return ProcessError.Failed;
     }
 }
@@ -118,6 +119,8 @@ ProcessError ToProcessError(int number)
 /// @failure ProcessError.NoResource  out of processes, descriptors or memory
 /// @failure ProcessError.Failed      it did not start, for a reason none of the
 ///                                   others names
+/// @failure ProcessError.InvalidArgument  an argument holds a NUL, or a line
+///                                   break for a Windows batch file
 /// @see OpenProcess
 /// @seealso Process.Start
 public Result<ProcessResult, ProcessError> RunProcess(String program, String[] arguments)
@@ -142,6 +145,8 @@ public Result<ProcessResult, ProcessError> RunProcess(String program, String[] a
 /// @failure ProcessError.NoResource  out of processes, descriptors or memory
 /// @failure ProcessError.Failed      it did not start, for a reason none of the
 ///                                   others names
+/// @failure ProcessError.InvalidArgument  an argument holds a NUL, or a line
+///                                   break for a Windows batch file
 public Result<ProcessResult, ProcessError> RunProcess(
     String program, String[] arguments, String? input
 )
@@ -233,6 +238,8 @@ public class Process
     ///                                   memory
     /// @failure ProcessError.Failed      it did not start, for a reason none of
     ///                                   the others names
+    /// @failure ProcessError.InvalidArgument  an argument holds a NUL, or a
+    ///                                   line break for a Windows batch file
     /// @see RunProcess
     public static Result<Process, ProcessError> Start(String program, String[] arguments)
     {
@@ -262,6 +269,8 @@ public class Process
 ///                                   memory
 /// @failure ProcessError.Failed      it did not start, for a reason none of the
 ///                                   others names
+/// @failure ProcessError.InvalidArgument  an argument holds a NUL, or a line
+///                                   break for a Windows batch file
 /// @see RunProcess
 public Result<RunningProcess, ProcessError> OpenProcess(String program, String[] arguments)
 {
@@ -285,6 +294,8 @@ public Result<RunningProcess, ProcessError> OpenProcess(String program, String[]
 ///                                   memory
 /// @failure ProcessError.Failed      it did not start, for a reason none of the
 ///                                   others names
+/// @failure ProcessError.InvalidArgument  an argument holds a NUL, or a line
+///                                   break for a Windows batch file
 public Result<RunningProcess, ProcessError> OpenProcess(
     String program, String[] arguments, String? input
 )

@@ -59,6 +59,7 @@
 #include "stainless.h"
 
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -85,6 +86,7 @@
 #define SL_PROCESS_DENIED      2
 #define SL_PROCESS_NO_RESOURCE 3
 #define SL_PROCESS_FAILED      4
+#define SL_PROCESS_INVALID     5    /* an argument no command line can carry */
 
 /*
  * A child that has been started and not yet reaped.
@@ -237,6 +239,7 @@ typedef struct SlArgs {
     char **items;
     size_t count;
     size_t capacity;
+    _Bool  invalid;     /* an argument held a NUL, which would cut it short */
 } SlArgs;
 
 void *sl_process_args_new(void)
@@ -266,6 +269,7 @@ _Bool sl_process_args_add(void *handle, void *text)
     if (copy == NULL) return 0;
 
     if (length > 0) memcpy(copy, sl_string_data((SlString *)text), length);
+    if (memchr(copy, 0, length) != NULL) args->invalid = 1;
     copy[length] = '\0';
 
     args->items[args->count] = copy;
@@ -392,14 +396,139 @@ static _Bool sip(HANDLE pipe, Buffer *into)
     return 1;
 }
 
-/* The command line CreateProcessW wants, as wide characters the caller frees. */
-static wchar_t *commandLineFor(SlArgs *list)
+/*
+ * True for a batch file, which CreateProcess runs through cmd.exe. Windows
+ * ignores trailing dots and spaces in a file name, so they are ignored here.
+ */
+static _Bool isBatchFile(const char *program)
+{
+    size_t length = strlen(program);
+    while (length > 0 && (program[length - 1] == '.' || program[length - 1] == ' ')) length--;
+    if (length < 4) return 0;
+
+    const char *extension = program + length - 4;
+    return _strnicmp(extension, ".bat", 4) == 0 || _strnicmp(extension, ".cmd", 4) == 0;
+}
+
+/*
+ * One argument to a batch file, quoted by cmd.exe's rules rather than the C
+ * runtime's.
+ *
+ * Anything but a letter, a digit or a known-safe symbol puts the argument in
+ * quotes, which is what keeps `&`, `|`, `<`, `>` and `^` from being cmd's. A
+ * `"` is doubled. A `%` becomes `%%cd:~,%`: an empty substring of a variable,
+ * which stops cmd expanding whatever `%NAME%` follows. Rust's standard library
+ * quotes a batch file's arguments the same way.
+ */
+static void quoteForBatch(Buffer *line, const char *argument)
+{
+    static const char safe[] = "#$*+-./:?@\\_";
+    size_t length = strlen(argument);
+
+    /* A trailing backslash would escape a quote the script adds itself. */
+    _Bool quoted = length == 0 || argument[length - 1] == '\\';
+
+    for (size_t i = 0; i < length && !quoted; i++) {
+        unsigned char c = (unsigned char)argument[i];
+        _Bool letter = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+
+        if (c < 0x80 && !letter && strchr(safe, c) == NULL) quoted = 1;
+
+        /* U+0080 to U+009F, the C1 controls. */
+        if (c == 0xC2 && i + 1 < length && (unsigned char)argument[i + 1] <= 0x9F) quoted = 1;
+    }
+
+    if (quoted) buffer_append(line, (const uint8_t *)"\"", 1);
+
+    size_t slashes = 0;
+    for (size_t i = 0; i < length; i++) {
+        char c = argument[i];
+
+        if (c == '\\') {
+            slashes++;
+        } else {
+            if (c == '"') {
+                for (size_t n = 0; n < slashes; n++)
+                    buffer_append(line, (const uint8_t *)"\\", 1);
+                buffer_append(line, (const uint8_t *)"\"", 1);
+            } else if (c == '%') {
+                buffer_append(line, (const uint8_t *)"%%cd:~,", 7);
+            }
+            slashes = 0;
+        }
+
+        buffer_append(line, (const uint8_t *)&c, 1);
+    }
+
+    if (quoted) {
+        for (size_t n = 0; n < slashes; n++)
+            buffer_append(line, (const uint8_t *)"\\", 1);
+        buffer_append(line, (const uint8_t *)"\"", 1);
+    }
+}
+
+/*
+ * The command line for a batch file: cmd.exe named outright, with the script
+ * and its arguments inside one pair of quotes that /c strips.
+ *
+ * Answers 0 for what cannot be passed safely: a script name with a quote in
+ * it or ending in a backslash, and an argument holding a line break, which
+ * would end the command there.
+ */
+static _Bool batchLineFor(SlArgs *list, Buffer *line)
+{
+    const char *script = list->items[0];
+    size_t scriptLength = strlen(script);
+
+    if (strchr(script, '"') != NULL || (scriptLength > 0 && script[scriptLength - 1] == '\\'))
+        return 0;
+
+    for (size_t i = 1; i < list->count; i++)
+        if (strpbrk(list->items[i], "\r\n") != NULL) return 0;
+
+    const char *start = "cmd.exe /e:ON /v:OFF /d /c \"\"";
+    buffer_append(line, (const uint8_t *)start, strlen(start));
+    buffer_append(line, (const uint8_t *)script, scriptLength);
+    buffer_append(line, (const uint8_t *)"\"", 1);
+
+    for (size_t i = 1; i < list->count; i++) {
+        buffer_append(line, (const uint8_t *)" ", 1);
+        quoteForBatch(line, list->items[i]);
+    }
+
+    buffer_append(line, (const uint8_t *)"\"", 1);
+    return 1;
+}
+
+/*
+ * The command line CreateProcessW wants, as wide characters the caller frees.
+ *
+ * `application` is set to the program CreateProcessW MUST be given by path,
+ * or emptied when it finds the program itself. NULL with `*refused` set is an
+ * argument that cannot be passed; NULL without it is out of memory.
+ */
+static wchar_t *commandLineFor(SlArgs *list, wchar_t application[MAX_PATH], _Bool *refused)
 {
     Buffer line = { NULL, 0, 0 };
+    application[0] = 0;
+    *refused = 0;
 
-    for (size_t i = 0; i < list->count; i += 1) {
-        if (i > 0) buffer_append(&line, (const uint8_t *)" ", 1);
-        quote(&line, list->items[i]);
+    if (isBatchFile(list->items[0])) {
+        /* By path, so a cmd.exe in the current directory is not the one run. */
+        UINT length = GetSystemDirectoryW(application, MAX_PATH - 9);
+        if (length == 0 || length >= MAX_PATH - 9) return NULL;
+        wcscat(application, L"\\cmd.exe");
+
+        if (!batchLineFor(list, &line)) {
+            buffer_free(&line);
+            *refused = 1;
+            return NULL;
+        }
+    } else {
+        for (size_t i = 0; i < list->count; i++) {
+            if (i > 0) buffer_append(&line, (const uint8_t *)" ", 1);
+            quote(&line, list->items[i]);
+        }
     }
 
     /* sl_widen wants a NUL, and the buffer holds none. */
@@ -811,6 +940,10 @@ void *sl_process_open(void *args, void *input, int *error)
     *error = SL_PROCESS_FAILED;
 
     if (list == NULL || list->count == 0) return NULL;
+    if (list->invalid) { *error = SL_PROCESS_INVALID; return NULL; }
+
+    /* What this process wrote comes before what the child writes. */
+    fflush(NULL);
 
 #ifdef _WIN32
     /* The default is 4KB, and every time a child fills it the pump sleeps a
@@ -863,15 +996,20 @@ void *sl_process_open(void *args, void *input, int *error)
     startup.StartupInfo.hStdError = errWrite;
     startup.lpAttributeList = attributes;
 
-    wchar_t *line = commandLineFor(list);
+    wchar_t application[MAX_PATH];
+    _Bool refused;
+    wchar_t *line = commandLineFor(list, application, &refused);
     PROCESS_INFORMATION information;
     memset(&information, 0, sizeof information);
 
     BOOL started = line != NULL && attributes != NULL && CreateProcessW(
-        NULL, line, NULL, NULL, TRUE, CREATE_NO_WINDOW | EXTENDED_STARTUPINFO_PRESENT,
+        application[0] != 0 ? application : NULL, line, NULL, NULL, TRUE,
+        CREATE_NO_WINDOW | EXTENDED_STARTUPINFO_PRESENT,
         NULL, NULL, &startup.StartupInfo, &information);
 
-    DWORD why = started ? 0 : attributes == NULL ? ERROR_NOT_ENOUGH_MEMORY : GetLastError();
+    DWORD why = started ? 0
+              : attributes == NULL || line == NULL ? ERROR_NOT_ENOUGH_MEMORY
+              : GetLastError();
     free(line);
 
     if (attributes != NULL) {
@@ -888,7 +1026,7 @@ void *sl_process_open(void *args, void *input, int *error)
 
     if (!started) {
         CloseHandle(outRead); CloseHandle(errRead); CloseHandle(inWrite);
-        *error = classify(why);
+        *error = refused ? SL_PROCESS_INVALID : classify(why);
         return NULL;
     }
 
@@ -1172,25 +1310,71 @@ void *sl_process_start(void *args, int *error)
     *error = SL_PROCESS_FAILED;
 
     if (list == NULL || list->count == 0) return NULL;
+    if (list->invalid) { *error = SL_PROCESS_INVALID; return NULL; }
+
+    /* What this process wrote comes before what the child writes. */
+    fflush(NULL);
 
 #ifdef _WIN32
-    wchar_t *line = commandLineFor(list);
+    wchar_t application[MAX_PATH];
+    _Bool refused;
+    wchar_t *line = commandLineFor(list, application, &refused);
 
-    STARTUPINFOW startup;
+    /*
+     * Its streams are this process's, and are handed over explicitly: without
+     * STARTF_USESTDHANDLES a console child writes to the console, not to the
+     * file or pipe this process's own output was redirected to. Each is an
+     * inheritable copy, and the handle list makes them all the child inherits.
+     */
+    static const DWORD standard[3] = { STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE };
+    HANDLE copies[3] = { NULL, NULL, NULL };
+    HANDLE inherited[3];
+    size_t count = 0;
+
+    for (int i = 0; i < 3; i++) {
+        HANDLE own = GetStdHandle(standard[i]);
+        if (own == NULL || own == INVALID_HANDLE_VALUE) continue;
+
+        if (DuplicateHandle(GetCurrentProcess(), own, GetCurrentProcess(), &copies[i],
+                            0, TRUE, DUPLICATE_SAME_ACCESS))
+            inherited[count++] = copies[i];
+    }
+
+    LPPROC_THREAD_ATTRIBUTE_LIST attributes = count > 0 ? inheritingOnly(inherited, count) : NULL;
+
+    STARTUPINFOEXW startup;
     memset(&startup, 0, sizeof startup);
-    startup.cb = sizeof startup;
+    startup.StartupInfo.cb = sizeof startup;
+
+    DWORD flags = 0;
+    if (attributes != NULL) {
+        startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+        startup.StartupInfo.hStdInput = copies[0];
+        startup.StartupInfo.hStdOutput = copies[1];
+        startup.StartupInfo.hStdError = copies[2];
+        startup.lpAttributeList = attributes;
+        flags = EXTENDED_STARTUPINFO_PRESENT;
+    }
 
     PROCESS_INFORMATION information;
     memset(&information, 0, sizeof information);
 
-    /* Its streams are this process's, so nothing is redirected. */
     BOOL started = line != NULL && CreateProcessW(
-        NULL, line, NULL, NULL, FALSE, 0, NULL, NULL, &startup, &information);
+        application[0] != 0 ? application : NULL, line,
+        NULL, NULL, attributes != NULL, flags, NULL, NULL, &startup.StartupInfo, &information);
 
-    DWORD why = started ? 0 : GetLastError();
+    DWORD why = started ? 0 : line == NULL ? ERROR_NOT_ENOUGH_MEMORY : GetLastError();
     free(line);
 
-    if (!started) { *error = classify(why); return NULL; }
+    if (attributes != NULL) {
+        DeleteProcThreadAttributeList(attributes);
+        free(attributes);
+    }
+
+    for (int i = 0; i < 3; i++)
+        if (copies[i] != NULL) CloseHandle(copies[i]);
+
+    if (!started) { *error = refused ? SL_PROCESS_INVALID : classify(why); return NULL; }
 
     CloseHandle(information.hThread);
 

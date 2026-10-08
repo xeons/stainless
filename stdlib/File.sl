@@ -40,25 +40,40 @@ extern "C"
     int  sl_file_rename(byte* from, byte* to);
 }
 
+// A path holding a NUL names nothing: C would end it there, and `log\0.txt`
+// would reach `log`. Each function below refuses one rather than act on the
+// part before it.
+
 /// True when the path names a file that is there. A directory is not a file,
 /// so this is false for one.
 public bool Exists(String path)
 {
+    if (path.Contains('\0'))
+        return false;
     return sl_path_exists(path.ToPointer()) && !sl_path_is_directory(path.ToPointer());
 }
 
 /// The size in bytes, or -1 when there is nothing there.
-public long GetSize(String path) => sl_path_size(path.ToPointer());
+public long GetSize(String path) => path.Contains('\0') ? -1 : sl_path_size(path.ToPointer());
 
 /// When it was last written, in seconds since the epoch, or -1.
-public long GetLastWriteTime(String path) => sl_path_modified(path.ToPointer());
+public long GetLastWriteTime(String path)
+{
+    return path.Contains('\0') ? -1 : sl_path_modified(path.ToPointer());
+}
 
 /// Removes the file. `IOError.None` on success.
 ///
 /// @failure IOError.NotFound      there is nothing at that path
 /// @failure IOError.AccessDenied  the file or its directory refuses it
 /// @failure IOError.IsADirectory  the path names a directory; use `Directory`
-public IOError Delete(String path) => (IOError)sl_file_delete(path.ToPointer());
+/// @failure IOError.Invalid       the path holds a NUL
+public IOError Delete(String path)
+{
+    if (path.Contains('\0'))
+        return IOError.Invalid;
+    return (IOError)sl_file_delete(path.ToPointer());
+}
 
 /// Moves or renames. Whether it replaces an existing destination is the
 /// platform's decision, not this one's.
@@ -69,8 +84,11 @@ public IOError Delete(String path) => (IOError)sl_file_delete(path.ToPointer());
 /// @failure IOError.AccessDenied   either path refuses it
 /// @failure IOError.AlreadyExists  `to` is taken and this platform will not
 ///                                 replace it
+/// @failure IOError.Invalid        either path holds a NUL
 public IOError Move(String from, String to)
 {
+    if (from.Contains('\0') || to.Contains('\0'))
+        return IOError.Invalid;
     return (IOError)sl_file_rename(from.ToPointer(), to.ToPointer());
 }
 

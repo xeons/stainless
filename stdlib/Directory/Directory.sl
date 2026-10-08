@@ -41,9 +41,14 @@ extern "C"
     void  sl_directory_close(byte* handle);
 }
 
+// A path holding a NUL names nothing: C would end it there. Each function
+// below refuses one rather than act on the part before it.
+
 /// True when the path names a directory that is there.
 public bool Exists(String path)
 {
+    if (path.Contains('\0'))
+        return false;
     return sl_path_exists(path.ToPointer()) && sl_path_is_directory(path.ToPointer());
 }
 
@@ -56,9 +61,12 @@ public bool Exists(String path)
 /// @failure IOError.NotADirectory  a file along the path was used as a directory
 /// @failure IOError.Unknown        the platform reported something with no case
 ///                                 of its own -- a full disk among them
+/// @failure IOError.Invalid        the path holds a NUL
 /// @see Directory.CreateDirectoryTree
 public IOError CreateDirectory(String path)
 {
+    if (path.Contains('\0'))
+        return IOError.Invalid;
     return (IOError)sl_directory_create(path.ToPointer());
 }
 
@@ -113,6 +121,8 @@ public IOError CreateDirectoryTree(String path)
 ///                                 among them
 public IOError Delete(String path)
 {
+    if (path.Contains('\0'))
+        return IOError.Invalid;
     return (IOError)sl_directory_delete(path.ToPointer());
 }
 
@@ -125,6 +135,8 @@ public IOError Delete(String path)
 public Result<List<Entry>, IOError> GetEntries(String path)
 {
     var found = new List<Entry>();
+    if (path.Contains('\0'))
+        return Fail(IOError.NotFound);
 
     var cursor = sl_directory_open(path.ToPointer());
     if (cursor == null)

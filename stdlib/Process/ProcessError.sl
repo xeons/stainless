@@ -44,4 +44,8 @@ public enum ProcessError
 
     /// It did not start, for a reason none of the above names.
     Failed,
+
+    /// An argument cannot be passed as it is: it holds a NUL, or it holds a
+    /// line break and the program is a Windows batch file.
+    InvalidArgument,
 }

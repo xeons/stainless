@@ -746,10 +746,17 @@ about.
 
 **A failure to start and a failure of the program are different things.**
 `ProcessError` is only about starting -- `NotFound`, `Denied`, `NoResource`,
-`Failed` -- and a program that ran and returned 1 is a `ProcessResult` with
-`ExitCode` 1, which
-is an outcome rather than a fault. `grep` answering 1 for "no match" is the
-ordinary case.
+`Failed`, `InvalidArgument` -- and a program that ran and returned 1 is a
+`ProcessResult` with `ExitCode` 1, which is an outcome rather than a fault.
+`grep` answering 1 for "no match" is the ordinary case.
+
+**An argument reaches the child as text, never as syntax.** No shell is run,
+so `&`, `|` and `$HOME` are characters the child receives. Windows runs a
+`.bat` or `.cmd` file through `cmd.exe`, so for one of those each argument is
+quoted by cmd's rules and `%` is kept from expanding; an argument holding a
+line break cannot be passed that way and is refused with `InvalidArgument`.
+So is an argument holding a NUL, on every platform, which C would otherwise
+cut short at the NUL.
 
 Telling those apart takes work on POSIX, and it is worth knowing why. A child
 cannot report a failed exec through its exit code: 127 is the shell's

@@ -1,0 +1,5 @@
+1="x & echo pwned"
+2="100%PATH%"
+3="a""b"
+4=plain
+refused true
