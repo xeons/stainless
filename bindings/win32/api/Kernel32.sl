@@ -466,6 +466,15 @@ public struct StartupInfo
     public HANDLE StandardError;
 }
 
+/// `STARTUPINFOEXW`: `StartupInfo` followed by an attribute list, for
+/// `CreateProcessW` with `ExtendedStartupInfoPresent`. `StartupInfo.Size` must
+/// be this struct's size, not the inner one's.
+public struct StartupInfoEx
+{
+    public StartupInfo StartupInfo;
+    public byte* AttributeList;
+}
+
 /// `PROCESS_INFORMATION`. Both handles belong to the caller and both must be
 /// closed, including the thread handle nobody wants.
 public struct ProcessInformation
@@ -498,7 +507,16 @@ public extern "C"
     int    TerminateProcess(HANDLE process, uint code);
     int    SetPriorityClass(HANDLE process, uint priority);
     uint   GetPriorityClass(HANDLE process);
+
+    int    InitializeProcThreadAttributeList(byte* list, uint count, uint flags, nuint* size);
+    int    UpdateProcThreadAttribute(byte* list, uint flags, nuint which, void* value,
+                                     nuint size, void* previous, nuint* returnSize);
+    void   DeleteProcThreadAttributeList(byte* list);
 }
+
+/// `PROC_THREAD_ATTRIBUTE_HANDLE_LIST`: the only handles a child inherits,
+/// however many others are inheritable. Each named one MUST be inheritable.
+public const nuint ProcThreadAttributeHandleList = 0x00020002u;
 
 public const uint StartFlagUseShowWindow = 0x00000001u;
 public const uint StartFlagUseStdHandles = 0x00000100u;
@@ -509,6 +527,7 @@ public const uint CreateNewConsole         = 0x00000010u;
 public const uint CreateNewProcessGroup    = 0x00000200u;
 public const uint CreateUnicodeEnvironment = 0x00000400u;
 public const uint CreateNoWindow           = 0x08000000u;
+public const uint ExtendedStartupInfoPresent = 0x00080000u;
 
 /// `WaitForSingleObject`'s answers. `WaitObject0` is the one that means the
 /// thing became signalled; the others are all "no".

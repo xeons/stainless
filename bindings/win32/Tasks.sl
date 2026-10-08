@@ -127,12 +127,33 @@ public Completed RunProcess(String commandLine, String workingDirectory)
     // copy of it and the pipe never reports end-of-file.
     SetHandleInformation(readEnd, HandleFlagInherit, 0u);
 
-    var startup = CreateStartupInfo();
-    startup.Flags = StartFlagUseStdHandles | StartFlagUseShowWindow;
-    startup.ShowWindow = 0u;                    // SW_HIDE
-    startup.StandardOutput = writeEnd;
-    startup.StandardError = writeEnd;
-    startup.StandardInput = null;
+    // The write end is the only handle the child gets. Without the list it
+    // would also inherit every inheritable handle this process holds -- the
+    // pipe ends of a child another thread is starting, say, whose reader would
+    // then never see end-of-file.
+    nuint listSize = 0u;
+    InitializeProcThreadAttributeList(null, 1u, 0u, &listSize);
+    var list = new ByteBuffer((uint)listSize);
+    if (!Win32.IsBoolSuccess(InitializeProcThreadAttributeList(list.Pointer, 1u, 0u, &listSize)))
+    {
+        CloseHandle(readEnd);
+        CloseHandle(writeEnd);
+        return completed;
+    }
+
+    HANDLE inherited = writeEnd;
+    UpdateProcThreadAttribute(list.Pointer, 0u, ProcThreadAttributeHandleList,
+                              (void*)&inherited, (nuint)sizeof(HANDLE), null, null);
+
+    StartupInfoEx extended;
+    extended.StartupInfo = CreateStartupInfo();
+    extended.StartupInfo.Size = (uint)sizeof(StartupInfoEx);
+    extended.StartupInfo.Flags = StartFlagUseStdHandles | StartFlagUseShowWindow;
+    extended.StartupInfo.ShowWindow = 0u;                    // SW_HIDE
+    extended.StartupInfo.StandardOutput = writeEnd;
+    extended.StartupInfo.StandardError = writeEnd;
+    extended.StartupInfo.StandardInput = null;
+    extended.AttributeList = list.Pointer;
 
     // CreateProcessW may write to the command line, so it gets a copy it owns.
     var mutable = Win32.CopyToWideBuffer(commandLine);
@@ -142,8 +163,9 @@ public Completed RunProcess(String commandLine, String workingDirectory)
     char16* directory = workingDirectory.IsEmpty ? null : wideDirectory.ToPointer();
 
     bool started = Win32.IsBoolSuccess(CreateProcessW(
-        null, mutable.Pointer, null, null, 1, CreateNoWindow, null,
-        directory, &startup, &information));
+        null, mutable.Pointer, null, null, 1, CreateNoWindow | ExtendedStartupInfoPresent,
+        null, directory, &extended.StartupInfo, &information));
+    DeleteProcThreadAttributeList(list.Pointer);
 
     // The parent's write end has to go now, whether or not the child started:
     // while it is open the pipe has a writer and the read below never ends.

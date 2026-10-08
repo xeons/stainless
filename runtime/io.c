@@ -220,16 +220,28 @@ void *sl_file_open(const uint8_t *path, int32_t mode, int32_t access, int32_t *e
         return NULL;
     }
 
+    /* "N": the handle is not inherited by a child this process starts. */
     wchar_t wideModes[8];
-    for (size_t i = 0; i < sizeof(wideModes) / sizeof(wideModes[0]); i++) {
-        wideModes[i] = (wchar_t)(unsigned char)modes[i];
-        if (modes[i] == '\0') break;
+    size_t used = 0;
+    while (modes[used] != '\0') {
+        wideModes[used] = (wchar_t)(unsigned char)modes[used];
+        used++;
     }
+    wideModes[used++] = L'N';
+    wideModes[used] = 0;
 
     file = _wfopen(widePath, wideModes);
     free(widePath);
+#elif defined(__linux__)
+    /* "e": opened close-on-exec, so a child started later does not get it. */
+    char closing[8];
+    snprintf(closing, sizeof closing, "%se", modes);
+    file = fopen((const char *)path, closing);
 #else
+    /* macOS starts children with posix_spawn's CLOEXEC_DEFAULT, so nothing
+     * leaks there; the flag is for a child started some other way. */
     file = fopen((const char *)path, modes);
+    if (file != NULL) fcntl(fileno(file), F_SETFD, FD_CLOEXEC);
 #endif
 
     if (file == NULL) {
