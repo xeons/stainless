@@ -228,7 +228,7 @@ public class PropertyGrid : Panel
         FormComponent? chosen = designer.SelectedComponent;
         var component = chosen == null ? designer.Document.Form : (FormComponent)chosen;
         _component = component;
-        _type = FindDesignedType(component.TypeName);
+        _type = designer.FindComponentType(component.TypeName);
         _heading.Text = " " + component.Name + "   " + component.TypeName;
         if (designer.SelectedCount > 1u)
             _heading.Text = _heading.Text + "   and " + Standard.Text.FromInteger((long)designer.SelectedCount - 1)

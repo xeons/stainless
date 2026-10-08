@@ -408,11 +408,73 @@ void TestGenerating(Harness harness)
                       FindDesignerPath("forms/MainForm.slfm").Replace("\\", "/"));
 
     TestGeneratingItems(harness);
+    TestGeneratingFrames(harness);
 }
 
 /// A menu and a toolbar: components made as the file says, each added to what
 /// it is inside, and the form's `Menu` set once the menu exists -- although
 /// the file sets it first.
+/// A frame's file makes its class like a form's does, and a form that places
+/// one makes it like any control, with itself as the parent.
+void TestGeneratingFrames(Harness harness)
+{
+    String frame = "module Samples.Address;\n"
+        + "\n"
+        + "form AddressFrame : Frame\n"
+        + "{\n"
+        + "    Bounds = 0, 0, 240, 80;\n"
+        + "\n"
+        + "    TextBox _street\n"
+        + "    {\n"
+        + "        Bounds = 8, 8, 220, 24;\n"
+        + "    }\n"
+        + "}\n";
+
+    String expected = "// Generated from AddressFrame.slfm. Edit that file or the designer;\n"
+        + "// this one is rewritten from it.\n"
+        + "module Samples.Address;\n"
+        + "\n"
+        + "import Forms;\n"
+        + "\n"
+        + "public class AddressFrame : Frame\n"
+        + "{\n"
+        + "    private late TextBox _street;\n"
+        + "\n"
+        + "    private void InitializeComponent()\n"
+        + "    {\n"
+        + "        SetBounds(0, 0, 240, 80);\n"
+        + "\n"
+        + "        _street = new TextBox(this);\n"
+        + "        _street.SetBounds(8, 8, 220, 24);\n"
+        + "    }\n"
+        + "}\n";
+
+    var read = ParseFormDocument(frame);
+    harness.Check("a frame's file reads", read.Ok);
+    if (!read.Ok)
+        return;
+    harness.CheckSame("and makes its class on Frame", expected,
+                      GenerateFormSource(read.Value, "AddressFrame.slfm"));
+
+    String form = "module Samples.Address;\n"
+        + "\n"
+        + "form Order : Form\n"
+        + "{\n"
+        + "    AddressFrame _delivery\n"
+        + "    {\n"
+        + "        Bounds = 8, 8, 240, 80;\n"
+        + "    }\n"
+        + "}\n";
+    var placing = ParseFormDocument(form);
+    harness.Check("a form placing a frame reads", placing.Ok);
+    if (!placing.Ok)
+        return;
+    String generated = GenerateFormSource(placing.Value, "Order.slfm");
+    harness.Check("and makes the frame with the form as its parent",
+                  generated.Contains("private late AddressFrame _delivery;")
+                  && generated.Contains("_delivery = new AddressFrame(this);"));
+}
+
 void TestGeneratingItems(Harness harness)
 {
     String form = "module Samples.Editor;\n"

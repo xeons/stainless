@@ -28,22 +28,50 @@ public class Toolbox : Panel
 {
     private late ListView _types;
     private String[] _names;
+    /// The project's frames, listed after the types, each with the picture
+    /// after the types'.
+    private String[] _frames;
     private bool _clearing;
 
     public Toolbox(WindowedControl parent)
     {
         _clearing = false;
         _names = ListDesignableTypes();
+        _frames = [];
         base(parent);
         _types = new ListView(this);
         _types.Dock = DockStyle.Fill;
         _types.View = ListViewStyle.List;
-        for (nuint i = 0u; i < _names.Length; i++)
-            _types.AddRow(_names[i], (int)i);
+        FillRows();
         _types.SelectedIndexChanged += this.OnTypeChosen;
     }
 
-    /// One picture per type, in the order `ListDesignableTypes` names them.
+    private void FillRows()
+    {
+        _clearing = true;
+        _types.Clear();
+        for (nuint i = 0u; i < _names.Length; i++)
+            _types.AddRow(_names[i], (int)i);
+        foreach (var frame in _frames)
+            _types.AddRow(frame, (int)_names.Length);
+        _clearing = false;
+    }
+
+    /// The project's frames, each placed by its class name. Listed again
+    /// only when they have changed.
+    public void SetFrameTypes(String[] frames)
+    {
+        bool same = frames.Length == _frames.Length;
+        for (nuint i = 0u; same && i < frames.Length; i++)
+            same = frames[i] == _frames[i];
+        if (same)
+            return;
+        _frames = frames;
+        FillRows();
+    }
+
+    /// One picture per type, in the order `ListDesignableTypes` names them,
+    /// and one more that every frame shows.
     public ImageList? Images
     {
         get => _types.Images;
@@ -65,9 +93,9 @@ public class Toolbox : Panel
     /// the program reports nothing, so this raises `Chosen` itself.
     public void ChooseType(String typeName)
     {
-        for (nuint i = 0u; i < _names.Length; i++)
+        for (nuint i = 0u; i < _names.Length + _frames.Length; i++)
         {
-            if (_names[i] == typeName)
+            if (NameAt(i) == typeName)
             {
                 _types.SelectedIndex = (int)i;
                 Chosen(typeName);
@@ -75,11 +103,14 @@ public class Toolbox : Panel
         }
     }
 
+    private String NameAt(nuint row) =>
+        row < _names.Length ? _names[row] : _frames[row - _names.Length];
+
     private void OnTypeChosen(Control sender)
     {
         int at = _types.SelectedIndex;
-        if (_clearing || at < 0 || (nuint)at >= _names.Length)
+        if (_clearing || at < 0 || (nuint)at >= _names.Length + _frames.Length)
             return;
-        Chosen(_names[(nuint)at]);
+        Chosen(NameAt((nuint)at));
     }
 }

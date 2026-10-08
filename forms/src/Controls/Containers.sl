@@ -235,6 +235,41 @@ public class ScrollBox : WindowedControl
     }
 }
 
+// ===================================================================== frame
+
+/// A group of controls designed once and placed on any number of forms: the
+/// LCL's `TFrame`.
+///
+/// A frame is designed in a form file of its own whose root is `Frame` rather
+/// than `Form`, and its class is the generated half beside it plus a
+/// constructor of the program's:
+///
+/// ```
+/// public class AddressFrame : Frame
+/// {
+///     public AddressFrame(WindowedControl parent)
+///     {
+///         base(parent);
+///         InitializeComponent();
+///     }
+/// }
+/// ```
+///
+/// A form that places one names that class like any control, and the
+/// generated half makes it with `new AddressFrame(this)`. It scrolls when
+/// what it holds outgrows it, as a scroll box does, and has no border.
+#if FORMS_REFLECT
+[Reflect]
+#endif
+public class Frame : ScrollBox
+{
+    public Frame(WindowedControl parent)
+    {
+        base(parent);
+        Border = ControlBorder.None;
+    }
+}
+
 // ================================================================= group box
 
 /// A frame with a caption, that other controls sit inside.

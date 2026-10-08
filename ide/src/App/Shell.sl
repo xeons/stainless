@@ -122,7 +122,7 @@ public class TreeEntry
 public enum Configuration { Debug, Release }
 
 /// The main window.
-public class Shell : Form
+public class Shell : Form, IFrameSource
 {
     late TabControl _tabs;
     List<EditorTab> _openTabs;
@@ -508,7 +508,11 @@ public class Shell : Form
 
         var tools = _dock.AddPane(Panes.Toolbox, "Toolbox", DockEdge.Left);
         _toolbox = new Toolbox(tools);
-        if (BuildToolboxIcons(ListDesignableTypes()) is ImageList pictures)
+        // Every frame shows the one picture after the types'.
+        var pictured = new List<String>();
+        pictured.AddRange(ListDesignableTypes());
+        pictured.Add("Frame");
+        if (BuildToolboxIcons(pictured.ToArray()) is ImageList pictures)
             _toolbox.Images = pictures;
         _toolbox.Dock = DockStyle.Fill;
         _toolbox.Chosen += (typeName) => this.OnToolChosen(typeName);
@@ -821,6 +825,15 @@ public class Shell : Form
 
     void OnTabChanged(Control sender)
     {
+        // A form shown again is read again: a frame it places may have been
+        // opened or edited in another tab since.
+        int at = _tabs.SelectedIndex;
+        if (at >= 0 && (nuint)at < _openTabs.Count)
+        {
+            var tab = _openTabs[(nuint)at];
+            if (tab.Designer is DesignSurface shown && shown.Visible)
+                ShowDesigner(tab);
+        }
         ShowActiveDesign();
         UpdateTitle();
         var now = Current;
@@ -2952,8 +2965,58 @@ public class Shell : Form
         surface.SelectionChanged += () => this.ShowActiveDesign();
         surface.Message += (message) => this.ShowStatus(message);
         surface.ItemsRequested += (owner) => this.OpenItemsEditor(owner);
+        surface.Frames = this;
         tab.Designer = surface;
         ShowDesigner(tab);
+    }
+
+    // ------------------------------------------------------------- frames
+
+    /// A frame's form file, by the frame's class name: an open tab's text
+    /// first, as the person last left it, then the project's files.
+    public FormDocument? FindFrameDocument(String typeName)
+    {
+        foreach (var document in CollectFrameDocuments())
+        {
+            if (document.Form.Name == typeName)
+                return document;
+        }
+        return null;
+    }
+
+    /// Every form file, open or in the project, whose root is a `Frame`.
+    List<FormDocument> CollectFrameDocuments()
+    {
+        var frames = new List<FormDocument>();
+        var seen = new List<String>();
+        foreach (var tab in _openTabs)
+        {
+            String location = tab.Editor.Contents.Location;
+            if (!location.EndsWith(".slfm"))
+                continue;
+            seen.Add(location);
+            var read = ParseFormDocument(tab.Editor.Contents.GetText());
+            if (read.Ok && read.Value.Form.TypeName == "Frame")
+                frames.Add(read.Value);
+        }
+        foreach (var path in ListFormFilePaths())
+        {
+            if (seen.Contains(path))
+                continue;
+            var read = ReadFormDocument(path);
+            if (read.Ok && read.Value.Form.TypeName == "Frame")
+                frames.Add(read.Value);
+        }
+        return frames;
+    }
+
+    /// Lists the project's frames in the Toolbox, under the types.
+    void RefreshToolboxFrames()
+    {
+        var names = new List<String>();
+        foreach (var document in CollectFrameDocuments())
+            names.Add(document.Form.Name);
+        _toolbox.SetFrameTypes(names.ToArray());
     }
 
     /// Shows the items of a menu or a toolbar on the form in front, as
@@ -2995,6 +3058,7 @@ public class Shell : Form
         }
 
         surface.BaseDirectory = Path.GetDirectoryName(tab.Editor.Contents.Location);
+        RefreshToolboxFrames();
         var unknown = surface.LoadDocument(read.Value);
         tab.Editor.Visible = false;
         surface.Visible = true;
@@ -3262,6 +3326,24 @@ public class Shell : Form
     /// Output, when a form could not be read.
     bool RegenerateFormHalves()
     {
+        var forms = ListFormFilePaths();
+        if (forms.IsEmpty)
+            return true;
+
+        var written = RegenerateFormSources(forms);
+        if (!written.Ok)
+        {
+            foreach (var line in written.Error.Split("\n"))
+                ShowOutputLine(line);
+            ShowStatus("A form file could not be read; see Output.");
+            return false;
+        }
+        return true;
+    }
+
+    /// Every form file the build sees: the project's, and any open in a tab.
+    List<String> ListFormFilePaths()
+    {
         var forms = new List<String>();
         var project = _project;
         if (project != null)
@@ -3283,18 +3365,7 @@ public class Shell : Form
             if (location.EndsWith(".slfm") && !forms.Contains(location))
                 forms.Add(location);
         }
-        if (forms.IsEmpty)
-            return true;
-
-        var written = RegenerateFormSources(forms);
-        if (!written.Ok)
-        {
-            foreach (var line in written.Error.Split("\n"))
-                ShowOutputLine(line);
-            ShowStatus("A form file could not be read; see Output.");
-            return false;
-        }
-        return true;
+        return forms;
     }
 
     // ------------------------------------------------------- breakpoints
@@ -5321,6 +5392,7 @@ public class Shell : Form
         ok = TestToolboxAndGrid() && ok;
         ok = TestMenusAndToolBars() && ok;
         ok = TestCommands() && ok;
+        ok = TestFrames() && ok;
         ok = TestTabClosingAndRecent() && ok;
 
         if (ok)
@@ -5563,6 +5635,69 @@ public class Shell : Form
         if (editor != null)
             ((ItemsEditor)editor).Hide();
         CloseTab(pad);
+        return ok;
+    }
+
+    /// A frame's own file, open in a tab, and a form placing it: the frame is
+    /// offered in the Toolbox, shown with what it holds, edited as a `Frame`
+    /// in the grid, and kept out of itself.
+    bool TestFrames()
+    {
+        bool ok = true;
+        var framePad = AddTab(new Document());
+        framePad.Editor.Contents.Location = "SelftestAddress.slfm";
+        framePad.Editor.TypeText("module Test;" + Newline + Newline
+            + "form SelftestAddress : Frame" + Newline + "{" + Newline
+            + "    Bounds = 0, 0, 240, 80;" + Newline + Newline
+            + "    TextBox _street" + Newline + "    {" + Newline
+            + "        Bounds = 8, 8, 220, 24;" + Newline + "    }" + Newline + Newline
+            + "    Button _check" + Newline + "    {" + Newline
+            + "        Bounds = 8, 40, 80, 24;" + Newline + "    }" + Newline + "}" + Newline);
+        AttachDesigner(framePad);
+        var frameSurface = (DesignSurface)framePad.Designer;
+        if (!frameSurface.IsFrameDocument)
+        {
+            Console.WriteLine("FAIL: a form file whose root is Frame was not designed as a frame");
+            ok = false;
+        }
+        frameSurface.PlaceComponent("SelftestAddress", Point.FromXY(20, 20));
+        if (frameSurface.FindComponent("_selftestAddress1") != null)
+        {
+            Console.WriteLine("FAIL: a frame was placed inside itself");
+            ok = false;
+        }
+
+        var pad = AddTab(new Document());
+        pad.Editor.Contents.Location = "selftest-frames.slfm";
+        pad.Editor.TypeText("module Test;" + Newline + Newline
+            + "form Probe : Form" + Newline + "{" + Newline
+            + "    Bounds = 0, 0, 320, 240;" + Newline + "}" + Newline);
+        AttachDesigner(pad);
+        var surface = (DesignSurface)pad.Designer;
+
+        _toolbox.ChooseType("SelftestAddress");
+        surface.PlaceComponent("SelftestAddress", Point.FromXY(16, 16));
+        var live = surface.FindLiveControl("_selftestAddress1");
+        String text = pad.Editor.Contents.GetText();
+        if (!text.Contains("SelftestAddress _selftestAddress1") || !text.Contains("Bounds = 16, 16, 240, 80;")
+            || live == null || !(live is Forms.Frame) || ((Forms.Frame)live).Controls.Count != 2u)
+        {
+            Console.WriteLine("FAIL: a placed frame was not written, or not shown with what it holds");
+            ok = false;
+        }
+        if (surface.ItemCount != 1u)
+        {
+            Console.WriteLine("FAIL: what a placed frame holds was made designable on the form");
+            ok = false;
+        }
+        if (!_grid.SelectProperty("Dock") || !_grid.SelectProperty("Anchors"))
+        {
+            Console.WriteLine("FAIL: a placed frame was not offered a Frame's properties");
+            ok = false;
+        }
+
+        CloseTab(pad);
+        CloseTab(framePad);
         return ok;
     }
 

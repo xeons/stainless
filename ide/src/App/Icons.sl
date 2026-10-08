@@ -188,6 +188,9 @@ public static class ToolboxIconFiles
 
     [Embed("icons/16/scrollbox.png")]
     public static readonly byte[] ScrollBox;
+
+    [Embed("icons/16/frame.png")]
+    public static readonly byte[] Frame;
 }
 
 /// Every toolbar icon as one list, or null if they could not be decoded.
@@ -264,6 +267,7 @@ byte[] FindToolboxIconFile(String typeName)
         case "Timer": return ToolboxIconFiles.Timer;
         case "CommandList": return ToolboxIconFiles.CommandList;
         case "ScrollBox": return ToolboxIconFiles.ScrollBox;
+        case "Frame": return ToolboxIconFiles.Frame;
         default: return ToolboxIconFiles.Button;
     }
 }

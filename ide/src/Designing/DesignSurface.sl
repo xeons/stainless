@@ -103,6 +103,17 @@ public class DesignedItem
 public closure void DesignChangedHandler();
 public closure void DesignMessageHandler(String message);
 
+/// Whatever knows the project's frames: finds a frame's own form file by the
+/// frame's class name, or answers null.
+public interface IFrameSource
+{
+    FormDocument? FindFrameDocument(String typeName);
+}
+
+/// How deep frames placed in frames are shown. A frame that places itself,
+/// however far down, would otherwise never finish being made.
+const int MaxFrameDepth = 4;
+
 /// A menu or a toolbar asked to have its items edited, by name.
 public closure void DesignItemsHandler(String owner);
 
@@ -220,6 +231,33 @@ public class DesignSurface : Panel
 
     /// The form file's directory, which a picture it names is relative to.
     public String BaseDirectory;
+
+    /// What finds a frame's form file by its class name, which is how a frame
+    /// placed on this form shows what it holds. Weak, because it is the shell
+    /// that holds this surface. With none, a frame's type is one the designer
+    /// does not know.
+    public weak IFrameSource? Frames;
+
+    /// The form file of a frame type, or null when the name is not one.
+    public FormDocument? FindFrameDocument(String typeName)
+    {
+        IFrameSource? source = Frames;
+        if (source == null)
+            return null;
+        FormDocument? found = ((IFrameSource)source).FindFrameDocument(typeName);
+        if (found != null && ((FormDocument)found).Form.TypeName == "Frame")
+            return found;
+        return null;
+    }
+
+    /// What reflection describes a component by: its own type, or `Frame`
+    /// for a frame of the project's, whose class the designer cannot see.
+    public Type FindComponentType(String typeName) =>
+        FindFrameDocument(typeName) != null ? FindDesignedType("Frame") : FindDesignedType(typeName);
+
+    /// Whether the document is a frame's: its root is `Frame`, and it is
+    /// shown with no caption, as it will be inside whatever places it.
+    public bool IsFrameDocument => _document.Form.TypeName == "Frame";
 
     /// Raised after every change to the document.
     public event DesignChangedHandler Changed;
@@ -568,6 +606,17 @@ public class DesignSurface : Panel
         _caption.Text = title;
         _caption.SetBounds(FrameSide, 7, width - FrameSide * 2, FrameTop - 12);
 
+        // A frame has no window of its own, so no caption and no menu: a
+        // line round its edge says where it ends.
+        _caption.Visible = !IsFrameDocument;
+        if (IsFrameDocument)
+        {
+            _menuStrip.Visible = false;
+            _client.SetBounds(1, 1, width - 2, height - 2);
+            LayOutTray();
+            return;
+        }
+
         // A menu bar takes its height from the client, as a real one takes
         // it from inside the window's bounds.
         int strip = FindFormMenu() != null ? MenuStripHeight : 0;
@@ -674,6 +723,13 @@ public class DesignSurface : Panel
             }
 
             Control? made = CreateDesignedControl(child.TypeName, parent);
+            FormDocument? frame = null;
+            if (made == null)
+            {
+                frame = FindFrameDocument(child.TypeName);
+                if (frame != null)
+                    made = new Frame(parent);
+            }
             if (made == null)
             {
                 unknown.Add(child.Name);
@@ -683,17 +739,74 @@ public class DesignSurface : Panel
             var live = (Control)made;
             live.IsDesigning = true;
             live.Paint += this.OnLiveControlPaint;
-            var type = FindDesignedType(child.TypeName);
+            var type = FindComponentType(child.TypeName);
+            if (frame != null)
+                ApplyFrameRoot(((FormDocument)frame).Form, live, type);
             for (nuint i = 0u; i < child.Members.Count; i++)
             {
                 if (child.Members[i] is FormProperty property)
                     ApplyDesignedProperty(live, type, property, BaseDirectory);
             }
             _items.Add(new DesignedItem(child, live));
-            if (live is ToolBar bar)
+            if (frame != null)
+                CreateFrameContents(((FormDocument)frame).Form, (WindowedControl)live, 1);
+            else if (live is ToolBar bar)
                 CreateToolButtons(child, bar, unknown);
             else if (live is WindowedControl container)
                 CreateDesignedChildren(child, container, unknown);
+        }
+    }
+
+    /// A frame's own properties, from its file, under whatever the form that
+    /// places it sets. Not where it is or how large: that is the placing
+    /// form's.
+    private void ApplyFrameRoot(FormComponent root, Control live, Type type)
+    {
+        for (nuint i = 0u; i < root.Members.Count; i++)
+        {
+            if (root.Members[i] is FormProperty property && property.Name != "Bounds")
+                ApplyDesignedProperty(live, type, property, BaseDirectory);
+        }
+    }
+
+    /// What a placed frame holds, from the frame's own file: made and shown,
+    /// and not designed. A frame is edited in its own file, so nothing in it
+    /// is selected, moved or written back from a form that places it -- the
+    /// LCL's inline frame, without its per-instance overrides.
+    private void CreateFrameContents(FormComponent component, WindowedControl into, int depth)
+    {
+        if (depth > MaxFrameDepth)
+            return;
+        foreach (var child in component.ListChildren())
+        {
+            if (IsNonVisualType(child.TypeName))
+                continue;
+            Control? made = CreateDesignedControl(child.TypeName, into);
+            FormDocument? nested = null;
+            if (made == null)
+            {
+                nested = FindFrameDocument(child.TypeName);
+                if (nested != null)
+                    made = new Frame(into);
+            }
+            if (made == null)
+                continue;
+
+            var live = (Control)made;
+            live.IsDesigning = true;
+            live.Paint += this.OnLiveControlPaint;
+            var type = FindComponentType(child.TypeName);
+            if (nested != null)
+                ApplyFrameRoot(((FormDocument)nested).Form, live, type);
+            for (nuint i = 0u; i < child.Members.Count; i++)
+            {
+                if (child.Members[i] is FormProperty property)
+                    ApplyDesignedProperty(live, type, property, BaseDirectory);
+            }
+            if (nested != null)
+                CreateFrameContents(((FormDocument)nested).Form, (WindowedControl)live, depth + 1);
+            else if (live is WindowedControl container && !(live is ToolBar))
+                CreateFrameContents(child, container, depth);
         }
     }
 
@@ -730,7 +843,7 @@ public class DesignSurface : Panel
 
     private void ApplyHeldProperties(DesignedItem item)
     {
-        var type = FindDesignedType(item.Component.TypeName);
+        var type = FindComponentType(item.Component.TypeName);
         for (nuint i = 0u; i < item.Component.Members.Count; i++)
         {
             if (item.Component.Members[i] is FormProperty property)
@@ -766,7 +879,7 @@ public class DesignSurface : Panel
     {
         foreach (var item in _items)
         {
-            var type = FindDesignedType(item.Component.TypeName);
+            var type = FindComponentType(item.Component.TypeName);
             if (!type.Exists)
                 continue;
             foreach (var member in item.Component.Members)
@@ -1497,6 +1610,11 @@ public class DesignSurface : Panel
     /// Studio's does, so there is somewhere to put a control at once.
     public void PlaceComponent(String typeName, Point at)
     {
+        if (FindFrameDocument(typeName) != null && typeName == _document.Form.Name)
+        {
+            Message("A frame cannot be placed inside itself.");
+            return;
+        }
         FormComponent parent = _document.Form;
         String name = CreateComponentName(typeName);
         var made = new FormComponent(typeName, name);
@@ -1550,6 +1668,9 @@ public class DesignSurface : Panel
             else
             {
                 Size extent = FindDefaultExtent(typeName);
+                FormDocument? frame = FindFrameDocument(typeName);
+                if (frame != null)
+                    extent = ReadDesignedExtent(((FormDocument)frame).Form);
                 made.SetProperty("Bounds", FormValue.FromRectangle(SnapToGrid(x), SnapToGrid(y),
                                                                     extent.Width, extent.Height));
             }
@@ -1651,6 +1772,16 @@ public class DesignSurface : Panel
             case "Bevel": return Size.FromDimensions(160, 48);
             default: return Size.FromDimensions(80, 24);
         }
+    }
+
+    /// How large a form file makes its root: its `Bounds`, or 320 by 240.
+    private static Size ReadDesignedExtent(FormComponent root)
+    {
+        FormProperty? bounds = root.FindProperty("Bounds");
+        if (bounds == null || ((FormProperty)bounds).Value.Items.Count != 4u)
+            return Size.FromDimensions(320, 240);
+        var items = ((FormProperty)bounds).Value.Items;
+        return Size.FromDimensions(ReadDesignedInteger(items[2u]), ReadDesignedInteger(items[3u]));
     }
 
     /// Where the file puts a component: its `Bounds`, which is what was asked

@@ -198,6 +198,29 @@ Button _saveButton
 The designer makes the list with no form, so a command being designed cannot
 be carried out and its shortcut presses nothing.
 
+**A frame is a form file whose root is `Frame`.** `form AddressFrame : Frame`
+generates a class on `Frame` exactly as a form's is generated on `Form`, and
+the program's half gives it a constructor taking the parent:
+
+```csharp
+public class AddressFrame : Frame
+{
+    public AddressFrame(WindowedControl parent)
+    {
+        base(parent);
+        InitializeComponent();
+    }
+}
+```
+
+A form places one by its class name, like any control, and the generated half
+makes it with `new AddressFrame(this)`. The designer finds the frame's own file
+among the project's form files and the open tabs, shows what it holds, and
+offers the project's frames in the Toolbox. What a placed frame holds is
+edited in the frame's file: the form that places it sets only the frame's own
+properties -- where it is, how it docks -- and not those of the controls in
+it, which is the LCL's inline frame without its per-instance overrides.
+
 Comments are `//` to the end of a line. One above a member belongs to that
 member and moves with it; one after a member's `;` stays on its line; one before
 a `}` stays at the end of the block. A comment among the imports, or between

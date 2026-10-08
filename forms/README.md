@@ -646,7 +646,7 @@ grouped by how much work it is rather than by where it lives.
 | `ToolBar`, `StatusBar`, `ProgressBar`, `TrackBar`, `TabControl`, `TreeView`, `ListView`, `CoolBar` | `comctrls.pp` |
 | `ImageList` | `imglist.pp` |
 | `PaintBox`, `Shape`, `Bevel`, `Splitter`, `Notebook` | `extctrls.pp` |
-| `ScrollBox` | `forms.pp` |
+| `ScrollBox`, `Frame` | `forms.pp` |
 | `CustomControl` | `customcontrol` in `controls.pp` |
 | `Clipboard`, `ClipboardData`, `ClipboardWatcher`: text, HTML, pictures, files and a program's own formats | `clipbrd.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
