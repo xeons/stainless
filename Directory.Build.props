@@ -10,7 +10,7 @@
   <!-- The major and minor version, and the one place either is written. The
        third part is the commit count; tools/Version.proj computes it. -->
   <PropertyGroup>
-    <VersionPrefix>0.2</VersionPrefix>
+    <VersionPrefix>0.3</VersionPrefix>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
