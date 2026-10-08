@@ -338,6 +338,13 @@ typedef struct SlObject {
  */
 #define SL_IMMORTAL ((size_t)-1)
 
+/*
+ * The strong count of an object whose destructor is running. Far from both
+ * zero and SL_IMMORTAL, so references the destructor takes and drops move the
+ * count near it and never onto either.
+ */
+#define SL_DYING (((size_t)-1) / 2)
+
 /* arc.c */
 SL_API void *sl_alloc(const SlTypeInfo *type);
 SL_API void *sl_alloc_aligned_at(size_t size, size_t alignment, size_t at);

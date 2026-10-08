@@ -1,0 +1,7 @@
+scope
+  made 1
+  ~Node 1
+  described 1
+  listed 1
+  weak is gone
+done

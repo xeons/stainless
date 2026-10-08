@@ -508,6 +508,44 @@ void sl_weak_release(void *pointer)
     }
 }
 
+/* True for a count that names no live object: zero, or one being destroyed. */
+static int sl_is_dead_count(size_t count)
+{
+    return count == 0 || (count >= SL_DYING && count != SL_IMMORTAL);
+}
+
+/*
+ * Destroys an object whose last strong reference has gone.
+ *
+ * The count is parked at SL_DYING while the destructor runs, so code in it
+ * that retains and releases `this` -- passing it as an argument, adding it to
+ * a list -- moves the count around the mark and never back to zero, and the
+ * destructor runs once. A weak load sees the mark as dead.
+ *
+ * A destructor MUST NOT leave a reference to its object behind. One that did
+ * would name freed memory, so it stops the program instead.
+ */
+static void sl_destroy(SlObject *object)
+{
+    __atomic_store_n(&object->strong, SL_DYING, __ATOMIC_RELEASE);
+
+    if (object->type != NULL && object->type->destroy != NULL)
+        object->type->destroy(object);
+
+    size_t left = __atomic_load_n(&object->strong, __ATOMIC_ACQUIRE);
+    if (left != SL_DYING) {
+        const char *name = object->type != NULL && object->type->name != NULL
+                         ? object->type->name : "an object";
+        char message[256];
+        snprintf(message, sizeof message,
+                 "the destructor of %s kept a reference to the object it destroyed", name);
+        sl_fail(message);
+    }
+
+    __atomic_store_n(&object->strong, 0, __ATOMIC_RELEASE);
+    sl_weak_release(object);            /* drops the object's own weak reference */
+}
+
 void sl_release(void *pointer)
 {
     SL_LEAK_RELEASE();
@@ -515,11 +553,9 @@ void sl_release(void *pointer)
     SlObject *object = (SlObject *)pointer;
     if (object == NULL || sl_is_immortal(object)) return;
 
-    if (__atomic_fetch_sub(&object->strong, 1, __ATOMIC_ACQ_REL) == 1) {
-        if (object->type != NULL && object->type->destroy != NULL)
-            object->type->destroy(object);
-        sl_weak_release(object);        /* drops the object's own weak reference */
-    }
+    size_t before = __atomic_fetch_sub(&object->strong, 1, __ATOMIC_ACQ_REL);
+    if (before == 1)
+        sl_destroy(object);
 }
 
 /*
@@ -539,7 +575,7 @@ void *sl_weak_load(void *pointer)
 
     for (;;) {
         if (current == SL_IMMORTAL) return object;
-        if (current == 0) return NULL;
+        if (sl_is_dead_count(current)) return NULL;
 
         if (__atomic_compare_exchange_n(&object->strong, &current, current + 1,
                                         1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
@@ -607,5 +643,5 @@ int32_t sl_weak_cell_is_dead(void *pointer)
     if (cell->target == NULL) return 0;
 
     SlObject *target = (SlObject *)cell->target;
-    return __atomic_load_n(&target->strong, __ATOMIC_RELAXED) == 0;
+    return sl_is_dead_count(__atomic_load_n(&target->strong, __ATOMIC_RELAXED));
 }

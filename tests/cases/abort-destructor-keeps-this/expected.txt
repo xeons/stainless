@@ -1,0 +1,2 @@
+destroying
+stainless: the destructor of AbortDestructorKeepsThis.Node kept a reference to the object it destroyed
