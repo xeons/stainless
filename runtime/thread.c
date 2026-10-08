@@ -595,9 +595,15 @@ static void *autorelease_pool_push(void) { return NULL; }
 static void autorelease_pool_pop(void *pool) { (void)pool; }
 #endif
 
+/*
+ * Owned twice: by the handle the starter holds, and by the running thread
+ * until it has read what to run. Whichever lets go last frees it, so a
+ * detached thread costs nothing once it has started.
+ */
 struct SlThread {
     void (*entry)(void *);
     void  *argument;
+    int    owners;
 #ifdef _WIN32
     HANDLE handle;
 #else
@@ -605,19 +611,33 @@ struct SlThread {
 #endif
 };
 
+static void thread_let_go(SlThread *thread)
+{
+    if (__atomic_sub_fetch(&thread->owners, 1, __ATOMIC_ACQ_REL) == 0)
+        free(thread);
+}
+
 #ifdef _WIN32
 static DWORD WINAPI thread_trampoline(LPVOID parameter)
 {
     SlThread *thread = (SlThread *)parameter;
-    thread->entry(thread->argument);
+    void (*entry)(void *) = thread->entry;
+    void *argument = thread->argument;
+    thread_let_go(thread);
+
+    entry(argument);
     return 0;
 }
 #else
 static void *thread_trampoline(void *parameter)
 {
     SlThread *thread = (SlThread *)parameter;
+    void (*entry)(void *) = thread->entry;
+    void *argument = thread->argument;
+    thread_let_go(thread);
+
     void *pool = autorelease_pool_push();
-    thread->entry(thread->argument);
+    entry(argument);
     autorelease_pool_pop(pool);
     return NULL;
 }
@@ -630,6 +650,7 @@ SlThread *sl_thread_start(void (*entry)(void *), void *argument)
 
     thread->entry    = entry;
     thread->argument = argument;
+    thread->owners   = 2;
 
 #ifdef _WIN32
     thread->handle = CreateThread(NULL, 0, thread_trampoline, thread, 0, NULL);
@@ -655,18 +676,14 @@ SlThread *sl_thread_start(void (*entry)(void *), void *argument)
     return thread;
 }
 
-void sl_thread_join(SlThread *thread)
+/* True when `thread` is the one calling. */
+static _Bool thread_is_current(SlThread *thread)
 {
-    if (thread == NULL) return;
-
 #ifdef _WIN32
-    WaitForSingleObject(thread->handle, INFINITE);
-    CloseHandle(thread->handle);
+    return GetThreadId(thread->handle) == GetCurrentThreadId();
 #else
-    pthread_join(thread->handle, NULL);
+    return pthread_equal(thread->handle, pthread_self()) != 0;
 #endif
-
-    free(thread);
 }
 
 void sl_thread_detach(SlThread *thread)
@@ -679,14 +696,31 @@ void sl_thread_detach(SlThread *thread)
     pthread_detach(thread->handle);
 #endif
 
-    /*
-     * The trampoline reads thread->entry and thread->argument before anything
-     * can detach it -- sl_thread_start returns only after pthread_create or
-     * CreateThread has taken a copy of the pointer, and the running thread
-     * touches the block once at the top. Freeing it here would still be a race
-     * with that first read, so the block is leaked instead: one allocation per
-     * detached thread, which is the price of not having a second handshake.
-     */
+    thread_let_go(thread);
+}
+
+/*
+ * A thread joining itself is detached instead. It happens when the last
+ * reference to a Thread is dropped on that thread -- its closure held its
+ * owner -- and a join there would wait for ever.
+ */
+void sl_thread_join(SlThread *thread)
+{
+    if (thread == NULL) return;
+
+    if (thread_is_current(thread)) {
+        sl_thread_detach(thread);
+        return;
+    }
+
+#ifdef _WIN32
+    WaitForSingleObject(thread->handle, INFINITE);
+    CloseHandle(thread->handle);
+#else
+    pthread_join(thread->handle, NULL);
+#endif
+
+    thread_let_go(thread);
 }
 
 void sl_thread_yield(void)
