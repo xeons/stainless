@@ -191,6 +191,9 @@ public static class ToolboxIconFiles
 
     [Embed("icons/16/frame.png")]
     public static readonly byte[] Frame;
+
+    [Embed("icons/16/maskedit.png")]
+    public static readonly byte[] MaskEdit;
 }
 
 /// Every toolbar icon as one list, or null if they could not be decoded.
@@ -243,6 +246,7 @@ byte[] FindToolboxIconFile(String typeName)
         case "Button": return ToolboxIconFiles.Button;
         case "Label": return ToolboxIconFiles.Label;
         case "TextBox": return ToolboxIconFiles.TextBox;
+        case "MaskEdit": return ToolboxIconFiles.MaskEdit;
         case "CheckBox": return ToolboxIconFiles.CheckBox;
         case "RadioButton": return ToolboxIconFiles.RadioButton;
         case "ToggleButton": return ToolboxIconFiles.ToggleButton;

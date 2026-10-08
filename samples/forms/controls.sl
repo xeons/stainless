@@ -87,6 +87,8 @@ public class ChecksForm : Form
     public late CoolBand Folded;
     public late Label FoldedLabel;
 
+    public late MaskEdit Phone;
+
     public int TabChanges;
     public int PageChanges;
     public int ChoiceChanges;
@@ -201,6 +203,12 @@ public class ChecksForm : Form
         FoldedLabel.Text = "Folded away";
         Folded.Control = FoldedLabel;
         Cool.Change += this.OnCoolChanged;
+
+        // Half filled, so the blanks and the literals both show.
+        Phone = new MaskEdit(this);
+        Phone.SetBounds(8, 460, 200, 26);
+        Phone.EditMask = "(999) 000-0000;0;_";
+        Phone.Text = "555123";
     }
 
     void AddCaption(NotebookPage page, String text)

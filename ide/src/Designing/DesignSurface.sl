@@ -1753,6 +1753,7 @@ public class DesignSurface : Panel
         {
             case "Label": return Size.FromDimensions(80, 16);
             case "TextBox":
+            case "MaskEdit":
             case "ComboBox": return Size.FromDimensions(120, 24);
             case "CheckBox":
             case "RadioButton": return Size.FromDimensions(104, 24);

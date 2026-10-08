@@ -32,7 +32,7 @@ import Ide.Designer;
 
 /// The types the designer can make, in the order a Toolbox lists them.
 public String[] ListDesignableTypes() =>
-    ["Button", "Label", "TextBox", "CheckBox", "RadioButton", "ToggleButton",
+    ["Button", "Label", "TextBox", "MaskEdit", "CheckBox", "RadioButton", "ToggleButton",
      "ListBox", "ComboBox", "CheckListBox", "SpinEdit", "ProgressBar", "TrackBar",
      "TreeView", "ListView", "Panel", "GroupBox", "ScrollBox", "TabControl", "TabPage", "Image", "PaintBox",
      "Shape", "Bevel", "ToolBar", "MainMenu", "Timer", "CommandList"];
@@ -122,6 +122,7 @@ public Control? CreateDesignedControl(String typeName, WindowedControl parent)
         case "Button": return new Button(parent);
         case "Label": return new Label(parent);
         case "TextBox": return new TextBox(parent);
+        case "MaskEdit": return new MaskEdit(parent);
         case "CheckBox": return new CheckBox(parent);
         case "RadioButton": return new RadioButton(parent);
         case "ToggleButton": return new ToggleButton(parent);

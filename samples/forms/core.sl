@@ -431,6 +431,7 @@ public class CoreForm : Form
         ok = KeyboardChecks(ok);
         ok = CommandChecks(ok);
         ok = ScrollBoxChecks(ok);
+        ok = MaskChecks(ok);
 
         var squeezed = Rectangle.FromBounds(0, 0, 10, 10).DeflateBy(6);
         ok = Check(ok, "deflating past nothing gives an empty rectangle",
@@ -710,6 +711,139 @@ public class CoreForm : Form
         ok = Check(ok, "the user scrolling is reported",
                    log.Runs == 1 && box.ScrollPosition.Y > 0);
 #endif
+
+        host.Close();
+        Settle();
+        return ok;
+    }
+
+    /// One mask laid over one text, against what LCL's documentation says it
+    /// shows and what `Text` then answers.
+    bool CheckFit(bool ok, String mask, String text, String shown, String answer)
+    {
+        var pattern = MaskPattern.Parse(mask);
+        String fitted = pattern.Fit(text);
+        String stripped = pattern.Strip(fitted);
+        bool right = fitted == shown && stripped == answer;
+        if (!right)
+            Console.WriteLine($"     {mask} with '{text}' showed '{fitted}' as '{stripped}'");
+        return Check(ok, $"'{text}' in {mask} shows '{shown}'", right);
+    }
+
+    /// The mask language on its own, then a box typed into as the user would.
+    bool MaskChecks(bool ok)
+    {
+        var phone = MaskPattern.Parse("(999) 000-0000;0;_");
+        ok = Check(ok, "a mask is as long as its positions",
+                   phone.Length == 14u && phone.IsLiteral(0u) && !phone.IsLiteral(1u));
+        ok = Check(ok, "and reads its two trailing fields",
+                   !phone.SavesLiterals && phone.Blank == (char32)'_');
+        ok = Check(ok, "an empty one shows its literals", phone.BlankText == "(___) ___-____");
+
+        ok = CheckFit(ok, "99", "1", "1_", "1 ");
+        ok = CheckFit(ok, "!99", "1", "_1", " 1");
+        ok = CheckFit(ok, "cc-cc", "1-2", "1_-2_", "1 -2 ");
+        ok = CheckFit(ok, "!cc-cc", "1-2", "_1-_2", " 1- 2");
+        ok = CheckFit(ok, "cc-cc@cc", "1-2@3", "1_-2_@3_", "1 -2 @3 ");
+        ok = CheckFit(ok, "cc-cc@cc", "123-456@789", "12-45@78", "12-45@78");
+        ok = CheckFit(ok, "!cc-cc@cc", "123-456@789", "23-56@89", "23-56@89");
+        ok = CheckFit(ok, "(999) 000-0000;0;_", "5551234567", "(555) 123-4567", "5551234567");
+        ok = CheckFit(ok, "(999) 000-0000;0;_", "(555) 123-4567", "(555) 123-4567", "5551234567");
+        ok = CheckFit(ok, "00:00;1;*", "12", "12:**", "12:  ");
+
+        var upper = MaskPattern.Parse(">LL<ll");
+        ok = Check(ok, "> and < turn what is typed into their case",
+                   upper.Accept(0u, (char32)'q') is Some big && big.Value == (char32)'Q'
+                   && upper.Accept(2u, (char32)'Q') is Some small && small.Value == (char32)'q');
+        var hex = MaskPattern.Parse("[a-c]\\[[!x]H");
+        ok = Check(ok, "a set takes its members, a range included",
+                   hex.Accept(0u, (char32)'b').HasValue && !hex.Accept(0u, (char32)'d').HasValue);
+        ok = Check(ok, "a backslash makes the next character literal",
+                   hex.IsLiteral(1u) && hex.GetSlot(1u).Literal == (char32)'[');
+        ok = Check(ok, "a negated set takes everything else",
+                   hex.Accept(2u, (char32)'y').HasValue && !hex.Accept(2u, (char32)'x').HasValue);
+        ok = Check(ok, "a required position refuses a blank, an optional one takes it",
+                   !hex.Accept(3u, (char32)' ').HasValue
+                   && MaskPattern.Parse("9").Accept(0u, (char32)' ').HasValue);
+        ok = Check(ok, "a mask is complete when every required position is filled",
+                   phone.IsComplete("(___) 123-4567") && !phone.IsComplete("(555) 123-45_7"));
+
+        var host = new Form(WindowBorder.Sizable);
+        host.Text = "Masked";
+        host.SetBounds(0, 0, 320, 160);
+        var box = new MaskEdit(host);
+        box.SetBounds(10, 10, 200, 24);
+        var edits = new CommandLog();
+        box.UserTextChanged += (sender) => { edits.Runs++; };
+        box.EditMask = "(999) 000-0000;0;_";
+        host.Show();
+        Settle();
+        box.Focus();
+        Settle();
+
+        ok = Check(ok, "a mask edit starts empty, showing its literals",
+                   box.EditText == "(___) ___-____" && box.Text == "");
+
+        var notify = (IControlNotify)box;
+        box.SelectionStart = 0;
+        box.SelectionLength = 0;
+        foreach (var typed in ["5", "5", "x", "5", "1", "2"])
+        {
+            if (!notify.OnPlatformKeyPress(typed.GetCodePointAt(0u)))
+                ok = Check(ok, $"typing '{typed}' is the mask's to place", false);
+        }
+        ok = Check(ok, "typing fills positions in turn, stepping over literals and refusing letters",
+                   box.EditText == "(555) 12_-____");
+        ok = Check(ok, "and leaves the caret after what it typed",
+                   box.SelectionStart == 8 && box.SelectionLength == 0);
+        ok = Check(ok, "each keystroke is the user's change", edits.Runs == 5);
+
+        notify.OnPlatformKeyDown(Key.Backspace, ModifierKeys.None);
+        ok = Check(ok, "backspace blanks the position before the caret",
+                   box.EditText == "(555) 1__-____" && box.SelectionStart == 7);
+        box.SelectionStart = 5;
+        notify.OnPlatformKeyDown(Key.Backspace, ModifierKeys.None);
+        ok = Check(ok, "stepping back over a literal",
+                   box.EditText == "(55_) 1__-____" && box.SelectionStart == 3);
+
+#if WINDOWS
+        // The messages a keyboard sends, rather than the notifications they
+        // become: Windows types a backspace as well as pressing it.
+        HWND edit = (HWND)(void*)box.Handle;
+        box.EditText = "";
+        box.SelectionStart = 0;
+        SendMessageW(edit, WmChar, (ulong)'4', 0);
+        SendMessageW(edit, WmChar, (ulong)'2', 0);
+        ok = Check(ok, "the platform's own keystrokes are placed the same way",
+                   box.EditText == "(42_) ___-____");
+        SendMessageW(edit, WmKeyDown, (ulong)VkBack, 0);
+        SendMessageW(edit, WmChar, 8u, 0);
+        ok = Check(ok, "and so is its backspace, once", box.EditText == "(4__) ___-____");
+#endif
+
+        box.Text = "5551234567";
+        ok = Check(ok, "setting Text lays it into the mask",
+                   box.EditText == "(555) 123-4567" && box.Text == "5551234567" && box.IsValid);
+        box.EditText = "(12";
+        ok = Check(ok, "setting EditText keeps the mask's shape",
+                   box.EditText == "(12_) ___-____" && !box.IsValid);
+        ok = Check(ok, "and ValidateEdit puts the caret on what is missing",
+                   !box.ValidateEdit() && box.SelectionStart == 6);
+
+        box.SelectionStart = 1;
+        box.SelectionLength = 13;
+        Clipboard.SetText("555-867-5309");
+        box.PasteFromClipboard();
+        Settle();
+        ok = Check(ok, "a paste is typed in from where it went, literals and all",
+                   box.EditText == "(555) 867-5309");
+
+        var late = new MaskEdit(host);
+        late.SetBounds(10, 50, 200, 24);
+        late.Text = "5551234567";
+        late.EditMask = "(999) 000-0000;0;_";
+        ok = Check(ok, "text set before the mask is laid into it",
+                   late.EditText == "(555) 123-4567");
 
         host.Close();
         Settle();

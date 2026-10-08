@@ -647,6 +647,7 @@ grouped by how much work it is rather than by where it lives.
 | `ImageList` | `imglist.pp` |
 | `PaintBox`, `Shape`, `Bevel`, `Splitter`, `Notebook` | `extctrls.pp` |
 | `ScrollBox`, `Frame` | `forms.pp` |
+| `MaskEdit`, `MaskPattern` | `maskedit.pp` |
 | `CustomControl` | `customcontrol` in `controls.pp` |
 | `Clipboard`, `ClipboardData`, `ClipboardWatcher`: text, HTML, pictures, files and a program's own formats | `clipbrd.pp` |
 | `OpenDialog`, `SaveDialog`, `FolderDialog`, `ColorDialog`, `FontDialog` | `dialogs.pp` |
@@ -660,6 +661,30 @@ grouped by how much work it is rather than by where it lives.
 | `ButtonPanel` | `buttonpanel.pas` |
 | `Color`, `Point`, `Size`, `Rectangle`, `Font`, `Pen`, `Brush`, `Graphics`, `Bitmap` | `graphics.pp` |
 | the widgetset seam | `widgetset/ws*.pp`, `interfaces/win32` |
+
+### MaskEdit: text with a shape
+
+`MaskEdit` is a `TextBox` whose `EditMask` fixes what each position takes, in
+the LCL's syntax: `(999) 000-0000;0;_` is a telephone number whose `Text` is
+its ten digits. `MaskPattern` is the mask parsed, and is a plain object with
+no window, so the rules are tested without one.
+
+**It is built on the keyboard, not on the platform.** No platform's entry
+knows about masks, so typing goes through `KeyPress` with `Handled` set: the
+character goes into the position at the caret, or the next that takes it,
+and literals are stepped over. Backspace and Delete put the blank back
+rather than closing the gap. Everything else the platform does to the text
+-- a paste, a cut, a dropped string -- arrives as a change after the fact,
+and is undone into what it removed and what it put in; the put-in text is
+then typed from where it went. So a paste of `555-867-5309` lands as
+`(555) 867-5309`, on all three platforms, without asking any of them for its
+clipboard.
+
+**Two departures from the LCL.** `:` and `/` are literals as written rather
+than the locale's separators, which this library does not know. And setting
+`EditMask` lays the text already there into the new mask rather than
+emptying the box, so a designed form that sets `Text` before `EditMask`
+keeps it.
 
 ### Next, and each a day rather than a week
 
@@ -729,9 +754,9 @@ not turned back into them.
 
 - **`DateTimePicker`, `Calendar`** (`calendar.pp`) — `comctl32` has both, and
   so does GTK; the work is a date type this library does not have yet.
-- **`MaskEdit`** (`maskedit.pp`) and the `editbtn.pas` family — `FileNameEdit`,
-  `DirectoryEdit`, `DateEdit`: an edit with a button that opens a dialog, which
-  is why the dialogs come first.
+- **The `editbtn.pas` family** -- `FileNameEdit`, `DirectoryEdit`, `DateEdit`:
+  an edit with a button that opens a dialog, which is why the dialogs come
+  first.
 - **`ColorBox`, `ColorListBox`** (`colorbox.pas`) — owner-drawn lists.
 - **Owner drawing** across list, combo and button. Menus and toolbars have it
   -- see *Chrome* above -- and the rest want the same two messages.
