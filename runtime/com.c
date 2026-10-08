@@ -258,22 +258,24 @@ static int32_t SL_COM_METHOD factory_query(void *self, const SlGuid *iid, void *
         !sl_guid_equals(iid, &sl_iid_class_factory))
         return SL_COM_E_NOINTERFACE;
 
-    factory->refs++;
+    __atomic_add_fetch(&factory->refs, 1, __ATOMIC_RELAXED);
     *result = factory;
     return SL_COM_S_OK;
 }
 
+/* Counted atomically: a free-threaded factory is AddRef'd and Released from
+ * any thread, and a lost update frees it twice or never. */
 static uint32_t SL_COM_METHOD factory_add_ref(void *self)
 {
     SlClassFactory *factory = (SlClassFactory *)self;
-    return (uint32_t)++factory->refs;
+    return (uint32_t)__atomic_add_fetch(&factory->refs, 1, __ATOMIC_RELAXED);
 }
 
 static uint32_t SL_COM_METHOD factory_release(void *self)
 {
     SlClassFactory *factory = (SlClassFactory *)self;
     int32_t *live = factory->live;
-    int32_t remaining = --factory->refs;
+    int32_t remaining = __atomic_sub_fetch(&factory->refs, 1, __ATOMIC_ACQ_REL);
 
     if (remaining == 0) {
         free(factory);

@@ -787,8 +787,14 @@ size_t sl_socket_send_to(size_t handle, const uint8_t *data, size_t count,
     moved = sendto((SlNative)handle, (const char *)data, sl_net_count(count), 0,
                    found->ai_addr, (SlLength)found->ai_addrlen);
 #else
+    /* See sl_net_no_sigpipe: a stream socket ignores the address and sends. */
+#  ifdef MSG_NOSIGNAL
+    moved = sendto((SlNative)handle, data, count, MSG_NOSIGNAL,
+                   found->ai_addr, (SlLength)found->ai_addrlen);
+#  else
     moved = sendto((SlNative)handle, data, count, 0,
                    found->ai_addr, (SlLength)found->ai_addrlen);
+#  endif
 #endif
 
     if (moved < 0) {

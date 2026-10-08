@@ -184,6 +184,12 @@ void sl_leak_forget(void *object)
 
     sl_mutex_lock(sl_live_gate);
 
+    if (sl_live_capacity == 0) {
+        sl_live_untracked++;
+        sl_mutex_unlock(sl_live_gate);
+        return;
+    }
+
     size_t at = sl_live_slot(sl_live_capacity, object);
     size_t probed = 0;
 
@@ -252,6 +258,11 @@ static int sl_leak_worst_first(const void *left, const void *right)
  * about is harder to read than one that follows it.
  *
  * The first line is the one a script reads. The rest is for a person.
+ *
+ * The table is read under its lock: other threads still run while atexit
+ * handlers do, and one allocating would move the table under the walk. The
+ * wait for it is bounded, because Windows ends a library's other threads
+ * before its handlers run, and one ended while holding it never lets go.
  */
 static void sl_leak_report(void)
 {
@@ -259,6 +270,12 @@ static void sl_leak_report(void)
     sl_live_reporting = 1;
 
     fflush(NULL);
+
+    _Bool locked = sl_mutex_try_lock(sl_live_gate);
+    for (int tries = 0; !locked && tries < 200; tries++) {
+        sl_thread_sleep(5);
+        locked = sl_mutex_try_lock(sl_live_gate);
+    }
 
     size_t live = sl_live_count;
     size_t bytes = 0;
@@ -281,6 +298,9 @@ static void sl_leak_report(void)
             size_t found = kinds;
             for (size_t k = 0; k < kinds; k++)
                 if (strcmp(tally[k].name, name) == 0) { found = k; break; }
+
+            /* Bounded by the count the tally was sized for. */
+            if (found == kinds && kinds == live) continue;
 
             if (found == kinds) {
                 tally[kinds].name = name;
@@ -315,6 +335,7 @@ static void sl_leak_report(void)
     }
 
     fflush(stderr);
+    if (locked) sl_mutex_unlock(sl_live_gate);
 }
 
 #endif /* SL_LEAK_CHECK */
