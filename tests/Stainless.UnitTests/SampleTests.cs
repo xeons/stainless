@@ -173,9 +173,6 @@ public class SampleTests
         new("macos/window", ["samples/macos/window.sl"]) { MacOnly = true },
     ];
 
-    /// <summary>The Win32 samples are written against the bindings.</summary>
-    private static string[] Win32Bindings() => BindingsUnder("win32");
-
     /// <summary>The Forms library's own sources, for a sample written against it.</summary>
     private static string[] FormsSources() =>
         Directory.EnumerateFiles(Path.Combine(Repository.Root, "forms", "src"),
@@ -183,14 +180,12 @@ public class SampleTests
             .OrderBy(p => p, StringComparer.Ordinal)
             .ToArray();
 
-    /// <summary>And the GTK sample against those.</summary>
-    private static string[] GtkBindings() => BindingsUnder("gtk");
-
     /// <summary>
     /// The files of a binding directory that <paramref name="program"/>
     /// reaches by its imports, as a build reaches the standard library's.
     /// <c>bindings/macos</c> is 438,000 lines, and binding all of it for each
-    /// Forms sample costs more than the rest of the suite.
+    /// Forms sample costs more than the rest of the suite; the others are
+    /// smaller and the same is true of them in proportion.
     /// </summary>
     private static string[] ReachedBindings(IEnumerable<string> program, string directory)
     {
@@ -210,16 +205,33 @@ public class SampleTests
             .OrderBy(p => p, StringComparer.Ordinal)
             .ToArray();
 
+    /// <summary>The samples that are not Forms programs.</summary>
     public static TheoryData<string> Names()
     {
         var data = new TheoryData<string>();
-        foreach (var sample in Samples) data.Add(sample.Name);
+        foreach (var sample in Samples.Where(s => !s.NeedsForms)) data.Add(sample.Name);
+        return data;
+    }
+
+    /// <summary>
+    /// The Forms programs, every other one from <paramref name="shard"/>. They
+    /// are the largest, and the runner takes one class at a time on a thread,
+    /// so they are tested by two classes of their own.
+    /// </summary>
+    public static TheoryData<string> FormsNames(int shard)
+    {
+        var data = new TheoryData<string>();
+        var forms = Samples.Where(s => s.NeedsForms).ToList();
+        for (int i = shard; i < forms.Count; i += 2)
+            data.Add(forms[i].Name);
         return data;
     }
 
     [Theory]
     [MemberData(nameof(Names))]
-    public void ASampleStillBinds(string name)
+    public void ASampleStillBinds(string name) => CheckSample(name);
+
+    internal static void CheckSample(string name)
     {
         var sample = Samples.First(s => s.Name == name);
 
@@ -227,28 +239,25 @@ public class SampleTests
             return;
 
         var paths = sample.Paths.Select(p => Path.Combine(Repository.Root, p)).ToList();
-        if (sample.WindowsOnly)
-            paths.AddRange(Win32Bindings());
-        if (sample.UnixOnly)
-            paths.AddRange(GtkBindings());
-        if (sample.LinuxOnly)
-            paths.AddRange(BindingsUnder("linux"));
-        if (sample.MacOnly)
-            paths.AddRange(BindingsUnder("macos"));
 
         // A Forms program needs the backend for the machine it is being bound
         // on, because that is the half of `forms/src` the preprocessor will
         // keep. Asking for the other one's bindings would bind nothing.
         if (sample.NeedsForms)
-        {
             paths.AddRange(FormsSources());
-            paths.AddRange(TargetPlatform.HostOS switch
-            {
-                TargetOS.Windows => Win32Bindings(),
-                TargetOS.MacOS => ReachedBindings(paths, "macos"),
-                _ => GtkBindings(),
-            });
-        }
+
+        // Each binding directory as far as the program reaches it, as a build
+        // takes it.
+        var reached = new List<string>();
+        if (sample.WindowsOnly || (sample.NeedsForms && TargetPlatform.HostOS == TargetOS.Windows))
+            reached.AddRange(ReachedBindings(paths, "win32"));
+        if (sample.UnixOnly || (sample.NeedsForms && TargetPlatform.HostOS == TargetOS.Linux))
+            reached.AddRange(ReachedBindings(paths, "gtk"));
+        if (sample.LinuxOnly)
+            reached.AddRange(ReachedBindings(paths, "linux"));
+        if (sample.MacOnly || (sample.NeedsForms && TargetPlatform.HostOS == TargetOS.MacOS))
+            reached.AddRange(ReachedBindings(paths, "macos"));
+        paths.AddRange(reached.Distinct(StringComparer.Ordinal));
 
         var program = Front.BindFiles(paths, out var diagnostics, sample.Shared);
 
@@ -342,4 +351,20 @@ public class SampleTests
 
         Assert.DoesNotContain(found, p => !listed.Contains(p));
     }
+}
+
+/// <summary>Half the Forms samples, as <see cref="SampleTests"/> checks the rest.</summary>
+public class FormsSampleTests
+{
+    [Theory]
+    [MemberData(nameof(SampleTests.FormsNames), 0, MemberType = typeof(SampleTests))]
+    public void AFormsSampleStillBinds(string name) => SampleTests.CheckSample(name);
+}
+
+/// <summary>And the other half.</summary>
+public class MoreFormsSampleTests
+{
+    [Theory]
+    [MemberData(nameof(SampleTests.FormsNames), 1, MemberType = typeof(SampleTests))]
+    public void AFormsSampleStillBinds(string name) => SampleTests.CheckSample(name);
 }

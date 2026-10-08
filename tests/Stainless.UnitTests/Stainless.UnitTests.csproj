@@ -8,6 +8,9 @@
     <RootNamespace>Stainless.UnitTests</RootNamespace>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
+    <!-- Every core binds at once, and the compiler allocates as it goes: the
+         workstation collector stops them all for each collection. -->
+    <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
 
   <ItemGroup>

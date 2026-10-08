@@ -308,53 +308,63 @@ public partial class DiagnosticTests
     }
 
     /// <summary>
-    /// Every case that must fail says only what is wrong: no message in it
-    /// names the error type, which is what a consequence of an earlier error
-    /// looks like when the place reporting it did not check.
+    /// The cases that must fail, by directory name: every <paramref name="of"/>th
+    /// one from <paramref name="shard"/>. The runner takes one class at a time
+    /// on a thread, so the cases are spread over <see cref="FailingCaseShards"/>
+    /// classes that run side by side.
     /// </summary>
-    [Fact]
-    public void NoFailingCaseNamesTheErrorType()
+    public static TheoryData<string> FailingCases(int shard, int of)
     {
         string cases = Path.Combine(Repository.Root, "tests", "cases");
-        var failing = Directory.EnumerateDirectories(cases)
+        var data = new TheoryData<string>();
+        var names = Directory.EnumerateDirectories(cases)
             .Where(d => File.Exists(Path.Combine(d, "errors.txt")))
             .Where(d => !Directory.Exists(Path.Combine(d, "library")))
+            .Select(Path.GetFileName)
             .Order(StringComparer.Ordinal)
             .ToList();
+        for (int i = shard; i < names.Count; i += of)
+            data.Add(names[i]!);
+        return data;
+    }
 
-        var named = new System.Collections.Concurrent.ConcurrentBag<string>();
+    public const int FailingCaseShards = 4;
 
-        Parallel.ForEach(failing, directory =>
+    /// <summary>
+    /// Every case that must fail says only what is wrong: no message in it
+    /// names the error type, which is what a consequence of an earlier error
+    /// looks like when the place reporting it did not check. The tests are in
+    /// <see cref="FailingCasesFirst"/> and its three siblings.
+    /// </summary>
+    public static void CheckFailingCase(string name)
+    {
+        string directory = Path.Combine(Repository.Root, "tests", "cases", name);
+        string output = Path.Combine(Path.GetTempPath(), "stainless-error-type", name);
+        string defines = Path.Combine(directory, "defines.txt");
+        string target = Path.Combine(directory, "target.txt");
+
+        var result = new Driver.Compilation().Compile(new Driver.CompilationOptions
         {
-            string output = Path.Combine(Path.GetTempPath(), "stainless-error-type", Path.GetFileName(directory));
-            string defines = Path.Combine(directory, "defines.txt");
-            string target = Path.Combine(directory, "target.txt");
-
-            Driver.CompilationResult result;
-            try
-            {
-                result = new Driver.Compilation().Compile(new Driver.CompilationOptions
-                {
-                    SourcePaths = Directory.EnumerateFiles(directory, "*.sl").Order(StringComparer.Ordinal).ToList(),
-                    OutputPath = output + ".ll",
-                    IntermediateDirectory = output,
-                    EmitIrOnly = true,
-                    Defines = File.Exists(defines) ? File.ReadAllLines(defines).Where(l => l.Length > 0).ToList() : [],
-                    Target = File.Exists(target) ? Binding.TargetPlatform.Parse(File.ReadAllText(target).Trim()) : null,
-                });
-            }
-            catch (InternalCompilerError error)
-            {
-                named.Add($"{Path.GetFileName(directory)}: {error.Message}");
-                return;
-            }
-
-            foreach (var diagnostic in result.Diagnostics)
-                if (diagnostic.Message.Contains(DiagnosticBag.ErrorTypeName, StringComparison.Ordinal))
-                    named.Add($"{Path.GetFileName(directory)}: {diagnostic.Message}");
+            SourcePaths = Directory.EnumerateFiles(directory, "*.sl").Order(StringComparer.Ordinal).ToList(),
+            OutputPath = output + ".ll",
+            IntermediateDirectory = output,
+            EmitIrOnly = true,
+            Defines = File.Exists(defines) ? File.ReadAllLines(defines).Where(l => l.Length > 0).ToList() : [],
+            Target = File.Exists(target) ? Binding.TargetPlatform.Parse(File.ReadAllText(target).Trim()) : null,
         });
 
-        Assert.Empty(named.Order(StringComparer.Ordinal));
+        Assert.DoesNotContain(result.Diagnostics,
+            d => d.Message.Contains(DiagnosticBag.ErrorTypeName, StringComparison.Ordinal));
+    }
+
+    /// <summary>Every shard together is every case.</summary>
+    [Fact]
+    public void TheShardsCoverEveryFailingCase()
+    {
+        int total = 0;
+        for (int shard = 0; shard < FailingCaseShards; shard++)
+            total += FailingCases(shard, FailingCaseShards).Count;
+        Assert.Equal(FailingCases(0, 1).Count, total);
     }
 
     [Fact]

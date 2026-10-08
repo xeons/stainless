@@ -41,20 +41,21 @@ public static class Front
     public const string TestFile = "<test>";
 
     /// <summary>
-    /// The standard library, parsed once.
+    /// The standard library, lexed and parsed once, each file beside what its
+    /// tokens say it reaches.
     ///
-    /// Every binder test needs it -- <c>String</c> and <c>int.ToString()</c>
-    /// come from there -- and it is thirty files. Sharing the trees is safe
-    /// because the syntax is immutable: a binder reads it and builds its own
-    /// symbols, so two binders over the same trees cannot see each other.
+    /// Every binder test needs some of it -- <c>String</c> and
+    /// <c>int.ToString()</c> come from there. Sharing the trees is safe because
+    /// the syntax is immutable: a binder reads it and builds its own symbols,
+    /// so two binders over the same trees cannot see each other.
     /// </summary>
-    private static readonly Lazy<IReadOnlyList<CompilationUnitSyntax>> Library = new(() =>
+    private static readonly Lazy<IReadOnlyList<(LexedSource Lexed, CompilationUnitSyntax Unit)>> Library = new(() =>
     {
         var diagnostics = new DiagnosticBag();
-        var units = StandardLibrary.Sources()
-            .Select(s => new Parser(new SourceText(s.Name, s.Text), diagnostics, Symbols)
-                .ParseCompilationUnit())
+        var files = StandardLibrary.Sources()
+            .Select(s => LexedSource.Of(new SourceText(s.Name, s.Text), diagnostics, Symbols))
             .ToList();
+        var parsed = files.Select(f => (f, f.Parse(diagnostics))).ToList();
 
         // A standard library that does not parse would fail every test below
         // with something unrelated to what the test is about.
@@ -63,8 +64,44 @@ public static class Front
                 "the standard library does not parse: " +
                 string.Join("; ", diagnostics.Items.Select(d => d.Code + " " + d.Message)));
 
-        return units;
+        return parsed;
     });
+
+    private static readonly Lazy<List<LexedSource>> LibraryFiles =
+        new(() => Library.Value.Select(f => f.Lexed).ToList());
+
+    /// <summary>
+    /// The library a program of these sources is bound with: the modules it
+    /// reaches, as the driver chooses them.
+    ///
+    /// Binding all of it instead costs most of a second a test, which over a
+    /// suite of thousands is most of its time, and binds a program the
+    /// compiler never would.
+    /// </summary>
+    private static List<CompilationUnitSyntax> LibraryFor(IEnumerable<SourceText> sources) =>
+        LibraryFor(sources.Select(s => LexedSource.Of(s, new DiagnosticBag(), Symbols)).ToList());
+
+    private static List<CompilationUnitSyntax> LibraryFor(List<LexedSource> own)
+    {
+        var reached = LibraryClosure.ReachedFiles(LibraryFiles.Value, own).ToHashSet();
+        return Library.Value.Where(f => reached.Contains(f.Lexed)).Select(f => f.Unit).ToList();
+    }
+
+    /// <summary>
+    /// Files read from disk, each lexed and parsed once, with what doing so
+    /// reported. The Forms sources and the bindings are shared by many
+    /// samples, and are the same text for every one of them.
+    /// </summary>
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<
+        string, (LexedSource Lexed, CompilationUnitSyntax Unit, DiagnosticBag Reported)> Files = new();
+
+    private static (LexedSource Lexed, CompilationUnitSyntax Unit, DiagnosticBag Reported) ReadFile(string path) =>
+        Files.GetOrAdd(path, p =>
+        {
+            var reported = new DiagnosticBag();
+            var lexed = LexedSource.Of(SourceText.FromFile(p), reported, Symbols);
+            return (lexed, lexed.Parse(reported), reported);
+        });
 
     public static SourceText Text(string source) => new(TestFile, source);
 
@@ -122,8 +159,9 @@ public static class Front
                                     CppAbi? abi = null, bool shared = false)
     {
         diagnostics = new DiagnosticBag();
-        var unit = new Parser(Text(source), diagnostics, Symbols).ParseCompilationUnit();
-        var units = Library.Value.Append(unit).ToList();
+        var text = Text(source);
+        var unit = new Parser(text, diagnostics, Symbols).ParseCompilationUnit();
+        var units = LibraryFor([text]).Append(unit).ToList();
 
         return new Binder(diagnostics, requireEntryPoint: !shared, cppAbi: abi).Bind(units);
     }
@@ -137,9 +175,10 @@ public static class Front
     {
         diagnostics = new DiagnosticBag();
 
-        var units = Library.Value.ToList();
-        foreach (string source in sources)
-            units.Add(new Parser(Text(source), diagnostics, Symbols).ParseCompilationUnit());
+        var texts = sources.Select(Text).ToList();
+        var units = LibraryFor(texts);
+        foreach (var text in texts)
+            units.Add(new Parser(text, diagnostics, Symbols).ParseCompilationUnit());
 
         return new Binder(diagnostics, requireEntryPoint: true).Bind(units);
     }
@@ -154,9 +193,9 @@ public static class Front
     public static BoundProgram BindAt(string path, string source, out DiagnosticBag diagnostics)
     {
         diagnostics = new DiagnosticBag();
-        var unit = new Parser(new SourceText(path, source), diagnostics, Symbols)
-            .ParseCompilationUnit();
-        var units = Library.Value.Append(unit).ToList();
+        var text = new SourceText(path, source);
+        var unit = new Parser(text, diagnostics, Symbols).ParseCompilationUnit();
+        var units = LibraryFor([text]).Append(unit).ToList();
 
         return new Binder(diagnostics, requireEntryPoint: false).Bind(units);
     }
@@ -174,10 +213,13 @@ public static class Front
     {
         diagnostics = new DiagnosticBag();
 
-        var units = Library.Value.ToList();
-        foreach (string path in paths)
-            units.Add(new Parser(SourceText.FromFile(path), diagnostics, Symbols)
-                .ParseCompilationUnit());
+        var files = paths.Select(ReadFile).ToList();
+        var units = LibraryFor(files.Select(f => f.Lexed).ToList());
+        foreach (var file in files)
+        {
+            diagnostics.AddRange(file.Reported);
+            units.Add(file.Unit);
+        }
 
         return new Binder(diagnostics, requireEntryPoint: !shared).Bind(units);
     }
@@ -193,11 +235,11 @@ public static class Front
     public static string[] FilesCodes(params string[] bodies)
     {
         var diagnostics = new DiagnosticBag();
-        var units = Library.Value.ToList();
+        var texts = bodies.Select(body => Text("module Test;\n" + body)).ToList();
+        var units = LibraryFor(texts);
 
-        foreach (string body in bodies)
-            units.Add(new Parser(Text("module Test;\n" + body), diagnostics, Symbols)
-                .ParseCompilationUnit());
+        foreach (var text in texts)
+            units.Add(new Parser(text, diagnostics, Symbols).ParseCompilationUnit());
 
         new Binder(diagnostics, requireEntryPoint: false).Bind(units);
         return Codes(diagnostics);
@@ -320,7 +362,7 @@ public static class Front
         var source = Text("module Test;\n" + body);
         var diagnostics = new DiagnosticBag();
         var unit = new Parser(source, diagnostics, Symbols).ParseCompilationUnit();
-        var units = Library.Value.Append(unit).ToList();
+        var units = LibraryFor([source]).Append(unit).ToList();
         var program = new Binder(diagnostics, requireEntryPoint: false, cppAbi: abi)
             .Bind(units);
 
