@@ -1,2 +1,3 @@
 held: square, square
-after: gone
+through the interface: square
+after: gone, gone

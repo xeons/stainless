@@ -802,6 +802,14 @@ public sealed partial class Binder
     private static bool IsSameOrBaseClass(TypeSymbol from, TypeSymbol to) =>
         from.Equals(to) || (from is ClassTypeSymbol derived && to is ClassTypeSymbol baseClass && derived.DerivesFrom(baseClass));
 
+    /// <summary>
+    /// Whether a weak slot of an interface may take <paramref name="referenced"/>
+    /// as it stands: a class that implements it, or an interface that extends
+    /// it. Both are the same pointer as the interface reference would be.
+    /// </summary>
+    private static bool ImplementsWeakTarget(NamedTypeSymbol referenced, TypeSymbol target) =>
+        target is InterfaceTypeSymbol wanted && referenced.AllInterfaces().Contains(wanted);
+
     private static bool CouldImplement(ClassTypeSymbol candidate, InterfaceTypeSymbol wanted) =>
         candidate.AllInterfaces().Contains(wanted) || !candidate.IsSealed;
 
@@ -997,12 +1005,14 @@ public sealed partial class Binder
         // weak slot already says what is meant, and requiring a cast as well
         // would put punctuation between the programmer and the one escape hatch
         // they have. A derived class goes into its base's slot as it goes into
-        // its base's variable: the reference is the same pointer.
+        // its base's variable, and a class into the slot of an interface it
+        // implements as into a variable of one: the reference is the same
+        // pointer either way.
         if (to is WeakTypeSymbol toWeak)
         {
             var referenced = from is OptionalTypeSymbol weakSource ? weakSource.Element : from;
-            return referenced is NamedTypeSymbol { IsReferenceType: true } &&
-                   IsSameOrBaseClass(referenced, toWeak.Element)
+            return referenced is NamedTypeSymbol { IsReferenceType: true } named &&
+                   (IsSameOrBaseClass(referenced, toWeak.Element) || ImplementsWeakTarget(named, toWeak.Element))
                 ? ConversionKind.ReferenceToWeak
                 : null;
         }
