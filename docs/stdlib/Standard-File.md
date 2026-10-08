@@ -29,7 +29,7 @@ Adds `text` to the end, creating the file if it is not there.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) -- the write or the close failed for a reason with no case of its own, a full disk among them
 
-<sub>[stdlib/File.sl:274](../../stdlib/File.sl#L274)</sub>
+<sub>[stdlib/File.sl:292](../../stdlib/File.sl#L292)</sub>
 
 ### Copy *function*
 
@@ -52,7 +52,7 @@ for something that will not fit in memory.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- either path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) -- the read or the write failed for a reason with no case of its own
 
-<sub>[stdlib/File.sl:295](../../stdlib/File.sl#L295)</sub>
+<sub>[stdlib/File.sl:313](../../stdlib/File.sl#L313)</sub>
 
 ### Delete *function*
 
@@ -67,8 +67,9 @@ Removes the file. `IOError.None` on success.
 - [IOError.NotFound](Standard-IO.md#notfound-case) -- there is nothing at that path
 - [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- the file or its directory refuses it
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory; use `Directory`
+- [IOError.Invalid](Standard-IO.md#invalid-case) -- the path holds a NUL
 
-<sub>[stdlib/File.sl:61](../../stdlib/File.sl#L61)</sub>
+<sub>[stdlib/File.sl:71](../../stdlib/File.sl#L71)</sub>
 
 ### Exists *function*
 
@@ -79,7 +80,7 @@ bool Exists(String path)
 True when the path names a file that is there. A directory is not a file,
 so this is false for one.
 
-<sub>[stdlib/File.sl:45](../../stdlib/File.sl#L45)</sub>
+<sub>[stdlib/File.sl:49](../../stdlib/File.sl#L49)</sub>
 
 ### GetLastWriteTime *function*
 
@@ -89,7 +90,7 @@ long GetLastWriteTime(String path)
 
 When it was last written, in seconds since the epoch, or -1.
 
-<sub>[stdlib/File.sl:54](../../stdlib/File.sl#L54)</sub>
+<sub>[stdlib/File.sl:60](../../stdlib/File.sl#L60)</sub>
 
 ### GetSize *function*
 
@@ -99,7 +100,7 @@ long GetSize(String path)
 
 The size in bytes, or -1 when there is nothing there.
 
-<sub>[stdlib/File.sl:51](../../stdlib/File.sl#L51)</sub>
+<sub>[stdlib/File.sl:57](../../stdlib/File.sl#L57)</sub>
 
 ### Move *function*
 
@@ -120,8 +121,9 @@ platform's decision, not this one's.
 - [IOError.NotFound](Standard-IO.md#notfound-case) -- `from` is not there
 - [IOError.AccessDenied](Standard-IO.md#accessdenied-case) -- either path refuses it
 - [IOError.AlreadyExists](Standard-IO.md#alreadyexists-case) -- `to` is taken and this platform will not replace it
+- [IOError.Invalid](Standard-IO.md#invalid-case) -- either path holds a NUL
 
-<sub>[stdlib/File.sl:72](../../stdlib/File.sl#L72)</sub>
+<sub>[stdlib/File.sl:88](../../stdlib/File.sl#L88)</sub>
 
 ### ReadAllBytes *function*
 
@@ -148,7 +150,7 @@ where a program was loaded.
 
 **See also** &nbsp; [File.ReadAllText](#readalltext-function)
 
-<sub>[stdlib/File.sl:107](../../stdlib/File.sl#L107)</sub>
+<sub>[stdlib/File.sl:125](../../stdlib/File.sl#L125)</sub>
 
 ### ReadAllLines *function*
 
@@ -168,7 +170,7 @@ producing no final empty line.
 
 **See also** &nbsp; [File.WriteAllLines](#writealllines-function)
 
-<sub>[stdlib/File.sl:183](../../stdlib/File.sl#L183)</sub>
+<sub>[stdlib/File.sl:201](../../stdlib/File.sl#L201)</sub>
 
 ### ReadAllText *function*
 
@@ -188,7 +190,7 @@ dropped: it says how the text is stored and is not part of it.
 
 **See also** &nbsp; [File.WriteAllText](#writealltext-function)
 
-<sub>[stdlib/File.sl:161](../../stdlib/File.sl#L161)</sub>
+<sub>[stdlib/File.sl:179](../../stdlib/File.sl#L179)</sub>
 
 ### WriteAllBytes *function*
 
@@ -204,7 +206,7 @@ Replaces the file with `data`, creating it if needed.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) -- the write or the close failed for a reason with no case of its own, a full disk among them
 
-<sub>[stdlib/File.sl:209](../../stdlib/File.sl#L209)</sub>
+<sub>[stdlib/File.sl:227](../../stdlib/File.sl#L227)</sub>
 
 ### WriteAllLines *function*
 
@@ -221,7 +223,7 @@ fails.
 - [IOError.IsADirectory](Standard-IO.md#isadirectory-case) -- the path names a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) -- a write or the close failed for a reason with no case of its own, a full disk among them
 
-<sub>[stdlib/File.sl:247](../../stdlib/File.sl#L247)</sub>
+<sub>[stdlib/File.sl:265](../../stdlib/File.sl#L265)</sub>
 
 ### WriteAllText *function*
 
@@ -239,5 +241,5 @@ Replaces the file with `text`, written as UTF-8.
 
 **See also** &nbsp; [File.ReadAllText](#readalltext-function)
 
-<sub>[stdlib/File.sl:228](../../stdlib/File.sl#L228)</sub>
+<sub>[stdlib/File.sl:246](../../stdlib/File.sl#L246)</sub>
 

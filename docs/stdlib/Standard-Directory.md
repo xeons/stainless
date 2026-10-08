@@ -77,10 +77,11 @@ it might not.
 - [IOError.AlreadyExists](Standard-IO.md#alreadyexists-case) -- something is there under that name
 - [IOError.NotADirectory](Standard-IO.md#notadirectory-case) -- a file along the path was used as a directory
 - [IOError.Unknown](Standard-IO.md#unknown-case) -- the platform reported something with no case of its own -- a full disk among them
+- [IOError.Invalid](Standard-IO.md#invalid-case) -- the path holds a NUL
 
 **See also** &nbsp; [Directory.CreateDirectoryTree](#createdirectorytree-function)
 
-<sub>[stdlib/Directory/Directory.sl:60](../../stdlib/Directory/Directory.sl#L60)</sub>
+<sub>[stdlib/Directory/Directory.sl:66](../../stdlib/Directory/Directory.sl#L66)</sub>
 
 ### CreateDirectoryTree *function*
 
@@ -102,7 +103,7 @@ runs -- made by another process, say -- is success rather than a failure.
 
 **See also** &nbsp; [Directory.CreateDirectory](#createdirectory-function)
 
-<sub>[stdlib/Directory/Directory.sl:76](../../stdlib/Directory/Directory.sl#L76)</sub>
+<sub>[stdlib/Directory/Directory.sl:84](../../stdlib/Directory/Directory.sl#L84)</sub>
 
 ### Delete *function*
 
@@ -120,7 +121,7 @@ Removes one empty directory.
 - [IOError.Invalid](Standard-IO.md#invalid-case) -- the last part of the path is `.`
 - [IOError.Unknown](Standard-IO.md#unknown-case) -- the platform reported something with no case of its own -- a directory that is not empty among them
 
-<sub>[stdlib/Directory/Directory.sl:114](../../stdlib/Directory/Directory.sl#L114)</sub>
+<sub>[stdlib/Directory/Directory.sl:122](../../stdlib/Directory/Directory.sl#L122)</sub>
 
 ### Exists *function*
 
@@ -130,7 +131,7 @@ bool Exists(String path)
 
 True when the path names a directory that is there.
 
-<sub>[stdlib/Directory/Directory.sl:45](../../stdlib/Directory/Directory.sl#L45)</sub>
+<sub>[stdlib/Directory/Directory.sl:48](../../stdlib/Directory/Directory.sl#L48)</sub>
 
 ### GetAllFiles *function*
 
@@ -150,7 +151,7 @@ run the stack out.
 
 **See also** &nbsp; [Directory.GetFiles](#getfiles-function)
 
-<sub>[stdlib/Directory/Directory.sl:202](../../stdlib/Directory/Directory.sl#L202)</sub>
+<sub>[stdlib/Directory/Directory.sl:214](../../stdlib/Directory/Directory.sl#L214)</sub>
 
 ### GetDirectories *function*
 
@@ -167,7 +168,7 @@ The full paths of the directories directly inside.
 
 **See also** &nbsp; [Directory.GetFiles](#getfiles-function)
 
-<sub>[stdlib/Directory/Directory.sl:178](../../stdlib/Directory/Directory.sl#L178)</sub>
+<sub>[stdlib/Directory/Directory.sl:190](../../stdlib/Directory/Directory.sl#L190)</sub>
 
 ### GetEntries *function*
 
@@ -184,7 +185,7 @@ Everything directly inside, files and directories both, not recursively.
 
 **See also** &nbsp; [Directory.GetFiles](#getfiles-function) &middot; [Directory.GetDirectories](#getdirectories-function)
 
-<sub>[stdlib/Directory/Directory.sl:125](../../stdlib/Directory/Directory.sl#L125)</sub>
+<sub>[stdlib/Directory/Directory.sl:135](../../stdlib/Directory/Directory.sl#L135)</sub>
 
 ### GetFiles *function*
 
@@ -201,5 +202,5 @@ The full paths of the files directly inside.
 
 **See also** &nbsp; [Directory.GetDirectories](#getdirectories-function) &middot; [Directory.GetAllFiles](#getallfiles-function)
 
-<sub>[stdlib/Directory/Directory.sl:158](../../stdlib/Directory/Directory.sl#L158)</sub>
+<sub>[stdlib/Directory/Directory.sl:170](../../stdlib/Directory/Directory.sl#L170)</sub>
 

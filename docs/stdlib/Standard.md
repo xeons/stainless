@@ -7,7 +7,7 @@ than library features, and so need no import to reach.
 
 ## Contents
 
-**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Array](#array-class) &middot; [Buffer](#buffer-class) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [IDisposable](#idisposable-interface) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Slot&lt;T&gt;](#slott-struct) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
+**Types** &nbsp; [Action](#action-closure) &middot; [Action&lt;T1, T2, T3, T4&gt;](#actiont1-t2-t3-t4-closure) &middot; [Action&lt;T1, T2, T3&gt;](#actiont1-t2-t3-closure) &middot; [Action&lt;T1, T2&gt;](#actiont1-t2-closure) &middot; [Action&lt;T&gt;](#actiont-closure) &middot; [Array](#array-class) &middot; [Buffer](#buffer-class) &middot; [Comparison&lt;T&gt;](#comparisont-closure) &middot; [Fold&lt;TAccumulate, TSource&gt;](#foldtaccumulate-tsource-closure) &middot; [ForeignException](#foreignexception-class) &middot; [ForeignExceptionKind](#foreignexceptionkind-enum) &middot; [Func&lt;T, TResult&gt;](#funct-tresult-closure) &middot; [Func&lt;T1, T2, T3, T4, TResult&gt;](#funct1-t2-t3-t4-tresult-closure) &middot; [Func&lt;T1, T2, T3, TResult&gt;](#funct1-t2-t3-tresult-closure) &middot; [Func&lt;T1, T2, TResult&gt;](#funct1-t2-tresult-closure) &middot; [Func&lt;TResult&gt;](#functresult-closure) &middot; [Guid](#guid-struct) &middot; [IDisposable](#idisposable-interface) &middot; [Index](#index-struct) &middot; [Lazy&lt;T&gt;](#lazyt-class) &middot; [LazyThreadSafetyMode](#lazythreadsafetymode-enum) &middot; [Optional&lt;T&gt;](#optionalt-variant) &middot; [ParseError](#parseerror-enum) &middot; [Predicate&lt;T&gt;](#predicatet-closure) &middot; [Range](#range-struct) &middot; [ReadOnlySpan&lt;T&gt;](#readonlyspant-struct) &middot; [Result&lt;T, TError&gt;](#resultt-terror-variant) &middot; [RuntimeHelpers](#runtimehelpers-class) &middot; [Slot&lt;T&gt;](#slott-struct) &middot; [Span&lt;T&gt;](#spant-struct) &middot; [Uri](#uri-class) &middot; [UriKind](#urikind-enum) &middot; [UriPartial](#uripartial-enum) &middot; [Version](#version-struct)
 
 ## Types
 
@@ -1165,6 +1165,116 @@ because a fold is the one shape that carries something along with it.
 - `TSource` -- what is folded over
 
 <sub>[stdlib/Standard/Standard.sl:110](../../stdlib/Standard/Standard.sl#L110)</sub>
+
+### ForeignException *class*
+
+```
+sealed class ForeignException
+```
+
+What a foreign function threw, caught at the call that a `[Throws]`
+declaration made.
+
+**Not an exception in Stainless.** Nothing unwinds through Stainless code:
+the one call a binding marks `[Throws]` catches what it throws and answers
+it as a value, a `Result<T, ForeignException>` or, for a call that produces
+nothing, a `ForeignException?` that is null when it worked.
+
+```
+[Throws]
+[Selector("readDataOfLength:")]
+public Result<NSData, ForeignException> ReadDataOfLength(nuint length);
+
+var read = handle.ReadDataOfLength(64u);
+if (!read.Ok)
+    Console.WriteLine(read.Error.Name + ": " + read.Error.Reason);
+```
+
+<sub>[stdlib/Standard/ForeignException.sl:46](../../stdlib/Standard/ForeignException.sl#L46)</sub>
+
+#### Kind *property*
+
+```
+ForeignExceptionKind Kind { get; }
+```
+
+Which language threw it.
+
+<sub>[stdlib/Standard/ForeignException.sl:49](../../stdlib/Standard/ForeignException.sl#L49)</sub>
+
+#### Name *property*
+
+```
+String Name { get; }
+```
+
+An `NSException`'s name -- `NSInvalidArgumentException` -- and empty
+for anything else.
+
+<sub>[stdlib/Standard/ForeignException.sl:53](../../stdlib/Standard/ForeignException.sl#L53)</sub>
+
+#### Reason *property*
+
+```
+String Reason { get; }
+```
+
+An `NSException`'s reason, and empty for anything else.
+
+<sub>[stdlib/Standard/ForeignException.sl:56](../../stdlib/Standard/ForeignException.sl#L56)</sub>
+
+#### Take *method*
+
+```
+static ForeignException Take(byte* caught)
+```
+
+What was caught, from the record the call's landing pad left, which
+this frees. Called by the code the compiler writes for a `[Throws]`
+call and by nothing else.
+
+<sub>[stdlib/Standard/ForeignException.sl:68](../../stdlib/Standard/ForeignException.sl#L68)</sub>
+
+### ForeignExceptionKind *enum*
+
+```
+enum ForeignExceptionKind
+```
+
+Which language threw a `ForeignException`.
+
+<sub>[stdlib/Standard/ForeignExceptionKind.sl:25](../../stdlib/Standard/ForeignExceptionKind.sl#L25)</sub>
+
+#### ObjectiveC *case*
+
+```
+ObjectiveC
+```
+
+An `NSException`, or any object `@throw` threw: it has a name and a
+reason.
+
+<sub>[stdlib/Standard/ForeignExceptionKind.sl:29](../../stdlib/Standard/ForeignExceptionKind.sl#L29)</sub>
+
+#### Cpp *case*
+
+```
+Cpp
+```
+
+A C++ exception, whose object only C++ can read.
+
+<sub>[stdlib/Standard/ForeignExceptionKind.sl:32](../../stdlib/Standard/ForeignExceptionKind.sl#L32)</sub>
+
+#### Other *case*
+
+```
+Other
+```
+
+Anything else the unwinder carried.
+
+<sub>[stdlib/Standard/ForeignExceptionKind.sl:35](../../stdlib/Standard/ForeignExceptionKind.sl#L35)</sub>
 
 ### Func&lt;T, TResult&gt; *closure*
 

@@ -3355,7 +3355,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Md5.sl:98](../../stdlib/Security/Cryptography/Md5.sl#L98)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:97](../../stdlib/Security/Cryptography/Md5.sl#L97)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -3365,7 +3365,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Md5.sl:100](../../stdlib/Security/Cryptography/Md5.sl#L100)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:99](../../stdlib/Security/Cryptography/Md5.sl#L99)</sub>
 
 #### HashData *method*
 
@@ -3375,7 +3375,7 @@ static byte[] HashData(ReadOnlySpan<byte> data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Md5.sl:103](../../stdlib/Security/Cryptography/Md5.sl#L103)</sub>
+<sub>[stdlib/Security/Cryptography/Md5.sl:102](../../stdlib/Security/Cryptography/Md5.sl#L102)</sub>
 
 ### PaddingMode *enum*
 
@@ -4927,7 +4927,7 @@ String Name { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Sha256.sl:64](../../stdlib/Security/Cryptography/Sha256.sl#L64)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:63](../../stdlib/Security/Cryptography/Sha256.sl#L63)</sub>
 
 #### HashSizeInBytes *property*
 
@@ -4937,7 +4937,7 @@ nuint HashSizeInBytes { get; }
 
 *No documentation.*
 
-<sub>[stdlib/Security/Cryptography/Sha256.sl:66](../../stdlib/Security/Cryptography/Sha256.sl#L66)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:65](../../stdlib/Security/Cryptography/Sha256.sl#L65)</sub>
 
 #### HashData *method*
 
@@ -4947,7 +4947,7 @@ static byte[] HashData(ReadOnlySpan<byte> data)
 
 The digest of `data`, with no object to keep.
 
-<sub>[stdlib/Security/Cryptography/Sha256.sl:69](../../stdlib/Security/Cryptography/Sha256.sl#L69)</sub>
+<sub>[stdlib/Security/Cryptography/Sha256.sl:68](../../stdlib/Security/Cryptography/Sha256.sl#L68)</sub>
 
 ### Sha2Wide *class*
 

@@ -171,7 +171,7 @@ Opens a file, or says why it could not be opened.
 - [IOError.IsADirectory](#isadirectory-case) -- a writing mode on a path that names a directory
 - [IOError.Unknown](#unknown-case) -- the platform reported something with no case of its own -- too many open files among them
 
-<sub>[stdlib/IO/FileStream.sl:85](../../stdlib/IO/FileStream.sl#L85)</sub>
+<sub>[stdlib/IO/FileStream.sl:87](../../stdlib/IO/FileStream.sl#L87)</sub>
 
 #### OpenRead *method*
 
@@ -189,7 +189,7 @@ Opens an existing file for reading.
 
 **See also** &nbsp; [FileStream.Open](#open-method)
 
-<sub>[stdlib/IO/FileStream.sl:101](../../stdlib/IO/FileStream.sl#L101)</sub>
+<sub>[stdlib/IO/FileStream.sl:103](../../stdlib/IO/FileStream.sl#L103)</sub>
 
 #### Create *method*
 
@@ -208,7 +208,7 @@ Creates the file, or replaces what is there.
 
 **See also** &nbsp; [FileStream.Open](#open-method)
 
-<sub>[stdlib/IO/FileStream.sl:114](../../stdlib/IO/FileStream.sl#L114)</sub>
+<sub>[stdlib/IO/FileStream.sl:116](../../stdlib/IO/FileStream.sl#L116)</sub>
 
 #### OpenAppend *method*
 
@@ -227,7 +227,7 @@ Opens for writing at the end, creating the file if it is not there.
 
 **See also** &nbsp; [FileStream.Open](#open-method)
 
-<sub>[stdlib/IO/FileStream.sl:127](../../stdlib/IO/FileStream.sl#L127)</sub>
+<sub>[stdlib/IO/FileStream.sl:129](../../stdlib/IO/FileStream.sl#L129)</sub>
 
 #### IsOpen *property*
 
@@ -238,7 +238,7 @@ bool IsOpen { get; }
 Whether the file is still open. False after `Close`, and after an
 open that failed.
 
-<sub>[stdlib/IO/FileStream.sl:136](../../stdlib/IO/FileStream.sl#L136)</sub>
+<sub>[stdlib/IO/FileStream.sl:138](../../stdlib/IO/FileStream.sl#L138)</sub>
 
 #### CanRead *property*
 
@@ -250,7 +250,7 @@ True while the file is open and was opened for reading. A file opened
 for writing answers false, and `Read` on it fails rather than
 returning nothing.
 
-<sub>[stdlib/IO/FileStream.sl:141](../../stdlib/IO/FileStream.sl#L141)</sub>
+<sub>[stdlib/IO/FileStream.sl:143](../../stdlib/IO/FileStream.sl#L143)</sub>
 
 #### CanWrite *property*
 
@@ -260,7 +260,7 @@ bool CanWrite { get; }
 
 True while the file is open and was opened for writing.
 
-<sub>[stdlib/IO/FileStream.sl:143](../../stdlib/IO/FileStream.sl#L143)</sub>
+<sub>[stdlib/IO/FileStream.sl:145](../../stdlib/IO/FileStream.sl#L145)</sub>
 
 #### CanSeek *property*
 
@@ -271,7 +271,7 @@ bool CanSeek { get; }
 True while the file is open. Every file is seekable, unlike a
 connection.
 
-<sub>[stdlib/IO/FileStream.sl:146](../../stdlib/IO/FileStream.sl#L146)</sub>
+<sub>[stdlib/IO/FileStream.sl:148](../../stdlib/IO/FileStream.sl#L148)</sub>
 
 #### Read *method*
 
@@ -286,7 +286,7 @@ Zero means the end of the file, or a failure -- `Error` is what tells
 the two apart. A count reaching past the end of `buffer` is refused as
 `Invalid` rather than overrunning it.
 
-<sub>[stdlib/IO/FileStream.sl:154](../../stdlib/IO/FileStream.sl#L154)</sub>
+<sub>[stdlib/IO/FileStream.sl:156](../../stdlib/IO/FileStream.sl#L156)</sub>
 
 #### Write *method*
 
@@ -301,7 +301,7 @@ Fewer than asked for means the write was cut short, and `Error` says
 why -- a full disk, usually. A count reaching past the end of `buffer`
 is refused as `Invalid`.
 
-<sub>[stdlib/IO/FileStream.sl:181](../../stdlib/IO/FileStream.sl#L181)</sub>
+<sub>[stdlib/IO/FileStream.sl:183](../../stdlib/IO/FileStream.sl#L183)</sub>
 
 #### WriteText *method*
 
@@ -312,7 +312,7 @@ nuint WriteText(String text)
 Writes the UTF-8 bytes of `text`, which is what a String already holds,
 so nothing is converted or copied on the way.
 
-<sub>[stdlib/IO/FileStream.sl:204](../../stdlib/IO/FileStream.sl#L204)</sub>
+<sub>[stdlib/IO/FileStream.sl:206](../../stdlib/IO/FileStream.sl#L206)</sub>
 
 #### Position *property*
 
@@ -323,7 +323,7 @@ long Position { get; }
 How far into the file the next read or write will happen, or -1 when
 the file is closed.
 
-<sub>[stdlib/IO/FileStream.sl:222](../../stdlib/IO/FileStream.sl#L222)</sub>
+<sub>[stdlib/IO/FileStream.sl:224](../../stdlib/IO/FileStream.sl#L224)</sub>
 
 #### Length *property*
 
@@ -335,7 +335,7 @@ How many bytes the file holds, or -1 when it is closed. Asks the
 system each time rather than caching, so it sees a file another
 process has grown.
 
-<sub>[stdlib/IO/FileStream.sl:235](../../stdlib/IO/FileStream.sl#L235)</sub>
+<sub>[stdlib/IO/FileStream.sl:237](../../stdlib/IO/FileStream.sl#L237)</sub>
 
 #### Seek *method*
 
@@ -348,7 +348,7 @@ Moves the position, answering whether it worked.
 Seeking past the end is allowed and does not extend the file; the gap
 becomes zeroes when something is written there.
 
-<sub>[stdlib/IO/FileStream.sl:249](../../stdlib/IO/FileStream.sl#L249)</sub>
+<sub>[stdlib/IO/FileStream.sl:251](../../stdlib/IO/FileStream.sl#L251)</sub>
 
 #### Flush *method*
 
@@ -361,7 +361,7 @@ disk -- the system's own cache is still in front of it -- so this is
 what makes a write visible to other processes, not what makes it
 survive a power cut. `Error` says whether the system took them.
 
-<sub>[stdlib/IO/FileStream.sl:267](../../stdlib/IO/FileStream.sl#L267)</sub>
+<sub>[stdlib/IO/FileStream.sl:269](../../stdlib/IO/FileStream.sl#L269)</sub>
 
 #### Close *method*
 
@@ -376,7 +376,7 @@ Bytes still buffered are written here, so a write can fail here: a
 caller that needs to know its data arrived MUST read `Error` after the
 first `Close`. A second call leaves it alone.
 
-<sub>[stdlib/IO/FileStream.sl:279](../../stdlib/IO/FileStream.sl#L279)</sub>
+<sub>[stdlib/IO/FileStream.sl:281](../../stdlib/IO/FileStream.sl#L281)</sub>
 
 #### Error *property*
 
@@ -388,7 +388,7 @@ The last error, or `None`. Set by every call that failed and left
 alone by one that did not, so read it directly after the call it
 belongs to.
 
-<sub>[stdlib/IO/FileStream.sl:291](../../stdlib/IO/FileStream.sl#L291)</sub>
+<sub>[stdlib/IO/FileStream.sl:293](../../stdlib/IO/FileStream.sl#L293)</sub>
 
 ### IOError *enum*
 

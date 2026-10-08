@@ -576,7 +576,21 @@ bool CanWrite { get; }
 False for a read-only property -- `public int Left { get; }` -- which
 is worth checking before a loader decides a document was ignored.
 
-<sub>[stdlib/Reflection/Property.sl:74](../../stdlib/Reflection/Property.sl#L74)</sub>
+True for a `private set` too, as .NET's is: reflection reaches what the
+class can. `IsSetterPublic` is whether any caller can.
+
+<sub>[stdlib/Reflection/Property.sl:77](../../stdlib/Reflection/Property.sl#L77)</sub>
+
+#### IsSetterPublic *property*
+
+```
+bool IsSetterPublic { get; }
+```
+
+Whether any code may call the setter: false for a read-only property
+and for `{ get; private set; }`.
+
+<sub>[stdlib/Reflection/Property.sl:81](../../stdlib/Reflection/Property.sl#L81)</sub>
 
 #### PropertyType *property*
 
@@ -587,7 +601,7 @@ Type PropertyType { get; }
 The type of an aggregate property, for walking into it. A handle of
 null for a primitive.
 
-<sub>[stdlib/Reflection/Property.sl:78](../../stdlib/Reflection/Property.sl#L78)</sub>
+<sub>[stdlib/Reflection/Property.sl:85](../../stdlib/Reflection/Property.sl#L85)</sub>
 
 #### AttributeCount *property*
 
@@ -597,7 +611,7 @@ nuint AttributeCount { get; }
 
 How many attributes are written on the property.
 
-<sub>[stdlib/Reflection/Property.sl:89](../../stdlib/Reflection/Property.sl#L89)</sub>
+<sub>[stdlib/Reflection/Property.sl:96](../../stdlib/Reflection/Property.sl#L96)</sub>
 
 #### GetAttributeAt *method*
 
@@ -607,7 +621,7 @@ Attribute GetAttributeAt(nuint index)
 
 The attribute at `index`, in the order they were written.
 
-<sub>[stdlib/Reflection/Property.sl:92](../../stdlib/Reflection/Property.sl#L92)</sub>
+<sub>[stdlib/Reflection/Property.sl:99](../../stdlib/Reflection/Property.sl#L99)</sub>
 
 #### HasAttribute *method*
 
@@ -617,7 +631,7 @@ bool HasAttribute(String name)
 
 True when an attribute of this name is written on the property.
 
-<sub>[stdlib/Reflection/Property.sl:100](../../stdlib/Reflection/Property.sl#L100)</sub>
+<sub>[stdlib/Reflection/Property.sl:107](../../stdlib/Reflection/Property.sl#L107)</sub>
 
 #### IsInteger *property*
 
@@ -631,7 +645,7 @@ The same three questions a `Field` answers about its kind.
 
 **See also** &nbsp; [Field.IsInteger](#isinteger-property)
 
-<sub>[stdlib/Reflection/Property.sl:114](../../stdlib/Reflection/Property.sl#L114)</sub>
+<sub>[stdlib/Reflection/Property.sl:121](../../stdlib/Reflection/Property.sl#L121)</sub>
 
 #### IsFloating *property*
 
@@ -641,7 +655,7 @@ bool IsFloating { get; }
 
 True for a `float` or a `double` property.
 
-<sub>[stdlib/Reflection/Property.sl:126](../../stdlib/Reflection/Property.sl#L126)</sub>
+<sub>[stdlib/Reflection/Property.sl:133](../../stdlib/Reflection/Property.sl#L133)</sub>
 
 #### IsText *property*
 
@@ -651,7 +665,7 @@ bool IsText { get; }
 
 True for a `String` property.
 
-<sub>[stdlib/Reflection/Property.sl:129](../../stdlib/Reflection/Property.sl#L129)</sub>
+<sub>[stdlib/Reflection/Property.sl:136](../../stdlib/Reflection/Property.sl#L136)</sub>
 
 #### ElementKind *property*
 
@@ -661,7 +675,7 @@ int ElementKind { get; }
 
 What an array property's elements are. `KindNone` for anything else.
 
-<sub>[stdlib/Reflection/Property.sl:132](../../stdlib/Reflection/Property.sl#L132)</sub>
+<sub>[stdlib/Reflection/Property.sl:139](../../stdlib/Reflection/Property.sl#L139)</sub>
 
 ### Reflect *attribute*
 
@@ -687,11 +701,14 @@ metadata, and what it carries is its fields, properties, public events and
 attributes; methods are not described, so there is nothing here to call.
 
 **An enum is described where a reflected field or property names it**: its
-members, and its attributes, which is where `[Flags]` is read.
+members, and its attributes, which is where `[Flags]` is read. One marked
+`[Reflect]` itself is in the type table too.
+
+A type that was not found answers as one with nothing in it.
 
 **See also** &nbsp; [FindType](#findtype-function)
 
-<sub>[stdlib/Reflection/Type.sl:37](../../stdlib/Reflection/Type.sl#L37)</sub>
+<sub>[stdlib/Reflection/Type.sl:40](../../stdlib/Reflection/Type.sl#L40)</sub>
 
 #### Handle *field*
 
@@ -702,7 +719,7 @@ byte* Handle
 The runtime's record for this type, or null for one that was looked up
 and not found. `Exists` is the check.
 
-<sub>[stdlib/Reflection/Type.sl:41](../../stdlib/Reflection/Type.sl#L41)</sub>
+<sub>[stdlib/Reflection/Type.sl:44](../../stdlib/Reflection/Type.sl#L44)</sub>
 
 #### Name *property*
 
@@ -712,7 +729,7 @@ String Name { get; }
 
 The type's name, qualified by its module.
 
-<sub>[stdlib/Reflection/Type.sl:44](../../stdlib/Reflection/Type.sl#L44)</sub>
+<sub>[stdlib/Reflection/Type.sl:47](../../stdlib/Reflection/Type.sl#L47)</sub>
 
 #### Size *property*
 
@@ -723,7 +740,7 @@ nuint Size { get; }
 How many bytes an instance occupies -- the struct's own size, or for a
 class the size of the object including its header.
 
-<sub>[stdlib/Reflection/Type.sl:48](../../stdlib/Reflection/Type.sl#L48)</sub>
+<sub>[stdlib/Reflection/Type.sl:51](../../stdlib/Reflection/Type.sl#L51)</sub>
 
 #### FieldCount *property*
 
@@ -734,7 +751,7 @@ nuint FieldCount { get; }
 How many fields the type has, inherited ones included, and automatic
 properties' storage among them.
 
-<sub>[stdlib/Reflection/Type.sl:52](../../stdlib/Reflection/Type.sl#L52)</sub>
+<sub>[stdlib/Reflection/Type.sl:55](../../stdlib/Reflection/Type.sl#L55)</sub>
 
 #### GetFieldAt *method*
 
@@ -744,7 +761,7 @@ Field GetFieldAt(nuint index)
 
 The field at `index`, in declaration order with inherited fields first.
 
-<sub>[stdlib/Reflection/Type.sl:55](../../stdlib/Reflection/Type.sl#L55)</sub>
+<sub>[stdlib/Reflection/Type.sl:58](../../stdlib/Reflection/Type.sl#L58)</sub>
 
 #### AttributeCount *property*
 
@@ -754,7 +771,7 @@ nuint AttributeCount { get; }
 
 How many attributes are written on the type.
 
-<sub>[stdlib/Reflection/Type.sl:63](../../stdlib/Reflection/Type.sl#L63)</sub>
+<sub>[stdlib/Reflection/Type.sl:66](../../stdlib/Reflection/Type.sl#L66)</sub>
 
 #### GetAttributeAt *method*
 
@@ -764,7 +781,7 @@ Attribute GetAttributeAt(nuint index)
 
 The attribute at `index`, in the order they were written.
 
-<sub>[stdlib/Reflection/Type.sl:66](../../stdlib/Reflection/Type.sl#L66)</sub>
+<sub>[stdlib/Reflection/Type.sl:69](../../stdlib/Reflection/Type.sl#L69)</sub>
 
 #### Exists *property*
 
@@ -775,7 +792,7 @@ bool Exists { get; }
 True when this handle names a type at all. A `FieldType` on a primitive
 field answers false.
 
-<sub>[stdlib/Reflection/Type.sl:75](../../stdlib/Reflection/Type.sl#L75)</sub>
+<sub>[stdlib/Reflection/Type.sl:78](../../stdlib/Reflection/Type.sl#L78)</sub>
 
 #### CanCreateInstance *property*
 
@@ -788,7 +805,7 @@ abstract, with a public parameterless constructor or none at all.
 
 **See also** &nbsp; [CreateInstance](#createinstance-function)
 
-<sub>[stdlib/Reflection/Type.sl:81](../../stdlib/Reflection/Type.sl#L81)</sub>
+<sub>[stdlib/Reflection/Type.sl:84](../../stdlib/Reflection/Type.sl#L84)</sub>
 
 #### FindField *method*
 
@@ -799,7 +816,7 @@ Field FindField(String name)
 The field of that name, or a handle of null. Names are compared whole,
 so a serializer looking up what a document named does one pass.
 
-<sub>[stdlib/Reflection/Type.sl:85](../../stdlib/Reflection/Type.sl#L85)</sub>
+<sub>[stdlib/Reflection/Type.sl:88](../../stdlib/Reflection/Type.sl#L88)</sub>
 
 #### HasAttribute *method*
 
@@ -809,7 +826,7 @@ bool HasAttribute(String name)
 
 True when the type carries an attribute of that name.
 
-<sub>[stdlib/Reflection/Type.sl:100](../../stdlib/Reflection/Type.sl#L100)</sub>
+<sub>[stdlib/Reflection/Type.sl:103](../../stdlib/Reflection/Type.sl#L103)</sub>
 
 #### PropertyCount *property*
 
@@ -826,7 +843,7 @@ object through `typeof(Base)` and setting a property the derived class
 overrode calls the base's setter, where `.Left = x` in the language
 would not.
 
-<sub>[stdlib/Reflection/Type.sl:118](../../stdlib/Reflection/Type.sl#L118)</sub>
+<sub>[stdlib/Reflection/Type.sl:121](../../stdlib/Reflection/Type.sl#L121)</sub>
 
 #### GetPropertyAt *method*
 
@@ -837,7 +854,7 @@ Property GetPropertyAt(nuint index)
 The property at `index`. An overridden property appears once, at the
 position the base gave it, carrying the derived accessors.
 
-<sub>[stdlib/Reflection/Type.sl:122](../../stdlib/Reflection/Type.sl#L122)</sub>
+<sub>[stdlib/Reflection/Type.sl:125](../../stdlib/Reflection/Type.sl#L125)</sub>
 
 #### IsEnum *property*
 
@@ -848,7 +865,7 @@ bool IsEnum { get; }
 Whether this is an enum, whose members `EnumMemberCount` and the two
 after it describe.
 
-<sub>[stdlib/Reflection/Type.sl:131](../../stdlib/Reflection/Type.sl#L131)</sub>
+<sub>[stdlib/Reflection/Type.sl:134](../../stdlib/Reflection/Type.sl#L134)</sub>
 
 #### EnumMemberCount *property*
 
@@ -858,7 +875,7 @@ nuint EnumMemberCount { get; }
 
 How many members an enum has; zero for anything else.
 
-<sub>[stdlib/Reflection/Type.sl:134](../../stdlib/Reflection/Type.sl#L134)</sub>
+<sub>[stdlib/Reflection/Type.sl:137](../../stdlib/Reflection/Type.sl#L137)</sub>
 
 #### GetEnumMemberName *method*
 
@@ -868,7 +885,7 @@ String GetEnumMemberName(nuint index)
 
 An enum member's name, in declaration order.
 
-<sub>[stdlib/Reflection/Type.sl:137](../../stdlib/Reflection/Type.sl#L137)</sub>
+<sub>[stdlib/Reflection/Type.sl:140](../../stdlib/Reflection/Type.sl#L140)</sub>
 
 #### GetEnumMemberValue *method*
 
@@ -879,7 +896,7 @@ long GetEnumMemberValue(nuint index)
 An enum member's value. A property of the enum's type is read and
 written with `GetInteger` and `SetInteger`.
 
-<sub>[stdlib/Reflection/Type.sl:142](../../stdlib/Reflection/Type.sl#L142)</sub>
+<sub>[stdlib/Reflection/Type.sl:145](../../stdlib/Reflection/Type.sl#L145)</sub>
 
 #### EventCount *property*
 
@@ -889,7 +906,7 @@ nuint EventCount { get; }
 
 How many public events a class has, inherited ones included.
 
-<sub>[stdlib/Reflection/Type.sl:145](../../stdlib/Reflection/Type.sl#L145)</sub>
+<sub>[stdlib/Reflection/Type.sl:148](../../stdlib/Reflection/Type.sl#L148)</sub>
 
 #### GetEventAt *method*
 
@@ -899,7 +916,7 @@ Event GetEventAt(nuint index)
 
 The event at `index`, a base's before its derived class's.
 
-<sub>[stdlib/Reflection/Type.sl:148](../../stdlib/Reflection/Type.sl#L148)</sub>
+<sub>[stdlib/Reflection/Type.sl:151](../../stdlib/Reflection/Type.sl#L151)</sub>
 
 #### FindProperty *method*
 
@@ -909,7 +926,7 @@ Property FindProperty(String name)
 
 The property of that name, or a handle of null.
 
-<sub>[stdlib/Reflection/Type.sl:157](../../stdlib/Reflection/Type.sl#L157)</sub>
+<sub>[stdlib/Reflection/Type.sl:160](../../stdlib/Reflection/Type.sl#L160)</sub>
 
 ## Functions
 
