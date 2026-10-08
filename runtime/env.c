@@ -129,7 +129,7 @@ void *sl_args_array(const SlTypeInfo *arrayType)
     size_t count = sl_args_count();
 
     SlArray *array = (SlArray *)sl_array_alloc(arrayType, count, sizeof(void *));
-    void **elements = (void **)((uint8_t *)array + 32);
+    void **elements = (void **)((uint8_t *)array + sizeof(SlArray));
 
     /* Each String arrives +1 and the array takes that reference over; nothing
      * is retained again and nothing released here. */
