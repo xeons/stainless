@@ -725,10 +725,24 @@ public sealed class TimeZoneInfo : IEquatable<TimeZoneInfo>, IHashable
         return (long)value;
     }
 
+    /// Far larger than any real zone file, and small enough that no sum of
+    /// counts bounded by it can wrap a 32-bit `nuint`.
+    const nuint MaxTzifBytes = 16777216u;
+
+    /// A count from a header, unsigned. Every counted item takes at least a
+    /// byte, so a count larger than the file is a malformed or hostile one.
+    static Optional<nuint> ReadCount(byte[] data, nuint at)
+    {
+        nuint count = (nuint)(ulong)(uint)ReadBigEndian(data, at, 4u);
+        if (count > data.Length)
+            return None;
+        return Some(count);
+    }
+
     bool ReadTzif(byte[] data)
     {
-        if (data.Length < 44u || data[0] != (byte)'T' || data[1] != (byte)'Z' || data[2] != (byte)'i' ||
-            data[3] != (byte)'f')
+        if (data.Length < 44u || data.Length > MaxTzifBytes || data[0] != (byte)'T' ||
+            data[1] != (byte)'Z' || data[2] != (byte)'i' || data[3] != (byte)'f')
             return false;
 
         nuint header = 0u;
@@ -737,25 +751,32 @@ public sealed class TimeZoneInfo : IEquatable<TimeZoneInfo>, IHashable
         // A version 2 file has a second, 64-bit copy after the first: skip to it.
         if (data[4] >= (byte)'2')
         {
-            nuint skipped = 44u + BlockSize(data, 0u, 4u);
+            if (BlockSize(data, 0u, 4u) is not Some block)
+                return false;
+            nuint skipped = 44u + block.Value;
             if (skipped + 44u > data.Length)
                 return false;
             header = skipped;
             timeSize = 8u;
         }
 
-        nuint isUtCount = (nuint)ReadBigEndian(data, header + 20u, 4u);
-        nuint isStdCount = (nuint)ReadBigEndian(data, header + 24u, 4u);
-        nuint leapCount = (nuint)ReadBigEndian(data, header + 28u, 4u);
-        nuint timeCount = (nuint)ReadBigEndian(data, header + 32u, 4u);
-        nuint typeCount = (nuint)ReadBigEndian(data, header + 36u, 4u);
-        nuint charCount = (nuint)ReadBigEndian(data, header + 40u, 4u);
+        if (ReadCount(data, header + 20u) is not Some isUt || ReadCount(data, header + 24u) is not Some isStd ||
+            ReadCount(data, header + 28u) is not Some leap || ReadCount(data, header + 32u) is not Some time ||
+            ReadCount(data, header + 36u) is not Some type || ReadCount(data, header + 40u) is not Some chars)
+            return false;
+
+        nuint isUtCount = isUt.Value;
+        nuint isStdCount = isStd.Value;
+        nuint leapCount = leap.Value;
+        nuint timeCount = time.Value;
+        nuint typeCount = type.Value;
+        nuint charCount = chars.Value;
 
         nuint times = header + 44u;
         nuint indices = times + timeCount * timeSize;
         nuint types = indices + timeCount;
-        nuint chars = types + typeCount * 6u;
-        nuint end = chars + charCount + leapCount * (timeSize + 4u) + isStdCount + isUtCount;
+        nuint names = types + typeCount * 6u;
+        nuint end = names + charCount + leapCount * (timeSize + 4u) + isStdCount + isUtCount;
         if (typeCount == 0u || end > data.Length)
             return false;
 
@@ -765,10 +786,10 @@ public sealed class TimeZoneInfo : IEquatable<TimeZoneInfo>, IHashable
 
         for (nuint i = 0u; i < timeCount; i++)
         {
-            nuint type = (nuint)data[indices + i];
-            if (type >= typeCount)
+            nuint index = (nuint)data[indices + i];
+            if (index >= typeCount)
                 return false;
-            nuint entry = types + type * 6u;
+            nuint entry = types + index * 6u;
             AddTransition(ReadBigEndian(data, times + i * timeSize, timeSize),
                 ReadBigEndian(data, entry, 4u), data[entry + 4u] != 0);
         }
@@ -793,25 +814,25 @@ public sealed class TimeZoneInfo : IEquatable<TimeZoneInfo>, IHashable
         // With no footer, the names come from the last types used.
         if (!_hasRule)
         {
-            _rule.StandardName = Abbreviation(data, types, chars, typeCount, charCount, false);
-            _rule.DaylightName = Abbreviation(data, types, chars, typeCount, charCount, true);
+            _rule.StandardName = Abbreviation(data, types, names, typeCount, charCount, false);
+            _rule.DaylightName = Abbreviation(data, types, names, typeCount, charCount, true);
             _standardName = _rule.StandardName;
             _daylightName = _rule.DaylightName;
         }
         return true;
     }
 
-    /// How far the data after a header runs, for a header at `at`.
-    static nuint BlockSize(byte[] data, nuint at, nuint timeSize)
+    /// How far the data after a header runs, for a header at `at`, or nothing
+    /// when a count could not be in a file this size.
+    static Optional<nuint> BlockSize(byte[] data, nuint at, nuint timeSize)
     {
-        nuint isUtCount = (nuint)ReadBigEndian(data, at + 20u, 4u);
-        nuint isStdCount = (nuint)ReadBigEndian(data, at + 24u, 4u);
-        nuint leapCount = (nuint)ReadBigEndian(data, at + 28u, 4u);
-        nuint timeCount = (nuint)ReadBigEndian(data, at + 32u, 4u);
-        nuint typeCount = (nuint)ReadBigEndian(data, at + 36u, 4u);
-        nuint charCount = (nuint)ReadBigEndian(data, at + 40u, 4u);
-        return timeCount * timeSize + timeCount + typeCount * 6u + charCount +
-               leapCount * (timeSize + 4u) + isStdCount + isUtCount;
+        if (ReadCount(data, at + 20u) is not Some isUt || ReadCount(data, at + 24u) is not Some isStd ||
+            ReadCount(data, at + 28u) is not Some leap || ReadCount(data, at + 32u) is not Some time ||
+            ReadCount(data, at + 36u) is not Some type || ReadCount(data, at + 40u) is not Some chars)
+            return None;
+
+        return Some(time.Value * timeSize + time.Value + type.Value * 6u + chars.Value +
+                    leap.Value * (timeSize + 4u) + isStd.Value + isUt.Value);
     }
 
     /// The abbreviation of the last type that is, or is not, daylight time.
