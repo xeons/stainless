@@ -1178,6 +1178,26 @@ public sealed partial class Binder
             return new BoundErrorExpression(syntax.Span);
         }
 
+        // A type two imported modules both declare reaches here from a pattern
+        // or an expression, and "not defined" would send a reader looking for
+        // a declaration that is there twice.
+        if (parts.Count == 1 && _context.File is { } file)
+        {
+            var types = file.ImportedModules
+                .Where(imported => imported.Types.TryGetValue(parts[0], out var t) && t.IsPublic)
+                .Select(imported => imported.Types[parts[0]])
+                .Distinct()
+                .ToList();
+            if (types.Count > 1)
+            {
+                diagnostics.Report(Codes.AmbiguousTypeName, syntax.Span,
+                    $"'{parts[0]}' is ambiguous between " +
+                    string.Join(" and ", types.Select(t => $"'{t.QualifiedName}'")) +
+                    "; qualify it with its module name");
+                return new BoundErrorExpression(syntax.Span);
+            }
+        }
+
         diagnostics.Report(Codes.NameNotFound, syntax.Span,
             $"'{syntax.Name.Text}' is not defined");
         return new BoundErrorExpression(syntax.Span);
